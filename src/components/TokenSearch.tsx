@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Search, TrendingUp, ExternalLink } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { useSearchToken } from '@/hooks/useDexScreener';
+import { usePlatformTokenSearch } from '@/hooks/usePlatformTokenSearch';
 import { Card } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 
@@ -17,7 +17,7 @@ const TokenSearch = ({ className = '', onResultClick }: TokenSearchProps) => {
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  const { data: searchResults, isLoading } = useSearchToken(debouncedQuery);
+  const { data: searchResults, isLoading } = usePlatformTokenSearch(debouncedQuery);
 
   // Debounce search query
   useEffect(() => {
@@ -58,7 +58,7 @@ const TokenSearch = ({ className = '', onResultClick }: TokenSearchProps) => {
     <div ref={searchRef} className={`relative ${className}`}>
       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
       <Input 
-        placeholder="Search by name or address..." 
+        placeholder="Search tokens in GIGACOCK..." 
         className="pl-10 bg-secondary/50 border-border/50 focus:border-primary transition-all"
         value={query}
         onChange={handleInputChange}
@@ -135,7 +135,8 @@ const TokenSearch = ({ className = '', onResultClick }: TokenSearchProps) => {
             </div>
           ) : (
             <div className="p-4 text-center text-muted-foreground">
-              No tokens found for "{query}"
+              <div>No tokens found in GIGACOCK platform</div>
+              <div className="text-xs mt-1">Try searching by token name or contract address</div>
             </div>
           )}
         </Card>
