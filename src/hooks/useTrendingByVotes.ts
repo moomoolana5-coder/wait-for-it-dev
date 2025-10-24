@@ -75,7 +75,7 @@ export const useTrendingByVotes = () => {
       // 2. Fetch data token dari Dexscreener dan lampirkan vote count yang benar.
       // Kami memetakan langsung voteCounts untuk menjamin kecocokan data.
       const tokenDataPromises = voteCounts.map(async (voteData) => {
-        const address = voteData.token_address;
+        const address = voteData.token_address.toLowerCase();
         const voteCount = voteData.vote_count;
 
         try {
@@ -87,17 +87,23 @@ export const useTrendingByVotes = () => {
           const data = await response.json();
           
           // Dapatkan pasangan terbaik (likuiditas tertinggi di PulseChain)
+          // DAN pastikan baseToken.address cocok dengan address yang divote
           const pulsechainPairs = (data.pairs || []).filter(
-            (pair: DexPair) => pair.chainId === 'pulsechain'
+            (pair: DexPair) => 
+              pair.chainId === 'pulsechain' && 
+              pair.baseToken.address.toLowerCase() === address
           );
           
           if (pulsechainPairs.length === 0) {
+            console.warn(`No valid PulseChain pairs found for ${address}`);
             return null;
           }
           
           const bestPair = pulsechainPairs.sort((a: DexPair, b: DexPair) => 
             (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0)
           )[0];
+          
+          console.log(`Found token: ${bestPair.baseToken.symbol} for address ${address} with ${voteCount} votes`);
           
           // Lampirkan vote count yang sudah dijamin benar
           return {
