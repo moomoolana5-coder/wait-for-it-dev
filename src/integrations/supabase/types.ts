@@ -14,10 +14,102 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      new_listing_tokens: {
+        Row: {
+          created_at: string
+          id: string
+          token_address: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          token_address: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          token_address?: string
+        }
+        Relationships: []
+      }
+      submitted_tokens: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          logo_url: string | null
+          status: string | null
+          telegram_url: string | null
+          token_address: string
+          token_name: string
+          token_symbol: string
+          transaction_hash: string
+          twitter_url: string | null
+          user_id: string
+          website_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          status?: string | null
+          telegram_url?: string | null
+          token_address: string
+          token_name: string
+          token_symbol: string
+          transaction_hash: string
+          twitter_url?: string | null
+          user_id: string
+          website_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          status?: string | null
+          telegram_url?: string | null
+          token_address?: string
+          token_name?: string
+          token_symbol?: string
+          transaction_hash?: string
+          twitter_url?: string | null
+          user_id?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      token_votes: {
+        Row: {
+          created_at: string
+          id: string
+          token_address: string
+          voter_ip: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          token_address: string
+          voter_ip: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          token_address?: string
+          voter_ip?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      token_vote_counts: {
+        Row: {
+          token_address: string | null
+          vote_count: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
