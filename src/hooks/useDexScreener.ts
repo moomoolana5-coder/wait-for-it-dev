@@ -79,58 +79,96 @@ export const FEATURED_TOKENS = [
 ];
 
 
+// Optimized version with batch loading for hundreds of tokens
 export const usePulseChainTokens = () => {
   return useQuery({
     queryKey: ['pulsechain-featured-tokens', FEATURED_TOKENS.length],
     queryFn: async () => {
       const addressesLower = FEATURED_TOKENS.map((a) => a.toLowerCase());
       const wanted = new Set(addressesLower);
+      const BATCH_SIZE = 20; // Process 20 tokens at a time
+      const DELAY_MS = 500; // 500ms delay between batches
 
-      // 1) Try the /tokens endpoint for all addresses at once
-      const r = await fetch(`${DEXSCREENER_API}/tokens/${addressesLower.join(',')}`);
-      if (!r.ok) throw new Error('Failed to fetch tokens');
-      const d = await r.json();
-      const pairs: DexPair[] = (d.pairs || []) as DexPair[];
-
-      // Pick best (highest liquidity) pair per requested address, accepting base OR quote match
       const bestByAddress = new Map<string, DexPair>();
-      for (const p of pairs) {
-        if (p.chainId !== 'pulsechain') continue;
-        const base = p.baseToken.address.toLowerCase();
-        const quote = p.quoteToken.address.toLowerCase();
-        const matched = wanted.has(base) ? base : wanted.has(quote) ? quote : undefined;
-        if (!matched) continue;
-        const current = bestByAddress.get(matched);
-        if (!current || (p.liquidity?.usd || 0) > (current.liquidity?.usd || 0)) {
-          bestByAddress.set(matched, p);
+
+      // Split into batches to avoid rate limiting
+      const batches: string[][] = [];
+      for (let i = 0; i < addressesLower.length; i += BATCH_SIZE) {
+        batches.push(addressesLower.slice(i, i + BATCH_SIZE));
+      }
+
+      console.log(`Loading ${addressesLower.length} tokens in ${batches.length} batches...`);
+
+      // Process each batch with delay
+      for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+        const batch = batches[batchIndex];
+        
+        try {
+          // Add delay between batches (except first one)
+          if (batchIndex > 0) {
+            await new Promise(resolve => setTimeout(resolve, DELAY_MS));
+          }
+
+          const r = await fetch(`${DEXSCREENER_API}/tokens/${batch.join(',')}`);
+          if (!r.ok) {
+            console.warn(`Batch ${batchIndex + 1} failed: HTTP ${r.status}`);
+            continue;
+          }
+
+          const d = await r.json();
+          const pairs: DexPair[] = (d.pairs || []) as DexPair[];
+
+          // Pick best pair per address in this batch
+          for (const p of pairs) {
+            if (p.chainId !== 'pulsechain') continue;
+            const base = p.baseToken.address.toLowerCase();
+            const quote = p.quoteToken.address.toLowerCase();
+            const matched = wanted.has(base) ? base : wanted.has(quote) ? quote : undefined;
+            if (!matched) continue;
+            const current = bestByAddress.get(matched);
+            if (!current || (p.liquidity?.usd || 0) > (current.liquidity?.usd || 0)) {
+              bestByAddress.set(matched, p);
+            }
+          }
+
+          console.log(`Batch ${batchIndex + 1}/${batches.length} completed (${bestByAddress.size} tokens loaded)`);
+        } catch (error) {
+          console.error(`Error in batch ${batchIndex + 1}:`, error);
         }
       }
 
-      // 2) Fallback via /search for those still missing
+      // Fallback for missing tokens (in smaller batches)
       const missing = addressesLower.filter((addr) => !bestByAddress.has(addr));
-      if (missing.length) {
-        const searchResults = await Promise.all(
-          missing.map(async (addr) => {
-            try {
-              const rs = await fetch(`${DEXSCREENER_API}/search?q=${addr}`);
-              if (!rs.ok) return null;
-              const ds = await rs.json();
-              const found: DexPair[] = (ds.pairs || []).filter((p: DexPair) => p.chainId === 'pulsechain');
-              // choose highest liquidity for this specific address (base or quote)
-              let best: DexPair | null = null;
-              for (const p of found) {
-                const base = p.baseToken.address.toLowerCase();
-                const quote = p.quoteToken.address.toLowerCase();
-                if (base !== addr && quote !== addr) continue;
-                if (!best || (p.liquidity?.usd || 0) > (best.liquidity?.usd || 0)) best = p;
-              }
-              if (best) bestByAddress.set(addr, best);
-              return null;
-            } catch {
-              return null;
+      if (missing.length > 0) {
+        console.log(`Fetching ${missing.length} missing tokens...`);
+        
+        // Process missing tokens in smaller groups
+        for (let i = 0; i < missing.length; i++) {
+          const addr = missing[i];
+          
+          try {
+            // Add small delay to avoid rate limiting
+            if (i > 0 && i % 5 === 0) {
+              await new Promise(resolve => setTimeout(resolve, 300));
             }
-          })
-        );
+
+            const rs = await fetch(`${DEXSCREENER_API}/search?q=${addr}`);
+            if (!rs.ok) continue;
+            const ds = await rs.json();
+            const found: DexPair[] = (ds.pairs || []).filter((p: DexPair) => p.chainId === 'pulsechain');
+            
+            let best: DexPair | null = null;
+            for (const p of found) {
+              const base = p.baseToken.address.toLowerCase();
+              const quote = p.quoteToken.address.toLowerCase();
+              if (base !== addr && quote !== addr) continue;
+              if (!best || (p.liquidity?.usd || 0) > (best.liquidity?.usd || 0)) best = p;
+            }
+            if (best) bestByAddress.set(addr, best);
+          } catch (error) {
+            console.warn(`Failed to fetch ${addr}:`, error);
+          }
+        }
       }
 
       // Keep order same as FEATURED_TOKENS
@@ -138,11 +176,11 @@ export const usePulseChainTokens = () => {
         .map((addr) => bestByAddress.get(addr))
         .filter(Boolean) as DexPair[];
 
-      console.log('Featured pairs (ordered):', ordered.map((p) => `${p.baseToken.symbol}/${p.quoteToken.symbol}`));
+      console.log(`✅ Loaded ${ordered.length}/${addressesLower.length} featured tokens`);
       return ordered;
     },
-    refetchInterval: 30000,
-    staleTime: 0,
+    refetchInterval: 60000, // Increased to 60s to reduce API load
+    staleTime: 30000,
   });
 };
 

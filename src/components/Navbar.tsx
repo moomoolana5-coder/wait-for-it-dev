@@ -1,11 +1,11 @@
-import { Search, Wallet, Menu, X } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Wallet, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { Link } from "react-router-dom";
 import projectLogo from "@/assets/project-logo.png";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
+import TokenSearch from "./TokenSearch";
 
 const Navbar = () => {
   const { address, isConnected } = useAccount();
@@ -36,13 +36,7 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-6">
-            <div className="relative w-72">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input 
-                placeholder="Search tokens..." 
-                className="pl-10 bg-secondary/50 border-border/50 focus:border-primary transition-all"
-              />
-            </div>
+            <TokenSearch className="w-72" />
             
             <Link to="/" className="text-foreground font-medium hover:text-primary transition-colors">
               Home
@@ -104,13 +98,7 @@ const Navbar = () => {
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px]">
                 <div className="flex flex-col gap-6 mt-8">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                      placeholder="Search tokens..." 
-                      className="pl-10 bg-secondary/50 border-border/50"
-                    />
-                  </div>
+                  <TokenSearch onResultClick={() => setIsOpen(false)} />
                   
                   <Link 
                     to="/" 
