@@ -1,6 +1,6 @@
 import { TrendingUp, ChevronRight, Loader2 } from "lucide-react";
 import { usePulseChainTokens } from "@/hooks/useDexScreener";
-import TokenCard from "./TokenCard";
+import TokenTable from "./TokenTable";
 
 const TopTokens = () => {
   const { data: tokens, isLoading } = usePulseChainTokens();
@@ -32,24 +32,11 @@ const TopTokens = () => {
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-accent" />
         </div>
+      ) : topTokens.length > 0 ? (
+        <TokenTable tokens={topTokens} />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {topTokens.map((token) => (
-            <TokenCard
-              key={token.pairAddress}
-              name={token.baseToken.name}
-              symbol={token.baseToken.symbol}
-              logo={token.info?.imageUrl}
-              priceUsd={token.priceUsd}
-              priceChange24h={token.priceChange.h24}
-              volume24h={token.volume.h24}
-              liquidity={token.liquidity.usd}
-              pairAddress={token.pairAddress}
-              baseTokenAddress={token.baseToken.address}
-              socials={token.info?.socials}
-              website={token.info?.websites?.[0]?.url}
-            />
-          ))}
+        <div className="text-center py-12 text-muted-foreground">
+          No top tokens available
         </div>
       )}
     </div>
