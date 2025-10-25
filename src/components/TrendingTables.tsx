@@ -47,7 +47,7 @@ const TrendingTables = () => {
                   <span className="font-medium text-sm">{token.baseToken.symbol}</span>
                 </div>
                 <span className="text-sm text-green-500">
-                  +{token.priceChange.h24.toFixed(1)}%
+                  +{(token.priceChange?.h24 ?? 0).toFixed(1)}%
                 </span>
               </Link>
             ))
@@ -85,8 +85,8 @@ const TrendingTables = () => {
                   )}
                   <span className="font-medium text-sm">{token.baseToken.symbol}</span>
                 </div>
-                <span className={`text-sm ${token.priceChange.h24 >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  {token.priceChange.h24 >= 0 ? '+' : ''}{token.priceChange.h24.toFixed(1)}%
+                <span className={`text-sm ${(token.priceChange?.h24 ?? 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {(token.priceChange?.h24 ?? 0) >= 0 ? '+' : ''}{(token.priceChange?.h24 ?? 0).toFixed(1)}%
                 </span>
               </Link>
             ))
@@ -125,7 +125,7 @@ const TrendingTables = () => {
                   <span className="font-medium text-sm">{token.baseToken.symbol}</span>
                 </div>
                 <span className="text-sm text-green-500">
-                  +{token.priceChange.h24.toFixed(1)}%
+                  +{(token.priceChange?.h24 ?? 0).toFixed(1)}%
                 </span>
               </Link>
             ))
