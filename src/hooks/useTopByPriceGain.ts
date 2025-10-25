@@ -120,7 +120,13 @@ export const useTopByPriceGain = () => {
       const toSort = positiveGainers.length > 0 ? positiveGainers : withPriceChange;
       const sorted = toSort.sort((a, b) => (b.priceChange?.h24 || 0) - (a.priceChange?.h24 || 0));
       
-      return sorted.slice(0, 3);
+      // Normalize data to ensure priceChange.h24 is always a number
+      const top = sorted.slice(0, 3).map((p) => ({
+        ...p,
+        priceChange: { ...p.priceChange, h24: Number(p.priceChange?.h24 ?? 0) },
+      }));
+      
+      return top;
     },
     refetchInterval: 60000,
     staleTime: 30000,
