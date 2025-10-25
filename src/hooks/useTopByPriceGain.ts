@@ -55,12 +55,23 @@ export const useTopByPriceGain = () => {
       const wanted = new Set(addressesLower);
 
       // Try the /tokens endpoint for all addresses at once
-      const response = await fetch(`${DEXSCREENER_API}/tokens/${addressesLower.join(',')}`);
-      if (!response.ok) throw new Error('Failed to fetch tokens');
-      const data = await response.json();
-      const pairs: DexPair[] = (data.pairs || []) as DexPair[];
+      // Batch fetch to avoid URL limits and rate limiting
+      const BATCH_SIZE = 20;
+      const pairs: DexPair[] = [];
+      for (let i = 0; i < addressesLower.length; i += BATCH_SIZE) {
+        const batch = addressesLower.slice(i, i + BATCH_SIZE);
+        const response = await fetch(`${DEXSCREENER_API}/tokens/${batch.join(',')}`);
+        if (!response.ok) {
+          console.warn(`useTopByPriceGain: batch ${i / BATCH_SIZE + 1} failed with status ${response.status}`);
+          continue;
+        }
+        const data = await response.json();
+        if (data.pairs) pairs.push(...(data.pairs as DexPair[]));
+        // tiny delay to be polite with API
+        await new Promise((r) => setTimeout(r, 200));
+      }
 
-      // Pick best (highest liquidity) pair per requested address
+      console.log(`TopByPriceGain: fetched ${pairs.length} pairs from ${addressesLower.length} addresses (batched)`);
       // CRITICAL: Only include tokens that are EXACTLY in our wanted list
       const bestByAddress = new Map<string, DexPair>();
       for (const p of pairs) {
@@ -112,12 +123,14 @@ export const useTopByPriceGain = () => {
       // Sort by price change (descending) and return top 3
       const allPairs = Array.from(bestByAddress.values());
       
-      // Filter only positive price changes, but if none exist, take top performers anyway
       const withPriceChange = allPairs.filter(p => p.priceChange?.h24 !== undefined);
-      const positiveGainers = withPriceChange.filter(p => p.priceChange.h24 > 0);
+      const positiveGainers = withPriceChange.filter(p => (p.priceChange?.h24 || 0) > 0);
       
-      // Use positive gainers if available, otherwise use all with highest changes
-      const toSort = positiveGainers.length > 0 ? positiveGainers : withPriceChange;
+      // Determine list to sort with safe fallbacks
+      const toSort = positiveGainers.length > 0
+        ? positiveGainers
+        : (withPriceChange.length > 0 ? withPriceChange : allPairs);
+      
       const sorted = toSort.sort((a, b) => (b.priceChange?.h24 || 0) - (a.priceChange?.h24 || 0));
       
       // Normalize data to ensure priceChange.h24 is always a number
