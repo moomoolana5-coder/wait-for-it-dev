@@ -60,11 +60,11 @@ export const useTopByPriceGain = () => {
       const data = await response.json();
       const pairs: DexPair[] = (data.pairs || []) as DexPair[];
 
-      // Pick best (highest liquidity) pair per requested address with positive price change
+      // Pick best (highest liquidity) pair per requested address
       // CRITICAL: Only include tokens that are EXACTLY in our wanted list
       const bestByAddress = new Map<string, DexPair>();
       for (const p of pairs) {
-        if (p.chainId !== 'pulsechain' || !p.priceChange?.h24 || p.priceChange.h24 <= 0) continue;
+        if (p.chainId !== 'pulsechain') continue;
         if (p.liquidity?.usd < 1000) continue;
         
         const base = p.baseToken.address.toLowerCase();
@@ -93,7 +93,6 @@ export const useTopByPriceGain = () => {
                   const base = p.baseToken.address.toLowerCase();
                   return p.chainId === 'pulsechain' 
                     && base === addr  // ONLY exact match on base token
-                    && p.priceChange?.h24 > 0 
                     && p.liquidity?.usd > 1000;
                 }
               );
@@ -110,9 +109,16 @@ export const useTopByPriceGain = () => {
         );
       }
 
-      // Sort by price change and return top 3
+      // Sort by price change (descending) and return top 3
       const allPairs = Array.from(bestByAddress.values());
-      const sorted = allPairs.sort((a, b) => b.priceChange.h24 - a.priceChange.h24);
+      
+      // Filter only positive price changes, but if none exist, take top performers anyway
+      const withPriceChange = allPairs.filter(p => p.priceChange?.h24 !== undefined);
+      const positiveGainers = withPriceChange.filter(p => p.priceChange.h24 > 0);
+      
+      // Use positive gainers if available, otherwise use all with highest changes
+      const toSort = positiveGainers.length > 0 ? positiveGainers : withPriceChange;
+      const sorted = toSort.sort((a, b) => (b.priceChange?.h24 || 0) - (a.priceChange?.h24 || 0));
       
       return sorted.slice(0, 3);
     },
