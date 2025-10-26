@@ -41,7 +41,7 @@ const TokenListings = () => {
               symbol={token.baseToken.symbol}
               logo={token.info?.imageUrl}
               priceUsd={token.priceUsd}
-              priceChange24h={token.priceChange.h24}
+              priceChange24h={Number(token.priceChange?.h24 || 0)}
               volume24h={token.volume.h24}
               liquidity={token.liquidity.usd}
               pairAddress={token.pairAddress}

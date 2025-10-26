@@ -90,7 +90,8 @@ export const useTrendingByVotes = () => {
           // DAN pastikan baseToken.address cocok dengan address yang divote
           const pulsechainPairs = (data.pairs || []).filter(
             (pair: DexPair) => 
-              pair.chainId === 'pulsechain' && 
+              pair.chainId === 'pulsechain' &&
+              pair.dexId === 'pulsex' &&
               pair.baseToken.address.toLowerCase() === address
           );
           

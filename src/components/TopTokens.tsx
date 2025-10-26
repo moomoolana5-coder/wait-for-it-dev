@@ -7,8 +7,8 @@ const TopTokens = () => {
 
   // Get top performing tokens (sorted by volume and price change)
   const topTokens = tokens
-    ?.filter(token => token.priceChange.h24 > 0)
-    .sort((a, b) => (b.volume.h24 * (1 + b.priceChange.h24/100)) - (a.volume.h24 * (1 + a.priceChange.h24/100)))
+    ?.filter(token => Number(token.priceChange?.h24) > 0)
+    .sort((a, b) => (b.volume.h24 * (1 + Number(b.priceChange?.h24 || 0)/100)) - (a.volume.h24 * (1 + Number(a.priceChange?.h24 || 0)/100)))
     .slice(0, 6) || [];
 
   return (
@@ -41,7 +41,7 @@ const TopTokens = () => {
               symbol={token.baseToken.symbol}
               logo={token.info?.imageUrl}
               priceUsd={token.priceUsd}
-              priceChange24h={token.priceChange.h24}
+              priceChange24h={Number(token.priceChange?.h24 || 0)}
               volume24h={token.volume.h24}
               liquidity={token.liquidity.usd}
               pairAddress={token.pairAddress}

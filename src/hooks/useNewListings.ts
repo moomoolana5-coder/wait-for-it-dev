@@ -81,9 +81,12 @@ export const useNewListings = () => {
           const data = await response.json();
           
           if (data.pairs && data.pairs.length > 0) {
-            // Find the best PulseChain pair for this token
+            // Find the best PulseChain pair for this token (PulseX only and base must match)
             const pulsechainTokenPairs = data.pairs.filter(
-              (pair: DexPair) => pair.chainId === 'pulsechain'
+              (pair: DexPair) => 
+                pair.chainId === 'pulsechain' &&
+                pair.dexId === 'pulsex' &&
+                pair.baseToken.address.toLowerCase() === token.token_address.toLowerCase()
             );
             
             if (pulsechainTokenPairs.length > 0) {

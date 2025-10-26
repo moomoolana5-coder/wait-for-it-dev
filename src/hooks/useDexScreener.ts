@@ -129,7 +129,7 @@ export const usePulseChainTokens = () => {
             if (p.dexId !== 'pulsex') continue; // Only PulseX DEX
             const base = p.baseToken.address.toLowerCase();
             const quote = p.quoteToken.address.toLowerCase();
-            const matched = wanted.has(base) ? base : wanted.has(quote) ? quote : undefined;
+            const matched = wanted.has(base) ? base : undefined;
             if (!matched) continue;
             const current = bestByAddress.get(matched);
             if (!current || (p.liquidity?.usd || 0) > (current.liquidity?.usd || 0)) {
@@ -168,8 +168,7 @@ export const usePulseChainTokens = () => {
             let best: DexPair | null = null;
             for (const p of found) {
               const base = p.baseToken.address.toLowerCase();
-              const quote = p.quoteToken.address.toLowerCase();
-              if (base !== addr && quote !== addr) continue;
+              if (base !== addr) continue;
               if (!best || (p.liquidity?.usd || 0) > (best.liquidity?.usd || 0)) best = p;
             }
             if (best) bestByAddress.set(addr, best);

@@ -82,9 +82,9 @@ export const useBatchedTokens = (tokenAddresses: string[]) => {
         const bestByAddress = new Map<string, DexPair>();
         for (const p of pairs) {
           if (p.chainId !== 'pulsechain') continue;
+          if (p.dexId !== 'pulsex') continue;
           const base = p.baseToken.address.toLowerCase();
-          const quote = p.quoteToken.address.toLowerCase();
-          const matched = wanted.has(base) ? base : wanted.has(quote) ? quote : undefined;
+          const matched = wanted.has(base) ? base : undefined;
           if (!matched) continue;
           const current = bestByAddress.get(matched);
           if (!current || (p.liquidity?.usd || 0) > (current.liquidity?.usd || 0)) {

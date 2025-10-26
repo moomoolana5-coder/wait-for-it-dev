@@ -131,7 +131,7 @@ const TokenCard = ({
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-sm text-muted-foreground">Price</span>
-          <span className="font-semibold">${parseFloat(priceUsd).toFixed(8)}</span>
+          <span className="font-semibold">{(() => { const n = Number(priceUsd); return Number.isFinite(n) ? `$${n.toFixed(8)}` : '—'; })()}</span>
         </div>
         
         <div className="flex items-center justify-between">

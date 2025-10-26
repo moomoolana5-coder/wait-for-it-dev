@@ -106,10 +106,11 @@ export const usePlatformTokenSearch = (query: string) => {
         if (!response.ok) return [];
         
         const data = await response.json();
-        const pairs = (data.pairs || []).filter((pair: DexPair) => 
-          pair.chainId === 'pulsechain' &&
-          pair.baseToken.address.toLowerCase() === matchedAddress
-        );
+          const pairs = (data.pairs || []).filter((pair: DexPair) => 
+            pair.chainId === 'pulsechain' &&
+            pair.dexId === 'pulsex' &&
+            pair.baseToken.address.toLowerCase() === matchedAddress
+          );
         
         return pairs;
       } else {
@@ -135,6 +136,7 @@ export const usePlatformTokenSearch = (query: string) => {
             const data = await response.json();
             const pairs = (data.pairs || []).filter((pair: DexPair) => {
               if (pair.chainId !== 'pulsechain') return false;
+              if (pair.dexId !== 'pulsex') return false;
               
               const baseAddr = pair.baseToken.address.toLowerCase();
               if (!platformAddresses.includes(baseAddr)) return false;

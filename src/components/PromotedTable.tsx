@@ -97,17 +97,29 @@ const PromotedTable = () => {
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className="border-primary/30 text-primary bg-primary/5">
-                      {token.dexId.toUpperCase()}
+                      {token.dexId ? token.dexId.toUpperCase() : '—'}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <span className={`flex items-center gap-1 font-semibold ${token.priceChange.h24 >= 0 ? 'text-accent' : 'text-destructive'}`}>
-                      {token.priceChange.h24 >= 0 ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
-                      {Math.abs(token.priceChange.h24).toFixed(2)}%
-                    </span>
+                    {(() => {
+                      const changeRaw = Number(token.priceChange?.h24);
+                      const change = Number.isFinite(changeRaw) ? changeRaw : 0;
+                      const isUp = change >= 0;
+                      return (
+                        <span className={`flex items-center gap-1 font-semibold ${isUp ? 'text-accent' : 'text-destructive'}`}>
+                          {isUp ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
+                          {Math.abs(change).toFixed(2)}%
+                        </span>
+                      );
+                    })()}
                   </TableCell>
                   <TableCell className="font-semibold">${token.liquidity.usd.toLocaleString(undefined, { maximumFractionDigits: 0 })}</TableCell>
-                  <TableCell className="font-mono">${parseFloat(token.priceUsd).toFixed(8)}</TableCell>
+                  <TableCell className="font-mono">
+                    {(() => {
+                      const price = Number(token.priceUsd);
+                      return Number.isFinite(price) ? `$${price.toFixed(8)}` : '—';
+                    })()}
+                  </TableCell>
                   <TableCell className="font-semibold">${token.volume.h24.toLocaleString(undefined, { maximumFractionDigits: 0 })}</TableCell>
                   <TableCell className="text-muted-foreground text-sm">{formatTimeAgo(token.pairCreatedAt)}</TableCell>
                   <TableCell>
