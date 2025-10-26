@@ -21,53 +21,56 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="border-b border-border bg-card/50 backdrop-blur-xl sticky top-0 z-50">
+    <nav className="border-b border-border bg-card sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 md:gap-3">
-            <img 
-              src={projectLogo} 
+          <Link to="/" className="flex items-center gap-2 shrink-0">
+            <img
+              src={projectLogo}
               alt="GIGACOCK Logo"
-              className="h-8 w-8 md:h-11 md:w-11 rounded-xl shadow-lg shadow-primary/20"
+              className="h-8 w-8 md:h-10 md:w-10 rounded-lg"
             />
-            <span className="text-lg md:text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">GIGACOCK</span>
+            <span className="text-lg md:text-xl font-bold text-foreground hidden sm:block">GIGACOCK</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-6">
-            <TokenSearch className="w-72" />
-            
-            <Link to="/" className="text-foreground font-medium hover:text-primary transition-colors">
-              Home
-            </Link>
-            <Link to="/new-listings" className="text-foreground hover:text-primary transition-colors">
-              New Listings
-            </Link>
-            <Link to="/add-coin" className="text-foreground hover:text-accent transition-colors">
-              Add Coin
-            </Link>
-            <a href="#advertise" className="text-accent hover:text-accent/80 transition-colors font-medium">
-              Advertise ✨
-            </a>
-            
-            {isConnected ? (
-              <Button 
-                onClick={() => disconnect()}
-                className="bg-gradient-accent hover:opacity-90 shadow-lg shadow-accent/20"
-              >
-                <Wallet className="h-4 w-4 mr-2" />
-                {address?.slice(0, 6)}...{address?.slice(-4)}
-              </Button>
-            ) : (
-              <Button 
-                onClick={handleConnect}
-                className="bg-gradient-primary hover:opacity-90 shadow-lg shadow-primary/20"
-              >
-                <Wallet className="h-4 w-4 mr-2" />
-                Connect Wallet
-              </Button>
-            )}
+          <div className="hidden lg:flex items-center gap-4 flex-1 justify-between">
+            <div className="flex items-center gap-6">
+              <Link to="/" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+                Cryptocurrencies
+              </Link>
+              <Link to="/new-listings" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                New Listings
+              </Link>
+              <Link to="/add-coin" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Submit Coin
+              </Link>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <TokenSearch className="w-64" />
+
+              {isConnected ? (
+                <Button
+                  onClick={() => disconnect()}
+                  size="sm"
+                  className="bg-primary hover:bg-primary/90"
+                >
+                  <Wallet className="h-4 w-4 mr-2" />
+                  {address?.slice(0, 6)}...{address?.slice(-4)}
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleConnect}
+                  size="sm"
+                  className="bg-primary hover:bg-primary/90"
+                >
+                  <Wallet className="h-4 w-4 mr-2" />
+                  Connect
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Mobile Menu */}
