@@ -2,11 +2,12 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useTokenVotes = (tokenAddress: string) => {
-  const [voteCount, setVoteCount] = useState<number>(0);
-  const [hasVoted, setHasVoted] = useState(false);
+  const [bullishCount, setBullishCount] = useState<number>(0);
+  const [bearishCount, setBearishCount] = useState<number>(0);
+  const [hasBullishVoted, setHasBullishVoted] = useState(false);
+  const [hasBearishVoted, setHasBearishVoted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Normalisasi alamat segera setelah hook dipanggil
+
   const normalizedAddress = tokenAddress.toLowerCase();
 
   // Get voter identifier (could be IP or session ID)
@@ -23,53 +24,49 @@ export const useTokenVotes = (tokenAddress: string) => {
     try {
       const { data, error } = await supabase
         .from('token_vote_counts')
-        .select('vote_count')
+        .select('bullish_count, bearish_count')
         .eq('token_address', normalizedAddress)
         .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error fetching vote count from view:', error);
       }
-      
-      const countFromView = data?.vote_count || 0;
-      
-      if (countFromView === 0) {
-        const { count, error: countError } = await supabase
-          .from('token_votes')
-          .select('*', { count: 'exact', head: true })
-          .eq('token_address', normalizedAddress);
-        
-        if (countError) {
-          console.error('Error counting votes directly:', countError);
-          setVoteCount(0);
-        } else {
-          setVoteCount(count || 0);
-        }
-      } else {
-        setVoteCount(countFromView);
-      }
+
+      setBullishCount(data?.bullish_count || 0);
+      setBearishCount(data?.bearish_count || 0);
     } catch (error) {
       console.error('General error fetching vote count:', error);
-      setVoteCount(0);
+      setBullishCount(0);
+      setBearishCount(0);
     }
   }, [normalizedAddress]);
 
   const checkHasVoted = useCallback(async () => {
     try {
       const voterId = getVoterIdentifier();
-      
-      const { data, error } = await supabase
+
+      const { data: bullishData } = await supabase
         .from('token_votes')
         .select('id')
         .eq('token_address', normalizedAddress)
-        .eq('voter_ip', voterId) 
+        .eq('voter_ip', voterId)
+        .eq('vote_type', 'bullish')
         .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') throw error;
-      setHasVoted(!!data);
+      const { data: bearishData } = await supabase
+        .from('token_votes')
+        .select('id')
+        .eq('token_address', normalizedAddress)
+        .eq('voter_ip', voterId)
+        .eq('vote_type', 'bearish')
+        .maybeSingle();
+
+      setHasBullishVoted(!!bullishData);
+      setHasBearishVoted(!!bearishData);
     } catch (error) {
       console.error('Error checking vote status:', error);
-      setHasVoted(false);
+      setHasBullishVoted(false);
+      setHasBearishVoted(false);
     } finally {
       setIsLoading(false);
     }
@@ -100,42 +97,39 @@ export const useTokenVotes = (tokenAddress: string) => {
     };
   }, [normalizedAddress, fetchVoteCount, checkHasVoted]);
 
-  const vote = async (captchaValid: boolean) => {
+  const vote = async (captchaValid: boolean, voteType: 'bullish' | 'bearish') => {
     if (!captchaValid) {
       throw new Error('Please complete the captcha');
     }
 
-    if (hasVoted) {
-      throw new Error('You have already voted for this token');
+    const hasAlreadyVoted = voteType === 'bullish' ? hasBullishVoted : hasBearishVoted;
+    if (hasAlreadyVoted) {
+      throw new Error(`You have already voted ${voteType} for this token`);
     }
 
-    // --- PERBAIKAN ESLINT DIMULAI DI SINI ---
-    // Menghapus blok try/catch yang tidak perlu dan menghilangkan 'any'
     const voterId = getVoterIdentifier();
-    
-    // Insert vote
+
     const { error } = await supabase
       .from('token_votes')
       .insert({
         token_address: normalizedAddress,
-        voter_ip: voterId
+        voter_ip: voterId,
+        vote_type: voteType
       });
 
     if (error) {
-      // Menangani error duplikasi primary/unique key (sudah voted)
       if (error.code === '23505') {
-        throw new Error('You have already voted for this token');
+        throw new Error(`You have already voted ${voteType} for this token`);
       }
-      // Melempar error lainnya
       throw error;
     }
-    
-    // Set status pemilih menjadi true segera
-    setHasVoted(true);
-    
-    // Realtime subscription akan menangani pembaruan voteCount
-    // --- PERBAIKAN ESLINT BERAKHIR DI SINI ---
+
+    if (voteType === 'bullish') {
+      setHasBullishVoted(true);
+    } else {
+      setHasBearishVoted(true);
+    }
   };
 
-  return { voteCount, hasVoted, isLoading, vote };
+  return { bullishCount, bearishCount, hasBullishVoted, hasBearishVoted, isLoading, vote };
 };
