@@ -1,8 +1,9 @@
-import { TrendingUp, Volume2, Flame, Loader2 } from "lucide-react";
+import { TrendingUp, Volume2, Flame } from "lucide-react";
 import { useTrendingByVotes } from "@/hooks/useTrendingByVotes";
 import { useTopByVolume } from "@/hooks/useTopByVolume";
 import { useTopByPriceGain } from "@/hooks/useTopByPriceGain";
-import TokenTable from "./TokenTable";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 
 const TrendingTables = () => {
   const { data: votedTokens, isLoading: loadingVoted } = useTrendingByVotes();
@@ -14,72 +15,123 @@ const TrendingTables = () => {
   const topGain = gainTokens || [];
 
   return (
-    <div className="space-y-8">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {/* Trending by Votes */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-primary/10">
-            <Flame className="h-6 w-6 text-primary" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold">Trending by Votes</h2>
-            <p className="text-sm text-muted-foreground">Most voted tokens by the community</p>
-          </div>
-        </div>
-        {loadingVoted ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        ) : topVoted.length > 0 ? (
-          <TokenTable tokens={topVoted} showRank={true} />
-        ) : (
-          <div className="text-center py-12 text-muted-foreground">No trending tokens available</div>
-        )}
-      </div>
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Flame className="h-4 w-4 text-primary" />
+            Trending by Votes
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {loadingVoted ? (
+            <div className="text-sm text-muted-foreground">Loading...</div>
+          ) : topVoted.length === 0 ? (
+            <div className="text-sm text-muted-foreground">No data</div>
+          ) : (
+            topVoted.map((token) => (
+              <Link
+                key={token.pairAddress}
+                to={`/token/${token.baseToken.address}`}
+                className="flex items-center justify-between hover:bg-accent/50 p-2 rounded-lg transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  {token.info?.imageUrl && (
+                    <img
+                      src={token.info.imageUrl}
+                      alt={token.baseToken.symbol}
+                      className="w-6 h-6 rounded-full"
+                    />
+                  )}
+                  <span className="font-medium text-sm">{token.baseToken.symbol}</span>
+                </div>
+                <span className="text-sm text-green-500">
+                  +{(token.priceChange?.h24 ?? 0).toFixed(1)}%
+                </span>
+              </Link>
+            ))
+          )}
+        </CardContent>
+      </Card>
 
       {/* Trending by Volume */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-accent/10">
-            <Volume2 className="h-6 w-6 text-accent" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold">Trending by Trading Volume</h2>
-            <p className="text-sm text-muted-foreground">Highest volume tokens in 24 hours</p>
-          </div>
-        </div>
-        {loadingVolume ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-accent" />
-          </div>
-        ) : topVolume.length > 0 ? (
-          <TokenTable tokens={topVolume} showRank={true} />
-        ) : (
-          <div className="text-center py-12 text-muted-foreground">No volume data available</div>
-        )}
-      </div>
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Volume2 className="h-4 w-4 text-accent" />
+            Trending by trading volume
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {loadingVolume ? (
+            <div className="text-sm text-muted-foreground">Loading...</div>
+          ) : topVolume.length === 0 ? (
+            <div className="text-sm text-muted-foreground">No data</div>
+          ) : (
+            topVolume.map((token) => (
+              <Link
+                key={token.pairAddress}
+                to={`/token/${token.baseToken.address}`}
+                className="flex items-center justify-between hover:bg-accent/50 p-2 rounded-lg transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  {token.info?.imageUrl && (
+                    <img
+                      src={token.info.imageUrl}
+                      alt={token.baseToken.symbol}
+                      className="w-6 h-6 rounded-full"
+                    />
+                  )}
+                  <span className="font-medium text-sm">{token.baseToken.symbol}</span>
+                </div>
+                <span className={`text-sm ${(token.priceChange?.h24 ?? 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {(token.priceChange?.h24 ?? 0) >= 0 ? '+' : ''}{(token.priceChange?.h24 ?? 0).toFixed(1)}%
+                </span>
+              </Link>
+            ))
+          )}
+        </CardContent>
+      </Card>
 
       {/* Trending by Price Gain */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-green-500/10">
-            <TrendingUp className="h-6 w-6 text-green-500" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold">Biggest Gainers</h2>
-            <p className="text-sm text-muted-foreground">Top performing tokens by price increase</p>
-          </div>
-        </div>
-        {loadingGain ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-green-500" />
-          </div>
-        ) : topGain.length > 0 ? (
-          <TokenTable tokens={topGain} showRank={true} />
-        ) : (
-          <div className="text-center py-12 text-muted-foreground">No price gain data available</div>
-        )}
-      </div>
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-green-500" />
+            Biggest Gainers
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {loadingGain ? (
+            <div className="text-sm text-muted-foreground">Loading...</div>
+          ) : topGain.length === 0 ? (
+            <div className="text-sm text-muted-foreground">No data</div>
+          ) : (
+            topGain.map((token) => (
+              <Link
+                key={token.pairAddress}
+                to={`/token/${token.baseToken.address}`}
+                className="flex items-center justify-between hover:bg-accent/50 p-2 rounded-lg transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  {token.info?.imageUrl && (
+                    <img
+                      src={token.info.imageUrl}
+                      alt={token.baseToken.symbol}
+                      className="w-6 h-6 rounded-full"
+                    />
+                  )}
+                  <span className="font-medium text-sm">{token.baseToken.symbol}</span>
+                </div>
+                <span className="text-sm text-green-500">
+                  +{(token.priceChange?.h24 ?? 0).toFixed(1)}%
+                </span>
+              </Link>
+            ))
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { Star, Loader2 } from "lucide-react";
 import { usePulseChainTokens } from "@/hooks/useDexScreener";
-import TokenTable from "./TokenTable";
+import TokenCard from "./TokenCard";
 
 const FeaturedTokens = () => {
   const { data: tokens, isLoading } = usePulseChainTokens();
@@ -23,11 +23,24 @@ const FeaturedTokens = () => {
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
-      ) : tokens && tokens.length > 0 ? (
-        <TokenTable tokens={tokens} />
       ) : (
-        <div className="text-center py-12 text-muted-foreground">
-          No featured tokens available
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {tokens?.map((token) => (
+            <TokenCard
+              key={`${token.baseToken.address}-${token.pairAddress}`}
+              name={token.baseToken.name}
+              symbol={token.baseToken.symbol}
+              logo={token.info?.imageUrl}
+              priceUsd={token.priceUsd}
+              priceChange24h={token.priceChange.h24}
+              volume24h={token.volume.h24}
+              liquidity={token.liquidity.usd}
+              pairAddress={token.pairAddress}
+              baseTokenAddress={token.baseToken.address}
+              socials={token.info?.socials}
+              website={token.info?.websites?.[0]?.url}
+            />
+          ))}
         </div>
       )}
     </section>
