@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
+import { ThumbsUp, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -18,13 +18,12 @@ interface VoteButtonProps {
 }
 
 const VoteButton = ({ tokenAddress }: VoteButtonProps) => {
-  const { bullishCount, bearishCount, hasBullishVoted, hasBearishVoted, isLoading, vote } = useTokenVotes(tokenAddress);
+  const { voteCount, hasVoted, isLoading, vote } = useTokenVotes(tokenAddress);
   const { toast } = useToast();
   const [showDialog, setShowDialog] = useState(false);
   const [isVoting, setIsVoting] = useState(false);
   const [captchaAnswer, setCaptchaAnswer] = useState('');
   const [captchaQuestion, setCaptchaQuestion] = useState({ a: 0, b: 0 });
-  const [voteType, setVoteType] = useState<'bullish' | 'bearish'>('bullish');
 
   const generateCaptcha = () => {
     const a = Math.floor(Math.random() * 10) + 1;
@@ -33,16 +32,15 @@ const VoteButton = ({ tokenAddress }: VoteButtonProps) => {
     return { a, b };
   };
 
-  const handleVoteClick = (type: 'bullish' | 'bearish') => {
-    if ((type === 'bullish' && hasBullishVoted) || (type === 'bearish' && hasBearishVoted)) {
+  const handleVoteClick = () => {
+    if (hasVoted) {
       toast({
         title: 'Already Voted',
-        description: `You have already voted ${type} for this token`,
+        description: 'You have already voted for this token',
         variant: 'destructive',
       });
       return;
     }
-    setVoteType(type);
     generateCaptcha();
     setShowDialog(true);
   };
@@ -62,10 +60,10 @@ const VoteButton = ({ tokenAddress }: VoteButtonProps) => {
 
     setIsVoting(true);
     try {
-      await vote(isCaptchaValid, voteType);
+      await vote(isCaptchaValid);
       toast({
         title: 'Vote Successful!',
-        description: `You voted ${voteType} for this token`,
+        description: 'Thank you for your vote',
       });
       setShowDialog(false);
       setCaptchaAnswer('');
@@ -82,46 +80,32 @@ const VoteButton = ({ tokenAddress }: VoteButtonProps) => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm" disabled className="gap-1">
-          <Loader2 className="h-4 w-4 animate-spin" />
-        </Button>
-      </div>
+      <Button variant="ghost" size="sm" disabled className="gap-2">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        <span className="text-sm">{voteCount}</span>
+      </Button>
     );
   }
 
   return (
     <>
-      <div className="flex items-center gap-2">
-        <Button
-          variant={hasBullishVoted ? 'default' : 'outline'}
-          size="sm"
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleVoteClick('bullish'); }}
-          disabled={hasBullishVoted}
-          className={`gap-1 ${hasBullishVoted ? 'bg-green-600 hover:bg-green-700' : 'hover:bg-green-50 hover:text-green-600 hover:border-green-600'}`}
-        >
-          <TrendingUp className="h-4 w-4" />
-          <span className="text-xs font-semibold">{bullishCount}</span>
-        </Button>
-
-        <Button
-          variant={hasBearishVoted ? 'default' : 'outline'}
-          size="sm"
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleVoteClick('bearish'); }}
-          disabled={hasBearishVoted}
-          className={`gap-1 ${hasBearishVoted ? 'bg-red-600 hover:bg-red-700' : 'hover:bg-red-50 hover:text-red-600 hover:border-red-600'}`}
-        >
-          <TrendingDown className="h-4 w-4" />
-          <span className="text-xs font-semibold">{bearishCount}</span>
-        </Button>
-      </div>
+      <Button
+        variant={hasVoted ? 'secondary' : 'ghost'}
+        size="sm"
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleVoteClick(); }}
+        disabled={hasVoted}
+        className="gap-2 hover:bg-primary/10"
+      >
+        <ThumbsUp className={`h-4 w-4 ${hasVoted ? 'fill-current text-primary' : ''}`} />
+        <span className="text-sm font-semibold">{voteCount}</span>
+      </Button>
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Vote {voteType === 'bullish' ? 'Bullish' : 'Bearish'}</DialogTitle>
+            <DialogTitle>Vote for Token</DialogTitle>
             <DialogDescription>
-              Please solve the captcha to confirm your {voteType} vote
+              Please solve the captcha to confirm your vote
             </DialogDescription>
           </DialogHeader>
           

@@ -16,7 +16,6 @@ interface TokenCardProps {
   baseTokenAddress: string;
   socials?: { type: string; url: string }[];
   website?: string;
-  rank?: number;
 }
 
 const TokenCard = ({
@@ -31,7 +30,6 @@ const TokenCard = ({
   baseTokenAddress,
   socials,
   website,
-  rank,
 }: TokenCardProps) => {
   const isPositive = priceChange24h >= 0;
   
@@ -62,14 +60,9 @@ const TokenCard = ({
       <Link to={`/token/${baseTokenAddress}`}>
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3 flex-1">
-            {rank && (
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted text-sm font-bold text-muted-foreground">
-                #{rank}
-              </div>
-            )}
             {logo ? (
-              <img
-                src={logo}
+              <img 
+                src={logo} 
                 alt={symbol}
                 className="w-12 h-12 rounded-full border border-border/30"
                 onError={(e) => {
