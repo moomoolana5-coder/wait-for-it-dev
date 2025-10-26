@@ -123,9 +123,10 @@ export const usePulseChainTokens = () => {
           const d = await r.json();
           const pairs: DexPair[] = (d.pairs || []) as DexPair[];
 
-          // Pick best pair per address in this batch
+          // Pick best pair per address in this batch (PulseX only)
           for (const p of pairs) {
             if (p.chainId !== 'pulsechain') continue;
+            if (p.dexId !== 'pulsex') continue; // Only PulseX DEX
             const base = p.baseToken.address.toLowerCase();
             const quote = p.quoteToken.address.toLowerCase();
             const matched = wanted.has(base) ? base : wanted.has(quote) ? quote : undefined;
@@ -160,7 +161,9 @@ export const usePulseChainTokens = () => {
             const rs = await fetch(`${DEXSCREENER_API}/search?q=${addr}`);
             if (!rs.ok) continue;
             const ds = await rs.json();
-            const found: DexPair[] = (ds.pairs || []).filter((p: DexPair) => p.chainId === 'pulsechain');
+            const found: DexPair[] = (ds.pairs || []).filter((p: DexPair) => 
+              p.chainId === 'pulsechain' && p.dexId === 'pulsex' // Only PulseX DEX
+            );
             
             let best: DexPair | null = null;
             for (const p of found) {

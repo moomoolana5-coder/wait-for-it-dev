@@ -71,10 +71,12 @@ export const useTopByVolume = () => {
         const tokenBestPairs = new Map<string, DexPair>();
         
         data.pairs.forEach((pair: DexPair) => {
-          if (pair.chainId === 'pulsechain' && pair.liquidity?.usd > 1000) {
+          // Only accept PulseChain tokens from PulseX DEX
+          if (pair.chainId === 'pulsechain' && pair.dexId === 'pulsex' && pair.liquidity?.usd > 1000) {
             const tokenAddress = pair.baseToken.address.toLowerCase();
             const existing = tokenBestPairs.get(tokenAddress);
             
+            // Prefer pairs with higher liquidity
             if (!existing || (pair.liquidity?.usd || 0) > (existing.liquidity?.usd || 0)) {
               tokenBestPairs.set(tokenAddress, pair);
             }

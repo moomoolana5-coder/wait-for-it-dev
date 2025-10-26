@@ -72,10 +72,11 @@ export const useTopByPriceGain = () => {
       }
 
       console.log(`TopByPriceGain: fetched ${pairs.length} pairs from ${addressesLower.length} addresses (batched)`);
-      // CRITICAL: Only include tokens that are EXACTLY in our wanted list
+      // CRITICAL: Only include tokens that are EXACTLY in our wanted list and from PulseX DEX
       const bestByAddress = new Map<string, DexPair>();
       for (const p of pairs) {
         if (p.chainId !== 'pulsechain') continue;
+        if (p.dexId !== 'pulsex') continue; // Only PulseX DEX
         if (p.liquidity?.usd < 1000) continue;
         
         const base = p.baseToken.address.toLowerCase();
@@ -103,6 +104,7 @@ export const useTopByPriceGain = () => {
                 (p: DexPair) => {
                   const base = p.baseToken.address.toLowerCase();
                   return p.chainId === 'pulsechain' 
+                    && p.dexId === 'pulsex' // Only PulseX DEX
                     && base === addr  // ONLY exact match on base token
                     && p.liquidity?.usd > 1000;
                 }
