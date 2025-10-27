@@ -248,7 +248,7 @@ const TokenDetail = () => {
                 <CardTitle>Price Chart</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
-                <div className="w-full h-[500px] rounded-lg overflow-hidden">
+                <div className="w-full h-[400px] rounded-lg overflow-hidden">
                   <iframe
                     src={`https://dexscreener.com/pulsechain/${mainPair.pairAddress}?embed=1&theme=dark&trades=0&info=0`}
                     className="w-full h-full border-0"
