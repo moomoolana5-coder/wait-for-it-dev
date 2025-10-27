@@ -1,1 +1,4 @@
 project_id = "ozeefnhzzjotqbtlxqxp"
+
+[functions.pulse-stats]
+verify_jwt = false

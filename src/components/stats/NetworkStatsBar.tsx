@@ -1,7 +1,7 @@
-import { ArrowUp, ArrowDown, Activity, DollarSign } from "lucide-react";
+import { ArrowUp, ArrowDown, Activity, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useNetworkStats } from "@/hooks/useNetworkStats";
+import { useOnChainNetworkStats } from "@/hooks/useOnChainNetworkStats";
 import { compactNumber, formatUSD, calculatePercentChange, formatTime } from "@/lib/formatters";
 
 interface NetworkStatsBarProps {
@@ -9,7 +9,7 @@ interface NetworkStatsBarProps {
 }
 
 const NetworkStatsBar = ({ pollIntervalMs = 30000 }: NetworkStatsBarProps) => {
-  const { transactions, dexVolume, isLoading, isError } = useNetworkStats(pollIntervalMs);
+  const { transactions, networkVolume, isLoading, isError } = useOnChainNetworkStats(pollIntervalMs);
 
   if (isError) {
     return (
@@ -81,8 +81,8 @@ const NetworkStatsBar = ({ pollIntervalMs = 30000 }: NetworkStatsBarProps) => {
     ? calculatePercentChange(transactions.value, transactions.prevValue)
     : undefined;
 
-  const volumePercentChange = dexVolume?.prevValue
-    ? calculatePercentChange(dexVolume.value, dexVolume.prevValue)
+  const volumePercentChange = networkVolume?.prevValue
+    ? calculatePercentChange(networkVolume.value, networkVolume.prevValue)
     : undefined;
 
   return (
@@ -95,11 +95,11 @@ const NetworkStatsBar = ({ pollIntervalMs = 30000 }: NetworkStatsBarProps) => {
         transactions?.timestamp
       )}
       {renderStatCard(
-        "Total DEX Volume (24h)",
-        <DollarSign className="h-4 w-4 text-accent" />,
-        dexVolume ? formatUSD(dexVolume.value) : "$0",
+        "Total Network Volume (24h)",
+        <TrendingUp className="h-4 w-4 text-accent" />,
+        networkVolume ? formatUSD(networkVolume.value) : "$0",
         volumePercentChange,
-        dexVolume?.timestamp
+        networkVolume?.timestamp
       )}
     </div>
   );
