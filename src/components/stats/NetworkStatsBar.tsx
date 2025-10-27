@@ -3,13 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNetworkStats } from "@/hooks/useNetworkStats";
 import { compactNumber, formatUSD, calculatePercentChange, formatTime } from "@/lib/formatters";
+import { LineChart, Line, ResponsiveContainer } from "recharts";
 
 interface NetworkStatsBarProps {
   pollIntervalMs?: number;
 }
 
 const NetworkStatsBar = ({ pollIntervalMs = 30000 }: NetworkStatsBarProps) => {
-  const { transactions, dexVolume, isLoading, isError } = useNetworkStats(pollIntervalMs);
+  const { transactions, dexVolume, isLoading, isError, transactionHistory, volumeHistory } = useNetworkStats(pollIntervalMs);
 
   if (isError) {
     return (
@@ -24,7 +25,8 @@ const NetworkStatsBar = ({ pollIntervalMs = 30000 }: NetworkStatsBarProps) => {
     icon: React.ReactNode,
     value: string,
     percentChange?: number,
-    timestamp?: Date
+    timestamp?: Date,
+    chartData?: Array<{ value: number }>
   ) => (
     <Card className="rounded-xl border-border/50 bg-gradient-card shadow-lg">
       <CardHeader className="pb-3">
@@ -41,8 +43,26 @@ const NetworkStatsBar = ({ pollIntervalMs = 30000 }: NetworkStatsBarProps) => {
           </>
         ) : (
           <>
-            <div className="text-3xl font-bold" aria-live="polite">
-              {value}
+            <div className="flex items-center justify-between">
+              <div className="text-3xl font-bold" aria-live="polite">
+                {value}
+              </div>
+              {chartData && chartData.length > 0 && (
+                <div className="w-32 h-12">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={chartData}>
+                      <Line 
+                        type="monotone" 
+                        dataKey="value" 
+                        stroke="#10b981" 
+                        strokeWidth={2}
+                        dot={false}
+                        isAnimationActive={false}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
             </div>
             <div className="flex items-center justify-between text-xs">
               {percentChange !== undefined && (
@@ -84,14 +104,16 @@ const NetworkStatsBar = ({ pollIntervalMs = 30000 }: NetworkStatsBarProps) => {
         <Activity className="h-4 w-4 text-primary" />,
         transactions ? compactNumber(transactions.value) : "0",
         undefined,
-        undefined
+        undefined,
+        transactionHistory
       )}
       {renderStatCard(
         "Total Volume 24h",
         <TrendingUp className="h-4 w-4 text-accent" />,
         dexVolume ? formatUSD(dexVolume.value) : "$0",
         undefined,
-        undefined
+        undefined,
+        volumeHistory
       )}
     </div>
   );

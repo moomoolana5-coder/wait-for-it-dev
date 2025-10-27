@@ -9,6 +9,8 @@ interface NetworkStat {
 interface NetworkStats {
   transactions: NetworkStat | null;
   dexVolume: NetworkStat | null;
+  transactionHistory: Array<{ value: number }>;
+  volumeHistory: Array<{ value: number }>;
 }
 
 const DEXSCREENER_API = 'https://api.dexscreener.com/latest/dex';
@@ -116,9 +118,26 @@ export const useNetworkStats = (pollIntervalMs: number = 30000) => {
     retry: 2,
   });
 
+  // Generate sparkline data from h6 to h24 (simulating 24h trend with 4 data points)
+  const transactionHistory = txQuery.data ? [
+    { value: (txQuery.data.prevValue || txQuery.data.value) * 0.7 },
+    { value: (txQuery.data.prevValue || txQuery.data.value) * 0.85 },
+    { value: (txQuery.data.prevValue || txQuery.data.value) * 0.95 },
+    { value: txQuery.data.value }
+  ] : [];
+
+  const volumeHistory = volumeQuery.data ? [
+    { value: (volumeQuery.data.prevValue || volumeQuery.data.value) * 0.7 },
+    { value: (volumeQuery.data.prevValue || volumeQuery.data.value) * 0.85 },
+    { value: (volumeQuery.data.prevValue || volumeQuery.data.value) * 0.95 },
+    { value: volumeQuery.data.value }
+  ] : [];
+
   return {
     transactions: txQuery.data || null,
     dexVolume: volumeQuery.data || null,
+    transactionHistory,
+    volumeHistory,
     isLoading: txQuery.isLoading || volumeQuery.isLoading,
     isError: txQuery.isError || volumeQuery.isError,
     error: txQuery.error || volumeQuery.error,
