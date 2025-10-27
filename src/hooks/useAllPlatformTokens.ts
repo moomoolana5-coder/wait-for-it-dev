@@ -83,7 +83,7 @@ export const useAllPlatformTokens = () => {
       const platformAddresses = await getPlatformTokenAddresses();
       console.log(`Loading ${platformAddresses.length} platform tokens...`);
       
-      const BATCH_SIZE = 30;
+      const BATCH_SIZE = 20;
       const DELAY_MS = 500;
       const bestByAddress = new Map<string, DexPair>();
 
@@ -92,6 +92,7 @@ export const useAllPlatformTokens = () => {
         batches.push(platformAddresses.slice(i, i + BATCH_SIZE));
       }
 
+      // Process batches
       for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
         const batch = batches[batchIndex];
         
@@ -101,7 +102,10 @@ export const useAllPlatformTokens = () => {
           }
 
           const response = await fetch(`${DEXSCREENER_API}/tokens/${batch.join(',')}`);
-          if (!response.ok) continue;
+          if (!response.ok) {
+            console.warn(`Batch ${batchIndex + 1} failed: HTTP ${response.status}`);
+            continue;
+          }
 
           const data = await response.json();
           const pairs: DexPair[] = (data.pairs || []);
@@ -123,11 +127,44 @@ export const useAllPlatformTokens = () => {
         }
       }
 
+      // Fallback: search for missing tokens individually
+      const missing = platformAddresses.filter(addr => !bestByAddress.has(addr));
+      if (missing.length > 0) {
+        console.log(`Fetching ${missing.length} missing tokens...`);
+        
+        for (let i = 0; i < missing.length; i++) {
+          const addr = missing[i];
+          
+          try {
+            if (i > 0 && i % 5 === 0) {
+              await new Promise(resolve => setTimeout(resolve, 300));
+            }
+
+            const rs = await fetch(`${DEXSCREENER_API}/search?q=${addr}`);
+            if (!rs.ok) continue;
+            const ds = await rs.json();
+            const found: DexPair[] = (ds.pairs || []).filter((p: DexPair) => 
+              p.chainId === 'pulsechain'
+            );
+            
+            let best: DexPair | null = null;
+            for (const p of found) {
+              const base = p.baseToken.address.toLowerCase();
+              if (base !== addr) continue;
+              if (!best || (p.liquidity?.usd || 0) > (best.liquidity?.usd || 0)) best = p;
+            }
+            if (best) bestByAddress.set(addr, best);
+          } catch (error) {
+            console.warn(`Failed to fetch ${addr}:`, error);
+          }
+        }
+      }
+
       const tokens = Array.from(bestByAddress.values());
-      console.log(`✅ Loaded ${tokens.length} platform tokens`);
+      console.log(`✅ Loaded ${tokens.length}/${platformAddresses.length} platform tokens`);
       return tokens;
     },
-    refetchInterval: 120000, // 2 minutes
+    refetchInterval: 120000,
     staleTime: 60000,
   });
 };
