@@ -45,12 +45,12 @@ const TokenConverter = ({ tokenSymbol, tokenName, priceUsd }: TokenConverterProp
 
   return (
     <Card className="sticky top-4 h-[240px] flex flex-col">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm">Converter</CardTitle>
+      <CardHeader className="pb-3 px-4 pt-4">
+        <CardTitle className="text-base font-semibold">Converter</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-2 flex-1 flex flex-col">
-        <div className="space-y-1">
-          <Label htmlFor="token-amount" className="text-xs">{tokenSymbol}</Label>
+      <CardContent className="space-y-3 flex-1 flex flex-col px-4 pb-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="token-amount" className="text-xs font-medium text-muted-foreground">{tokenSymbol}</Label>
           <Input
             id="token-amount"
             type="number"
@@ -58,23 +58,23 @@ const TokenConverter = ({ tokenSymbol, tokenName, priceUsd }: TokenConverterProp
             value={tokenAmount}
             onChange={(e) => handleTokenChange(e.target.value)}
             step="any"
-            className="h-8 text-sm"
+            className="h-9 text-sm"
           />
         </div>
 
-        <div className="flex justify-center py-1">
+        <div className="flex justify-center -my-1">
           <Button
             variant="ghost"
             size="icon"
             onClick={handleSwap}
-            className="rounded-full h-6 w-6"
+            className="rounded-full h-7 w-7 hover:bg-accent"
           >
-            <ArrowDownUp className="h-3 w-3" />
+            <ArrowDownUp className="h-3.5 w-3.5" />
           </Button>
         </div>
 
-        <div className="space-y-1">
-          <Label htmlFor="usdt-amount" className="text-xs">USDT</Label>
+        <div className="space-y-1.5">
+          <Label htmlFor="usdt-amount" className="text-xs font-medium text-muted-foreground">USDT</Label>
           <Input
             id="usdt-amount"
             type="number"
@@ -82,12 +82,12 @@ const TokenConverter = ({ tokenSymbol, tokenName, priceUsd }: TokenConverterProp
             value={usdtAmount}
             onChange={(e) => handleUsdtChange(e.target.value)}
             step="any"
-            className="h-8 text-sm"
+            className="h-9 text-sm"
           />
         </div>
 
-        <div className="pt-2 border-t text-[10px] text-muted-foreground mt-auto">
-          <p>1 {tokenSymbol} = ${priceUsd.toFixed(8)}</p>
+        <div className="pt-2 mt-auto border-t text-[11px] text-muted-foreground">
+          <p className="truncate">1 {tokenSymbol} = ${priceUsd.toFixed(8)}</p>
         </div>
       </CardContent>
     </Card>

@@ -66,26 +66,26 @@ const TokenPriceHistory = ({
 
   return (
     <Card className="bg-card/50 backdrop-blur h-[240px] flex flex-col">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm">Price History</CardTitle>
+      <CardHeader className="pb-3 px-4 pt-4">
+        <CardTitle className="text-base font-semibold">Price History</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-0 flex-1 overflow-auto">
+      <CardContent className="space-y-0 flex-1 px-4 pb-4">
         {/* 24h Range */}
-        <div className="flex items-center justify-between py-2 border-b border-border/50">
-          <span className="text-[10px] text-muted-foreground">24h Range</span>
-          <span className="font-semibold text-[10px]">
+        <div className="flex items-center justify-between py-2.5 border-b border-border/50">
+          <span className="text-xs font-medium text-muted-foreground">24h Range</span>
+          <span className="text-xs font-semibold text-right">
             {formatPrice(low24h)} – {formatPrice(high24h)}
           </span>
         </div>
 
         {/* All-Time High */}
-        <div className="py-2 border-b border-border/50">
+        <div className="py-2.5 border-b border-border/50">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] text-muted-foreground">ATH</span>
+            <span className="text-xs font-medium text-muted-foreground">All-Time High</span>
             <div className="text-right">
-              <div className="font-semibold text-[10px]">{formatPrice(estimatedATH)}</div>
-              <div className="flex items-center justify-end gap-0.5 text-[9px] text-red-500">
-                <TrendingDown className="h-2.5 w-2.5" />
+              <div className="text-xs font-semibold mb-1">{formatPrice(estimatedATH)}</div>
+              <div className="flex items-center justify-end gap-1 text-[10px] text-red-500 font-medium">
+                <TrendingDown className="h-3 w-3" />
                 <span>{Math.abs(athChangePercent).toFixed(1)}%</span>
               </div>
             </div>
@@ -93,13 +93,13 @@ const TokenPriceHistory = ({
         </div>
 
         {/* All-Time Low */}
-        <div className="py-2">
+        <div className="py-2.5">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] text-muted-foreground">ATL</span>
+            <span className="text-xs font-medium text-muted-foreground">All-Time Low</span>
             <div className="text-right">
-              <div className="font-semibold text-[10px]">{formatPrice(estimatedATL)}</div>
-              <div className="flex items-center justify-end gap-0.5 text-[9px] text-green-500">
-                <TrendingUp className="h-2.5 w-2.5" />
+              <div className="text-xs font-semibold mb-1">{formatPrice(estimatedATL)}</div>
+              <div className="flex items-center justify-end gap-1 text-[10px] text-green-500 font-medium">
+                <TrendingUp className="h-3 w-3" />
                 <span>{Math.abs(atlChangePercent).toFixed(1)}%</span>
               </div>
             </div>
