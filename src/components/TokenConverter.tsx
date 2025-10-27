@@ -44,7 +44,7 @@ const TokenConverter = ({ tokenSymbol, tokenName, priceUsd }: TokenConverterProp
   };
 
   return (
-    <Card className="sticky top-4 h-[240px] flex flex-col">
+    <Card className="h-[240px] flex flex-col">
       <CardHeader className="pb-3 px-4 pt-4">
         <CardTitle className="text-base font-semibold">Converter</CardTitle>
       </CardHeader>
