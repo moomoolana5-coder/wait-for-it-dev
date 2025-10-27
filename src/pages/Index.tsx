@@ -6,6 +6,7 @@ import TokenTicker from "@/components/TokenTicker";
 import TabNavigation from "@/components/TabNavigation";
 import TrendingTables from "@/components/TrendingTables";
 import TokenTable from "@/components/TokenTable";
+import NetworkStatsBar from "@/components/stats/NetworkStatsBar";
 import { useAllPlatformTokens } from "@/hooks/useAllPlatformTokens";
 import { useTrendingByVotes } from "@/hooks/useTrendingByVotes";
 import { useTopByVolume } from "@/hooks/useTopByVolume";
@@ -47,6 +48,7 @@ const Index = () => {
       <TokenTicker />
       
       <section className="container mx-auto px-4 py-12 space-y-8">
+        <NetworkStatsBar />
         <TrendingTables />
         <TabNavigation />
         
