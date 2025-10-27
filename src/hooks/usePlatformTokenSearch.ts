@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { FEATURED_TOKENS } from './useDexScreener';
 
 // GIGACOCK ecosystem token whitelist
@@ -51,11 +50,6 @@ interface DexPair {
 
 const DEXSCREENER_API = 'https://api.dexscreener.com/latest/dex';
 
-// Get GIGACOCK token addresses only
-const getGigacockTokenAddresses = async (): Promise<string[]> => {
-  return Array.from(GIGACOCK_TOKEN_SET);
-};
-
 const MAX_RESULTS = 50;
 
 export const usePlatformTokenSearch = (query: string) => {
@@ -64,70 +58,63 @@ export const usePlatformTokenSearch = (query: string) => {
     queryFn: async () => {
       if (!query || query.length < 2) return [];
       
-      // Get GIGACOCK token addresses only
-      const gigacockAddresses = await getGigacockTokenAddresses();
-      
-      console.log(`Searching in ${gigacockAddresses.length} GIGACOCK tokens for: "${query}"`);
-      
       const queryLower = query.toLowerCase().trim();
       const isContractAddress = /^0x[a-fA-F0-9]{40}$/.test(query);
       
-      // Fetch data for all GIGACOCK tokens
-      const BATCH_SIZE = 30;
-      const batches: string[][] = [];
-      
-      for (let i = 0; i < gigacockAddresses.length; i += BATCH_SIZE) {
-        batches.push(gigacockAddresses.slice(i, i + BATCH_SIZE));
-      }
+      console.log(`Searching DexScreener for: "${query}"`);
       
       let allPairs: DexPair[] = [];
       
-      for (const batch of batches) {
-        try {
-          const response = await fetch(`${DEXSCREENER_API}/tokens/${batch.join(',')}`);
-          if (!response.ok) continue;
-          
-          const data = await response.json();
-          const pairs = (data.pairs || []).filter((pair: DexPair) => {
-            if (pair.chainId !== 'pulsechain') return false;
-            if (pair.dexId !== 'pulsex') return false;
-            
-            const baseAddr = pair.baseToken.address.toLowerCase();
-            // Must be in GIGACOCK whitelist
-            if (!GIGACOCK_TOKEN_SET.has(baseAddr)) return false;
-            
-            return true;
-          });
-          
-          allPairs = [...allPairs, ...pairs];
-          
-          // Small delay between batches
-          await new Promise(resolve => setTimeout(resolve, 100));
-        } catch (error) {
-          console.error('Error fetching GIGACOCK batch:', error);
+      try {
+        // Use DexScreener search API
+        const response = await fetch(`${DEXSCREENER_API}/search?q=${encodeURIComponent(query)}`);
+        if (!response.ok) {
+          console.error('DexScreener search failed:', response.status);
+          return [];
         }
+        
+        const data = await response.json();
+        const pairs = (data.pairs || []).filter((pair: DexPair) => {
+          // Only PulseChain + PulseX
+          if (pair.chainId !== 'pulsechain') return false;
+          if (pair.dexId !== 'pulsex') return false;
+          
+          const baseAddr = pair.baseToken.address.toLowerCase();
+          // CRITICAL: Must be in GIGACOCK whitelist
+          if (!GIGACOCK_TOKEN_SET.has(baseAddr)) return false;
+          
+          return true;
+        });
+        
+        allPairs = pairs;
+        console.log(`Found ${allPairs.length} GIGACOCK tokens matching "${query}"`);
+        
+      } catch (error) {
+        console.error('Error searching tokens:', error);
+        return [];
       }
       
-      // Remove duplicates by pairAddress, keep highest liquidity
+      // Remove duplicates by baseToken address, keep highest liquidity
       const pairMap = new Map<string, DexPair>();
       allPairs.forEach(pair => {
-        const existing = pairMap.get(pair.baseToken.address.toLowerCase());
+        const baseAddr = pair.baseToken.address.toLowerCase();
+        const existing = pairMap.get(baseAddr);
         if (!existing || (pair.liquidity?.usd || 0) > (existing.liquidity?.usd || 0)) {
-          pairMap.set(pair.baseToken.address.toLowerCase(), pair);
+          pairMap.set(baseAddr, pair);
         }
       });
       
       let filteredPairs = Array.from(pairMap.values());
       
-      // Filter by search query
+      // Additional client-side filtering for precision
       if (isContractAddress) {
-        // Exact contract address search (case-insensitive)
+        // Exact contract address match
         const exactMatch = filteredPairs.find(
           pair => pair.baseToken.address.toLowerCase() === queryLower
         );
         filteredPairs = exactMatch ? [exactMatch] : [];
       } else {
-        // Substring search on name or symbol
+        // Substring search on name or symbol (already filtered by API, but double-check)
         filteredPairs = filteredPairs.filter(pair => {
           const symbol = pair.baseToken.symbol.toLowerCase();
           const name = pair.baseToken.name.toLowerCase();
@@ -151,5 +138,6 @@ export const usePlatformTokenSearch = (query: string) => {
     },
     enabled: query.length >= 2,
     staleTime: 30000, // Cache for 30s
+    retry: 1, // Only retry once on failure
   });
 };
