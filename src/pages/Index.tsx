@@ -1,5 +1,4 @@
 import Navbar from "@/components/Navbar";
-import PromotedTable from "@/components/PromotedTable";
 import Footer from "@/components/Footer";
 import TokenTicker from "@/components/TokenTicker";
 import TabNavigation from "@/components/TabNavigation";
@@ -88,7 +87,6 @@ const Index = () => {
         </div>
       </section>
 
-      <PromotedTable />
       <Footer />
     </div>
   );
