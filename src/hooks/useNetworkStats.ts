@@ -13,22 +13,47 @@ interface NetworkStats {
 
 const DEXSCREENER_API = 'https://api.dexscreener.com/latest/dex';
 
-// Ambil seluruh pasangan di PulseChain langsung dari Dexscreener
-// Ini mencakup lintas DEX (pulsex, 9mm, dst), bukan per token saja
-const fetchAllPulseChainPairs = async (): Promise<any[]> => {
+// Anchor tokens untuk mencakup mayoritas ekosistem PulseChain lintas DEX
+// WPLS sebagai base utama + inti stable dan token ekosistem kunci
+const ANCHOR_TOKENS: string[] = [
+  '0xA1077a294dDE1B09bB078844df40758a5D0f9a27', // WPLS
+  '0x15D38573d2feeb82e7ad5187aB8c1D52810B1f07', // USDC (bridged)
+  '0x0Cb6F5a34ad42ec934882A05265A7d5F59b51A2f', // USDT (bridged)
+  '0xefD766cCb38EaF1dfd701853BFCe31359239F305', // DAI (from ETH)
+  '0x6B175474E89094C44Da98b954EedeAC495271d0F', // DAI (bridged alt)
+  '0x95B303987A60C71504D99Aa1b13B4DA07b0790ab', // PLSX
+  '0x2fa878Ab3F87CC1C9737Fc071108F904c0B0C95d', // INC
+  '0x2b591e99afE9f32eAA6214f7B7629768c40Eeb39', // HEX
+  '0xec4252e62C6dE3D655cA9Ce3AfC12E553ebBA274', // PUMP
+  '0x4Eb7C1c05087f98Ae617d006F48914eE73fF8D2A', // XGAME
+];
+
+const fetchPairsForAddress = async (address: string) => {
   try {
-    const res = await fetch(`${DEXSCREENER_API}/pairs/pulsechain`);
+    const res = await fetch(`${DEXSCREENER_API}/search?q=${address}`);
     if (!res.ok) return [] as any[];
     const data = await res.json();
-    // Ambil hanya pasangan yang punya aktivitas atau likuiditas
     return (
-      data.pairs?.filter(
-        (p: any) => (p.volume?.h24 || 0) > 0 || (p.txns?.h24?.buys || 0) + (p.txns?.h24?.sells || 0) > 0 || (p.liquidity?.usd || 0) > 0
-      ) || []
+      data.pairs?.filter((p: any) => p.chainId === 'pulsechain' && ((p.volume?.h24 || 0) > 0 || (p.txns?.h24?.buys || 0) + (p.txns?.h24?.sells || 0) > 0)) || []
     );
   } catch {
     return [] as any[];
   }
+};
+
+// Kumpulkan semua pairs unik di PulseChain berbasis anchor tokens (dengan deduplikasi)
+const fetchAllPulseChainPairs = async (): Promise<any[]> => {
+  const seen = new Set<string>();
+  const results = await Promise.all(ANCHOR_TOKENS.map((addr) => fetchPairsForAddress(addr)));
+  const all: any[] = [];
+  results.flat().forEach((pair: any) => {
+    const id = pair?.pairAddress || `${pair?.baseToken?.address}-${pair?.quoteToken?.address}`;
+    if (id && !seen.has(id)) {
+      seen.add(id);
+      all.push(pair);
+    }
+  });
+  return all;
 };
 
 // DexScreener-wide aggregation for PulseChain
