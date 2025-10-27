@@ -12,31 +12,30 @@ interface NetworkStats {
 }
 
 const DEXSCREENER_API = 'https://api.dexscreener.com/latest/dex';
-
-// Featured tokens to aggregate stats from
-const FEATURED_TOKENS = [
-  '0x2b591e99afE9f32eAA6214f7B7629768c40Eeb39', // HEX
-  '0xA1077a294dDE1B09bB078844df40758a5D0f9a27', // WPLS
-  '0x95B303987A60C71504D99Aa1b13B4DA07b0790ab', // PLSX
-  '0x2fa878Ab3F87CC1C9737Fc071108F904c0B0C95d', // INC
-  '0x4Eb7C1c05087f98Ae617d006F48914eE73fF8D2A', // XGAME
-  '0x14aED785b3F951Eb5aC98250E8f4f530A2F83177', // GIGACOCK
-  '0xec4252e62C6dE3D655cA9Ce3AfC12E553ebBA274', // PUMP
-  '0x0392fBD58918E7ECBB2C68f4EBe4e2225C9a6468', // TRX
-];
+const PULSESCAN_API = 'https://api.scan.pulsechain.com/api';
 
 /**
- * Fetch pairs for multiple tokens in batches
+ * Fetch all active PulseChain pairs from DexScreener
+ * Uses multiple major base tokens to get comprehensive coverage
  */
-const fetchTokenPairs = async (addresses: string[]): Promise<any[]> => {
-  const batchSize = 10;
-  const allPairs: any[] = [];
-  
-  for (let i = 0; i < addresses.length; i += batchSize) {
-    const batch = addresses.slice(i, i + batchSize);
-    const promises = batch.map(async (address) => {
+const fetchAllPulseChainPairs = async (): Promise<any[]> => {
+  try {
+    // Fetch pairs for major base tokens to get comprehensive network coverage
+    const majorTokens = [
+      '0xA1077a294dDE1B09bB078844df40758a5D0f9a27', // WPLS (most pairs)
+      '0x2b591e99afE9f32eAA6214f7B7629768c40Eeb39', // HEX
+      '0x95B303987A60C71504D99Aa1b13B4DA07b0790ab', // PLSX
+      '0x15D38573d2feeb82e7ad5187aB8c1D52810B1f07', // USDC
+      '0xefD766cCb38EaF1dfd701853BFCe31359239F305', // DAI
+    ];
+
+    const allPairs: any[] = [];
+    const seenPairs = new Set<string>();
+
+    // Fetch pairs for each major token
+    const promises = majorTokens.map(async (token) => {
       try {
-        const response = await fetch(`${DEXSCREENER_API}/search?q=${address}`);
+        const response = await fetch(`${DEXSCREENER_API}/search?q=${token}`);
         if (!response.ok) return [];
         const data = await response.json();
         return data.pairs?.filter((p: any) => p.chainId === 'pulsechain') || [];
@@ -44,21 +43,31 @@ const fetchTokenPairs = async (addresses: string[]): Promise<any[]> => {
         return [];
       }
     });
+
+    const results = await Promise.all(promises);
     
-    const batchResults = await Promise.all(promises);
-    allPairs.push(...batchResults.flat());
+    // Deduplicate pairs by address
+    results.flat().forEach(pair => {
+      if (pair.pairAddress && !seenPairs.has(pair.pairAddress)) {
+        seenPairs.add(pair.pairAddress);
+        allPairs.push(pair);
+      }
+    });
+
+    return allPairs;
+  } catch (error) {
+    console.error('Error fetching PulseChain pairs:', error);
+    throw error;
   }
-  
-  return allPairs;
 };
 
 /**
  * Fetch total DEX volume for PulseChain (24h)
- * Aggregates volume from featured token pairs
+ * Aggregates volume from ALL active PulseChain pairs
  */
 const fetchDexVolume24h = async (): Promise<NetworkStat> => {
   try {
-    const pairs = await fetchTokenPairs(FEATURED_TOKENS);
+    const pairs = await fetchAllPulseChainPairs();
     
     if (pairs.length === 0) {
       throw new Error('No pairs data available');
@@ -69,11 +78,13 @@ const fetchDexVolume24h = async (): Promise<NetworkStat> => {
       return sum + (pair.volume?.h24 || 0);
     }, 0);
 
-    // Estimate previous 24h using h6 data
+    // Estimate previous 24h using h6 data (multiply by 4 for 24h approximation)
     const prevVolume = pairs.reduce((sum: number, pair: any) => {
       const h6Volume = pair.volume?.h6 || 0;
       return sum + h6Volume;
     }, 0) * 4;
+
+    console.log(`PulseChain DEX Stats: ${pairs.length} pairs, $${(totalVolume / 1000000).toFixed(2)}M volume`);
 
     return {
       value: totalVolume,
@@ -88,11 +99,11 @@ const fetchDexVolume24h = async (): Promise<NetworkStat> => {
 
 /**
  * Fetch total transactions for PulseChain (24h)
- * Using DexScreener transaction data from featured pairs
+ * Aggregates DEX transactions from ALL active PulseChain pairs
  */
 const fetchTransactions24h = async (): Promise<NetworkStat> => {
   try {
-    const pairs = await fetchTokenPairs(FEATURED_TOKENS);
+    const pairs = await fetchAllPulseChainPairs();
     
     if (pairs.length === 0) {
       throw new Error('No pairs data available');
@@ -105,12 +116,14 @@ const fetchTransactions24h = async (): Promise<NetworkStat> => {
       return sum + buys + sells;
     }, 0);
 
-    // Estimate previous 24h using h6 data
+    // Estimate previous 24h using h6 data (multiply by 4 for 24h approximation)
     const prevTxs = pairs.reduce((sum: number, pair: any) => {
       const buys = pair.txns?.h6?.buys || 0;
       const sells = pair.txns?.h6?.sells || 0;
       return sum + buys + sells;
     }, 0) * 4;
+
+    console.log(`PulseChain TX Stats: ${pairs.length} pairs, ${totalTxs.toLocaleString()} transactions`);
 
     return {
       value: totalTxs,
