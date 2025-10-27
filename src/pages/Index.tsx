@@ -1,33 +1,61 @@
+import { useState } from "react";
 import Navbar from "@/components/Navbar";
-import TokenListings from "@/components/TokenListings";
-import TrendingCoins from "@/components/TrendingCoins";
 import PromotedTable from "@/components/PromotedTable";
-import FeaturedTokens from "@/components/FeaturedTokens";
-import TopTokens from "@/components/TopTokens";
-import TrendingTables from "@/components/TrendingTables";
 import Footer from "@/components/Footer";
 import TokenTicker from "@/components/TokenTicker";
 import TabNavigation from "@/components/TabNavigation";
+import TrendingTables from "@/components/TrendingTables";
+import TokenTable from "@/components/TokenTable";
+import { useAllPlatformTokens } from "@/hooks/useAllPlatformTokens";
+import { useTrendingByVotes } from "@/hooks/useTrendingByVotes";
+import { useTopByVolume } from "@/hooks/useTopByVolume";
+import { useTopByPriceGain } from "@/hooks/useTopByPriceGain";
+import { useNewListings } from "@/hooks/useNewListings";
+import { useLocation } from "react-router-dom";
 
 const Index = () => {
+  const location = useLocation();
+  const hash = location.hash;
+  
+  const { data: allTokens, isLoading: isLoadingAll } = useAllPlatformTokens();
+  const { data: trendingTokens, isLoading: isLoadingTrending } = useTrendingByVotes();
+  const { data: topVolumeTokens, isLoading: isLoadingVolume } = useTopByVolume();
+  const { data: topGainerTokens, isLoading: isLoadingGainers } = useTopByPriceGain();
+  const { data: newListingTokens, isLoading: isLoadingNew } = useNewListings();
+  
+  // Determine which tokens to display based on active tab
+  const getActiveTokens = () => {
+    switch (hash) {
+      case '#trending':
+        return { tokens: trendingTokens || [], isLoading: isLoadingTrending, title: 'Trending Tokens' };
+      case '#top-tokens':
+        return { tokens: topVolumeTokens || [], isLoading: isLoadingVolume, title: 'Top Tokens by Volume' };
+      case '#gainers':
+        return { tokens: topGainerTokens || [], isLoading: isLoadingGainers, title: 'Biggest Gainers' };
+      case '#new':
+        return { tokens: newListingTokens || [], isLoading: isLoadingNew, title: 'New Listings' };
+      default:
+        return { tokens: allTokens || [], isLoading: isLoadingAll, title: 'All Tokens' };
+    }
+  };
+  
+  const { tokens, isLoading, title } = getActiveTokens();
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <TokenTicker />
       
-      <section className="container mx-auto px-4 py-12 space-y-16">
+      <section className="container mx-auto px-4 py-12 space-y-8">
         <TrendingTables />
         <TabNavigation />
-        <div id="trending">
-          <FeaturedTokens />
+        
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-3xl font-bold">{title}</h2>
+          </div>
+          <TokenTable tokens={tokens} isLoading={isLoading} />
         </div>
-        <div id="top-tokens">
-          <TopTokens />
-        </div>
-        <div id="gainers">
-          <TrendingCoins />
-        </div>
-        <TokenListings />
       </section>
 
       <PromotedTable />

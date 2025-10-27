@@ -1,20 +1,9 @@
-import { useTopByVolume } from "@/hooks/useTopByVolume";
-import { useTopByPriceGain } from "@/hooks/useTopByPriceGain";
-import { useTrendingByVotes } from "@/hooks/useTrendingByVotes";
+import { useAllPlatformTokens } from "@/hooks/useAllPlatformTokens";
 
 const TokenTicker = () => {
-  const { data: volumeTokens } = useTopByVolume();
-  const { data: gainTokens } = useTopByPriceGain();
-  const { data: trendingTokens } = useTrendingByVotes();
+  const { data: allTokens } = useAllPlatformTokens();
 
-  // Combine all tokens for the ticker
-  const allTokens = [
-    ...(volumeTokens || []),
-    ...(gainTokens || []),
-    ...(trendingTokens || []),
-  ].slice(0, 8); // Limit to 8 tokens
-
-  if (!allTokens.length) return null;
+  if (!allTokens || allTokens.length === 0) return null;
 
   return (
     <div className="border-b border-border bg-background/95 backdrop-blur-sm overflow-hidden">

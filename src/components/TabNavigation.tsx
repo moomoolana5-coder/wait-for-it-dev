@@ -10,7 +10,7 @@ const TabNavigation = () => {
     { id: "trending", label: "Trending", icon: TrendingUp, href: "#trending" },
     { id: "top-tokens", label: "Top Tokens", icon: Trophy, href: "#top-tokens" },
     { id: "gainers", label: "Top Gainers", icon: Flame, href: "#gainers" },
-    { id: "new", label: "New Listings", icon: Clock, href: "/new-listings" },
+    { id: "new", label: "New Listings", icon: Clock, href: "#new" },
   ];
 
   const isActive = (href: string) => {
