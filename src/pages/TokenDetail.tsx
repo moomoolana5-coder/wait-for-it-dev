@@ -78,129 +78,129 @@ const TokenDetail = () => {
         <div className="grid grid-cols-1 xl:grid-cols-[350px_1fr_350px] gap-6 items-start">
           {/* Left Column - Token Details */}
           <div className="space-y-6 order-2 xl:order-1">
-            {/* Token Header */}
+            {/* Token Header with Complete Info */}
             <Card>
               <CardContent className="pt-6">
-                <div className="flex flex-col items-center text-center mb-4">
+                {/* Header Section */}
+                <div className="flex flex-col items-center text-center mb-6 pb-6 border-b">
                   <img 
                     src={mainPair.info?.imageUrl || "/placeholder.svg"} 
                     alt={mainPair.baseToken.name}
-                    className="w-24 h-24 rounded-full border-4 border-border mb-4"
+                    className="w-20 h-20 rounded-full border-4 border-border mb-3"
                     onError={(e) => {
                       e.currentTarget.src = "/placeholder.svg";
                     }}
                   />
                   <h1 className="text-2xl font-bold mb-1">{mainPair.baseToken.name}</h1>
-                  <p className="text-lg text-muted-foreground mb-3">{mainPair.baseToken.symbol}</p>
+                  <p className="text-base text-muted-foreground mb-3">{mainPair.baseToken.symbol}</p>
+                  
+                  {/* Price Display */}
+                  <div className="mb-3">
+                    <p className="text-3xl font-bold mb-2">${parseFloat(mainPair.priceUsd).toFixed(8)}</p>
+                    <Badge variant={mainPair.priceChange.h24 >= 0 ? "default" : "destructive"} className="text-sm">
+                      {mainPair.priceChange.h24 >= 0 ? "+" : ""}{mainPair.priceChange.h24.toFixed(2)}% (24h)
+                    </Badge>
+                  </div>
+
                   <VoteButton tokenAddress={mainPair.baseToken.address} />
                 </div>
 
-                {/* Price Info */}
-                <div className="text-center mb-4 pb-4 border-b">
-                  <p className="text-3xl font-bold mb-2">${parseFloat(mainPair.priceUsd).toFixed(8)}</p>
-                  <Badge variant={mainPair.priceChange.h24 >= 0 ? "default" : "destructive"} className="text-sm">
-                    {mainPair.priceChange.h24 >= 0 ? "+" : ""}{mainPair.priceChange.h24.toFixed(2)}% (24h)
-                  </Badge>
-                </div>
-
                 {/* Social Links */}
-                <div className="flex flex-wrap justify-center gap-2">
+                <div className="flex flex-wrap justify-center gap-2 mb-6 pb-6 border-b">
                   {mainPair.info?.websites?.[0] && (
-                    <a
-                      href={mainPair.info.websites[0].url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm"
-                    >
-                      <FaGlobe className="h-3 w-3" />
-                      <span>Website</span>
-                    </a>
+                    <Button variant="outline" size="sm" asChild>
+                      <a
+                        href={mainPair.info.websites[0].url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <FaGlobe className="h-3 w-3 mr-2" />
+                        Website
+                      </a>
+                    </Button>
                   )}
                   {mainPair.info?.socials?.map((social, idx) => (
-                    <a
-                      key={idx}
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-secondary hover:bg-secondary/80 transition-colors text-sm"
-                    >
-                      {getSocialIcon(social.type)}
-                      <span className="capitalize">{social.type}</span>
-                    </a>
+                    <Button key={idx} variant="outline" size="sm" asChild>
+                      <a
+                        href={social.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {getSocialIcon(social.type)}
+                        <span className="ml-2 capitalize">{social.type}</span>
+                      </a>
+                    </Button>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* Stats */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Statistics</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Market Cap</p>
-                  <p className="text-lg font-bold">${mainPair.marketCap?.toLocaleString() || 'N/A'}</p>
-                </div>
-                <div className="border-t pt-3">
-                  <p className="text-sm text-muted-foreground mb-1">24h Volume</p>
-                  <p className="text-lg font-bold">${mainPair.volume.h24.toLocaleString()}</p>
-                </div>
-                <div className="border-t pt-3">
-                  <p className="text-sm text-muted-foreground mb-1">Liquidity</p>
-                  <p className="text-lg font-bold">${mainPair.liquidity.usd.toLocaleString()}</p>
-                </div>
-                <div className="border-t pt-3">
-                  <p className="text-sm text-muted-foreground mb-1">FDV</p>
-                  <p className="text-lg font-bold">${mainPair.fdv?.toLocaleString() || 'N/A'}</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Trading Activity */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Trading (24h)</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Buys</p>
-                  <p className="text-2xl font-bold text-green-500">{mainPair.txns.h24.buys}</p>
-                </div>
-                <div className="border-t pt-3">
-                  <p className="text-sm text-muted-foreground mb-1">Sells</p>
-                  <p className="text-2xl font-bold text-red-500">{mainPair.txns.h24.sells}</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Token Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Contract</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-2">Address</p>
-                  <div className="flex flex-col gap-2">
-                    <code className="text-xs bg-muted px-2 py-2 rounded break-all">
+                {/* Token Details Table */}
+                <div className="space-y-0">
+                  <div className="grid grid-cols-2 py-3 border-b">
+                    <span className="text-sm text-muted-foreground">Market Cap</span>
+                    <span className="text-sm font-semibold text-right">${mainPair.marketCap?.toLocaleString() || 'N/A'}</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 py-3 border-b">
+                    <span className="text-sm text-muted-foreground">FDV</span>
+                    <span className="text-sm font-semibold text-right">${mainPair.fdv?.toLocaleString() || 'N/A'}</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 py-3 border-b">
+                    <span className="text-sm text-muted-foreground">24h Volume</span>
+                    <span className="text-sm font-semibold text-right">${mainPair.volume.h24.toLocaleString()}</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 py-3 border-b">
+                    <span className="text-sm text-muted-foreground">Liquidity</span>
+                    <span className="text-sm font-semibold text-right">${mainPair.liquidity.usd.toLocaleString()}</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 py-3 border-b">
+                    <span className="text-sm text-muted-foreground">24h Buys</span>
+                    <span className="text-sm font-semibold text-right text-green-500">{mainPair.txns.h24.buys}</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 py-3 border-b">
+                    <span className="text-sm text-muted-foreground">24h Sells</span>
+                    <span className="text-sm font-semibold text-right text-red-500">{mainPair.txns.h24.sells}</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 py-3 border-b">
+                    <span className="text-sm text-muted-foreground">DEX</span>
+                    <span className="text-sm font-semibold text-right capitalize">{mainPair.dexId}</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 py-3 border-b">
+                    <span className="text-sm text-muted-foreground">Pair Created</span>
+                    <span className="text-sm font-semibold text-right">
+                      {new Date(mainPair.pairCreatedAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </span>
+                  </div>
+                  
+                  <div className="pt-4">
+                    <p className="text-xs text-muted-foreground mb-2">Contract Address</p>
+                    <code className="text-xs bg-muted px-2 py-2 rounded block break-all mb-2">
                       {mainPair.baseToken.address}
                     </code>
-                    <div className="flex gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={handleCopyAddress}
-                        className="flex-1 text-xs"
+                        className="w-full"
                       >
                         {copied ? (
                           <>
-                            <Check className="h-3 w-3 mr-1" />
+                            <Check className="h-3 w-3 mr-2" />
                             Copied
                           </>
                         ) : (
                           <>
-                            <Copy className="h-3 w-3 mr-1" />
+                            <Copy className="h-3 w-3 mr-2" />
                             Copy
                           </>
                         )}
@@ -209,51 +209,45 @@ const TokenDetail = () => {
                         variant="outline"
                         size="sm"
                         asChild
-                        className="flex-1 text-xs"
+                        className="w-full"
                       >
                         <a
                           href={`https://scan.pulsechain.com/address/${mainPair.baseToken.address}`}
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          <ExternalLink className="h-3 w-3 mr-1" />
+                          <ExternalLink className="h-3 w-3 mr-2" />
                           Explorer
                         </a>
                       </Button>
                     </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      asChild
+                      className="w-full mt-2"
+                    >
+                      <a
+                        href={mainPair.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <ExternalLink className="h-3 w-3 mr-2" />
+                        View on DexScreener
+                      </a>
+                    </Button>
                   </div>
-                </div>
-
-                <div className="border-t pt-3">
-                  <p className="text-xs text-muted-foreground mb-1">DEX</p>
-                  <p className="font-semibold capitalize">{mainPair.dexId}</p>
-                </div>
-
-                <div className="border-t pt-3">
-                  <p className="text-xs text-muted-foreground mb-1">Pair</p>
-                  <a
-                    href={mainPair.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline font-semibold text-sm flex items-center gap-1"
-                  >
-                    View on DexScreener
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                </div>
-
-                <div className="border-t pt-3">
-                  <p className="text-xs text-muted-foreground mb-1">Created</p>
-                  <p className="font-semibold text-sm">
-                    {new Date(mainPair.pairCreatedAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric'
-                    })}
-                  </p>
                 </div>
               </CardContent>
             </Card>
+
+            {/* Price History moved here */}
+            <TokenPriceHistory
+              currentPrice={parseFloat(mainPair.priceUsd)}
+              priceChange24h={mainPair.priceChange.h24}
+              priceChange6h={mainPair.priceChange.h6}
+              pairCreatedAt={mainPair.pairCreatedAt}
+            />
           </div>
 
           {/* Center Column - Price Chart */}
@@ -274,18 +268,12 @@ const TokenDetail = () => {
             </Card>
           </div>
 
-          {/* Right Column - Converter & Price History */}
+          {/* Right Column - Converter Only */}
           <div className="space-y-6 order-3">
             <TokenConverter 
               tokenSymbol={mainPair.baseToken.symbol}
               tokenName={mainPair.baseToken.name}
               priceUsd={parseFloat(mainPair.priceUsd)}
-            />
-            <TokenPriceHistory
-              currentPrice={parseFloat(mainPair.priceUsd)}
-              priceChange24h={mainPair.priceChange.h24}
-              priceChange6h={mainPair.priceChange.h6}
-              pairCreatedAt={mainPair.pairCreatedAt}
             />
           </div>
         </div>
