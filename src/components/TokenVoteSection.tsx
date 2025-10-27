@@ -88,69 +88,69 @@ const TokenVoteSection = ({ tokenAddress }: TokenVoteSectionProps) => {
           <CardTitle className="text-xl">Vote Sentiment</CardTitle>
         </CardHeader>
         <CardContent className="pt-6">
-          <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="grid grid-cols-2 gap-2 mb-3">
             {/* Bullish Button */}
             <button
               onClick={() => handleVoteClick('bullish')}
               disabled={hasVoted || isLoading}
-              className="group relative overflow-hidden rounded-lg bg-gradient-to-br from-emerald-500/90 to-emerald-600/90 p-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="group relative overflow-hidden rounded-md bg-gradient-to-br from-emerald-500/90 to-emerald-600/90 p-2.5 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               
-              <div className="relative flex flex-col items-center justify-center gap-2">
-                <div className="flex items-center gap-1.5">
+              <div className="relative flex flex-col items-center justify-center gap-1">
+                <div className="flex items-center gap-1">
                   {isLoading ? (
-                    <Loader2 className="h-5 w-5 animate-spin text-white" />
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-white" />
                   ) : (
-                    <TrendingUp className="h-5 w-5 text-white" />
+                    <TrendingUp className="h-3.5 w-3.5 text-white" />
                   )}
-                  <span className="text-base font-bold text-white">Bullish</span>
+                  <span className="text-xs font-bold text-white">Bullish</span>
                 </div>
-                <div className="text-2xl font-black text-white drop-shadow-lg">
+                <div className="text-lg font-black text-white drop-shadow-lg">
                   {Math.floor(voteCount * 0.6)}
                 </div>
-                <div className="text-xs font-semibold text-white/90">
+                <div className="text-[10px] font-semibold text-white/90">
                   {voteCount > 0 ? '60%' : '0%'}
                 </div>
               </div>
 
-              <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-12 translate-x-12" />
-              <div className="absolute bottom-0 left-0 w-16 h-16 bg-black/5 rounded-full translate-y-8 -translate-x-8" />
+              <div className="absolute top-0 right-0 w-16 h-16 bg-white/5 rounded-full -translate-y-8 translate-x-8" />
+              <div className="absolute bottom-0 left-0 w-12 h-12 bg-black/5 rounded-full translate-y-6 -translate-x-6" />
             </button>
 
             {/* Bearish Button */}
             <button
               onClick={() => handleVoteClick('bearish')}
               disabled={hasVoted || isLoading}
-              className="group relative overflow-hidden rounded-lg bg-gradient-to-br from-rose-500/90 to-rose-600/90 p-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="group relative overflow-hidden rounded-md bg-gradient-to-br from-rose-500/90 to-rose-600/90 p-2.5 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               
-              <div className="relative flex flex-col items-center justify-center gap-2">
-                <div className="flex items-center gap-1.5">
+              <div className="relative flex flex-col items-center justify-center gap-1">
+                <div className="flex items-center gap-1">
                   {isLoading ? (
-                    <Loader2 className="h-5 w-5 animate-spin text-white" />
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-white" />
                   ) : (
-                    <TrendingDown className="h-5 w-5 text-white" />
+                    <TrendingDown className="h-3.5 w-3.5 text-white" />
                   )}
-                  <span className="text-base font-bold text-white">Bearish</span>
+                  <span className="text-xs font-bold text-white">Bearish</span>
                 </div>
-                <div className="text-2xl font-black text-white drop-shadow-lg">
+                <div className="text-lg font-black text-white drop-shadow-lg">
                   {Math.floor(voteCount * 0.4)}
                 </div>
-                <div className="text-xs font-semibold text-white/90">
+                <div className="text-[10px] font-semibold text-white/90">
                   {voteCount > 0 ? '40%' : '0%'}
                 </div>
               </div>
 
-              <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-12 translate-x-12" />
-              <div className="absolute bottom-0 left-0 w-16 h-16 bg-black/5 rounded-full translate-y-8 -translate-x-8" />
+              <div className="absolute top-0 right-0 w-16 h-16 bg-white/5 rounded-full -translate-y-8 translate-x-8" />
+              <div className="absolute bottom-0 left-0 w-12 h-12 bg-black/5 rounded-full translate-y-6 -translate-x-6" />
             </button>
           </div>
 
           {/* Progress Bar */}
-          <div className="space-y-2">
-            <div className="flex h-4 rounded-full overflow-hidden bg-muted shadow-inner">
+          <div className="space-y-1.5">
+            <div className="flex h-2 rounded-full overflow-hidden bg-muted shadow-inner">
               <div 
                 className="bg-gradient-to-r from-emerald-500 to-emerald-600 transition-all duration-500"
                 style={{ width: voteCount > 0 ? '60%' : '50%' }}
