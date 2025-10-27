@@ -110,3 +110,37 @@ All colors MUST be HSL.
     @apply bg-background text-foreground dark;
   }
 }
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .ticker-container {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .ticker-content {
+    display: flex;
+    animation: ticker 30s linear infinite;
+  }
+
+  .ticker-item {
+    flex-shrink: 0;
+  }
+
+  @keyframes ticker {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+}
