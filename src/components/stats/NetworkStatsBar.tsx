@@ -77,28 +77,20 @@ const NetworkStatsBar = ({ pollIntervalMs = 30000 }: NetworkStatsBarProps) => {
     </Card>
   );
 
-  const txPercentChange = transactions?.prevValue !== null && transactions?.prevValue !== undefined
-    ? calculatePercentChange(transactions.value, transactions.prevValue)
-    : undefined;
-
-  const volumePercentChange = dexVolume?.prevValue !== null && dexVolume?.prevValue !== undefined
-    ? calculatePercentChange(dexVolume.value, dexVolume.prevValue)
-    : undefined;
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
       {renderStatCard(
         "Total Transactions 24h",
         <Activity className="h-4 w-4 text-primary" />,
         transactions ? compactNumber(transactions.value) : "0",
-        txPercentChange,
+        undefined,
         transactions?.timestamp
       )}
       {renderStatCard(
         "Total Volume 24h",
         <TrendingUp className="h-4 w-4 text-accent" />,
         dexVolume ? formatUSD(dexVolume.value) : "$0",
-        volumePercentChange,
+        undefined,
         dexVolume?.timestamp
       )}
     </div>
