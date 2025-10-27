@@ -88,69 +88,75 @@ const TokenVoteSection = ({ tokenAddress }: TokenVoteSectionProps) => {
           <CardTitle className="text-xl">Vote Sentiment</CardTitle>
         </CardHeader>
         <CardContent className="pt-6">
-          <div className="grid grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-2 gap-4 mb-6">
             {/* Bullish Button */}
-            <div className="space-y-3">
-              <Button
-                variant={hasVoted ? 'secondary' : 'default'}
-                size="lg"
-                onClick={() => handleVoteClick('bullish')}
-                disabled={hasVoted || isLoading}
-                className="w-full h-24 flex flex-col gap-2 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg hover:shadow-xl transition-all"
-              >
+            <button
+              onClick={() => handleVoteClick('bullish')}
+              disabled={hasVoted || isLoading}
+              className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-emerald-500/90 to-emerald-600/90 p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              
+              <div className="relative flex flex-col items-center justify-center gap-3">
                 <div className="flex items-center gap-2">
                   {isLoading ? (
-                    <Loader2 className="h-6 w-6 animate-spin" />
+                    <Loader2 className="h-7 w-7 animate-spin text-white" />
                   ) : (
-                    <TrendingUp className="h-6 w-6" />
+                    <TrendingUp className="h-7 w-7 text-white" />
                   )}
-                  <span className="text-lg font-bold">Bullish</span>
+                  <span className="text-xl font-bold text-white">Bullish</span>
                 </div>
-                <div className="text-3xl font-black">{Math.floor(voteCount * 0.6)}</div>
-              </Button>
-              <div className="text-center">
-                <div className="text-sm font-semibold text-green-600">
+                <div className="text-4xl font-black text-white drop-shadow-lg">
+                  {Math.floor(voteCount * 0.6)}
+                </div>
+                <div className="text-sm font-semibold text-white/90">
                   {voteCount > 0 ? '60%' : '0%'}
                 </div>
               </div>
-            </div>
+
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16" />
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/5 rounded-full translate-y-12 -translate-x-12" />
+            </button>
 
             {/* Bearish Button */}
-            <div className="space-y-3">
-              <Button
-                variant={hasVoted ? 'secondary' : 'default'}
-                size="lg"
-                onClick={() => handleVoteClick('bearish')}
-                disabled={hasVoted || isLoading}
-                className="w-full h-24 flex flex-col gap-2 bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl transition-all"
-              >
+            <button
+              onClick={() => handleVoteClick('bearish')}
+              disabled={hasVoted || isLoading}
+              className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-rose-500/90 to-rose-600/90 p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              
+              <div className="relative flex flex-col items-center justify-center gap-3">
                 <div className="flex items-center gap-2">
                   {isLoading ? (
-                    <Loader2 className="h-6 w-6 animate-spin" />
+                    <Loader2 className="h-7 w-7 animate-spin text-white" />
                   ) : (
-                    <TrendingDown className="h-6 w-6" />
+                    <TrendingDown className="h-7 w-7 text-white" />
                   )}
-                  <span className="text-lg font-bold">Bearish</span>
+                  <span className="text-xl font-bold text-white">Bearish</span>
                 </div>
-                <div className="text-3xl font-black">{Math.floor(voteCount * 0.4)}</div>
-              </Button>
-              <div className="text-center">
-                <div className="text-sm font-semibold text-red-600">
+                <div className="text-4xl font-black text-white drop-shadow-lg">
+                  {Math.floor(voteCount * 0.4)}
+                </div>
+                <div className="text-sm font-semibold text-white/90">
                   {voteCount > 0 ? '40%' : '0%'}
                 </div>
               </div>
-            </div>
+
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16" />
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/5 rounded-full translate-y-12 -translate-x-12" />
+            </button>
           </div>
 
           {/* Progress Bar */}
           <div className="space-y-2">
-            <div className="flex h-3 rounded-full overflow-hidden bg-muted">
+            <div className="flex h-4 rounded-full overflow-hidden bg-muted shadow-inner">
               <div 
-                className="bg-gradient-to-r from-green-500 to-green-600 transition-all duration-500"
+                className="bg-gradient-to-r from-emerald-500 to-emerald-600 transition-all duration-500"
                 style={{ width: voteCount > 0 ? '60%' : '50%' }}
               />
               <div 
-                className="bg-gradient-to-r from-red-500 to-red-600 transition-all duration-500"
+                className="bg-gradient-to-r from-rose-500 to-rose-600 transition-all duration-500"
                 style={{ width: voteCount > 0 ? '40%' : '50%' }}
               />
             </div>
