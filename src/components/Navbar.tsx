@@ -6,12 +6,15 @@ import gigacockLogo from "@/assets/gigacock-logo.png";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import TokenSearch from "./TokenSearch";
+import { VerificationRequestDialog } from "./VerificationRequestDialog";
+import { CheckCircle } from "lucide-react";
 
 const Navbar = () => {
   const { address, isConnected } = useAccount();
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
   const [isOpen, setIsOpen] = useState(false);
+  const [verificationDialogOpen, setVerificationDialogOpen] = useState(false);
 
   const handleConnect = () => {
     const connector = connectors[0];
@@ -50,6 +53,14 @@ const Navbar = () => {
             <a href="#advertise" className="text-accent hover:text-accent/80 transition-colors font-medium">
               Advertise ✨
             </a>
+            <Button 
+              onClick={() => setVerificationDialogOpen(true)}
+              variant="outline"
+              className="border-yellow-500 text-yellow-500 hover:bg-yellow-500/10"
+            >
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Verify Token
+            </Button>
             
             {isConnected ? (
               <Button 
@@ -130,12 +141,27 @@ const Navbar = () => {
                   >
                     Advertise ✨
                   </a>
+                  <Button 
+                    onClick={() => {
+                      setVerificationDialogOpen(true);
+                      setIsOpen(false);
+                    }}
+                    variant="outline"
+                    className="border-yellow-500 text-yellow-500 hover:bg-yellow-500/10 w-full justify-start text-lg"
+                  >
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Verify Token
+                  </Button>
                 </div>
               </SheetContent>
             </Sheet>
           </div>
         </div>
       </div>
+      <VerificationRequestDialog 
+        open={verificationDialogOpen} 
+        onOpenChange={setVerificationDialogOpen}
+      />
     </nav>
   );
 };

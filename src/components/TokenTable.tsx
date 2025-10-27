@@ -2,6 +2,8 @@ import { DexPair } from "@/hooks/useAllPlatformTokens";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import VoteButton from "./VoteButton";
+import { VerifiedBadge } from "./VerifiedBadge";
+import { useTokenVerification } from "@/hooks/useTokenVerification";
 import {
   Table,
   TableBody,
@@ -64,78 +66,91 @@ const TokenTable = ({ tokens, isLoading }: TokenTableProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {tokens.map((token, index) => {
-            const priceChange = token.priceChange?.h24 || 0;
-            const isPositive = priceChange >= 0;
-            
-            return (
-              <TableRow key={token.pairAddress} className="border-border hover:bg-muted/50">
-                <TableCell className="font-medium text-muted-foreground">
-                  {index + 1}
-                </TableCell>
-                <TableCell>
-                  <Link
-                    to={`/token/${token.baseToken.address}`}
-                    className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-                  >
-                    {token.info?.imageUrl ? (
-                      <img
-                        src={token.info.imageUrl}
-                        alt={token.baseToken.symbol}
-                        className="h-8 w-8 rounded-full"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
-                        <span className="text-xs font-bold">
-                          {token.baseToken.symbol.slice(0, 2)}
-                        </span>
-                      </div>
-                    )}
-                    <div>
-                      <div className="font-semibold">{token.baseToken.symbol}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {token.baseToken.name}
-                      </div>
-                    </div>
-                  </Link>
-                </TableCell>
-                <TableCell className="text-right font-mono">
-                  {formatPrice(token.priceUsd)}
-                </TableCell>
-                <TableCell className="text-right">
-                  <div
-                    className={`flex items-center justify-end gap-1 font-medium ${
-                      isPositive ? 'text-accent' : 'text-destructive'
-                    }`}
-                  >
-                    {isPositive ? (
-                      <TrendingUp className="h-4 w-4" />
-                    ) : (
-                      <TrendingDown className="h-4 w-4" />
-                    )}
-                    {Math.abs(priceChange).toFixed(2)}%
-                  </div>
-                </TableCell>
-                <TableCell className="text-right font-medium">
-                  {formatNumber(token.volume.h24)}
-                </TableCell>
-                <TableCell className="text-right font-medium">
-                  {formatNumber(token.liquidity.usd)}
-                </TableCell>
-                <TableCell>
-                  <div className="flex justify-center">
-                    <VoteButton tokenAddress={token.baseToken.address} />
-                  </div>
-                </TableCell>
-              </TableRow>
-            );
-          })}
+          {tokens.map((token, index) => (
+            <TokenRow key={token.pairAddress} token={token} index={index} formatNumber={formatNumber} formatPrice={formatPrice} />
+          ))}
         </TableBody>
       </Table>
     </div>
+  );
+};
+
+const TokenRow = ({ token, index, formatNumber, formatPrice }: { 
+  token: DexPair; 
+  index: number; 
+  formatNumber: (num: number) => string;
+  formatPrice: (price: string | number) => string;
+}) => {
+  const { data: isVerified } = useTokenVerification(token.baseToken.address);
+  const priceChange = token.priceChange?.h24 || 0;
+  const isPositive = priceChange >= 0;
+  
+  return (
+    <TableRow className="border-border hover:bg-muted/50">
+      <TableCell className="font-medium text-muted-foreground">
+        {index + 1}
+      </TableCell>
+      <TableCell>
+        <Link
+          to={`/token/${token.baseToken.address}`}
+          className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+        >
+          {token.info?.imageUrl ? (
+            <img
+              src={token.info.imageUrl}
+              alt={token.baseToken.symbol}
+              className="h-8 w-8 rounded-full"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          ) : (
+            <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+              <span className="text-xs font-bold">
+                {token.baseToken.symbol.slice(0, 2)}
+              </span>
+            </div>
+          )}
+          <div>
+            <div className="font-semibold flex items-center gap-2">
+              {token.baseToken.symbol}
+              {isVerified && <VerifiedBadge className="w-4 h-4" />}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {token.baseToken.name}
+            </div>
+          </div>
+        </Link>
+      </TableCell>
+      <TableCell className="text-right font-mono">
+        {formatPrice(token.priceUsd)}
+      </TableCell>
+      <TableCell className="text-right">
+        <div
+          className={`flex items-center justify-end gap-1 font-medium ${
+            isPositive ? 'text-accent' : 'text-destructive'
+          }`}
+        >
+          {isPositive ? (
+            <TrendingUp className="h-4 w-4" />
+          ) : (
+            <TrendingDown className="h-4 w-4" />
+          )}
+          {Math.abs(priceChange).toFixed(2)}%
+        </div>
+      </TableCell>
+      <TableCell className="text-right font-medium">
+        {formatNumber(token.volume.h24)}
+      </TableCell>
+      <TableCell className="text-right font-medium">
+        {formatNumber(token.liquidity.usd)}
+      </TableCell>
+      <TableCell>
+        <div className="flex justify-center">
+          <VoteButton tokenAddress={token.baseToken.address} />
+        </div>
+      </TableCell>
+    </TableRow>
   );
 };
 
