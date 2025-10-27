@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface NetworkStat {
   value: number;
-  prevValue?: number;
+  prevValue: number | null;
   timestamp: Date;
   source?: string;
 }
@@ -28,13 +28,13 @@ const fetchOnChainStats = async (): Promise<OnChainNetworkStats> => {
     return {
       transactions: {
         value: data.tx24h?.value || 0,
-        prevValue: data.tx24h?.prevValue,
+        prevValue: data.tx24h?.prevValue ?? null,
         timestamp: new Date(data.tx24h?.updatedAt || Date.now()),
         source: data.tx24h?.source,
       },
       networkVolume: {
         value: data.networkVolume24h?.value || 0,
-        prevValue: data.networkVolume24h?.prevValue,
+        prevValue: data.networkVolume24h?.prevValue ?? null,
         timestamp: new Date(data.networkVolume24h?.updatedAt || Date.now()),
         source: data.networkVolume24h?.source,
       },
@@ -45,13 +45,13 @@ const fetchOnChainStats = async (): Promise<OnChainNetworkStats> => {
     return {
       transactions: {
         value: 0,
-        prevValue: 0,
+        prevValue: null,
         timestamp: new Date(),
         source: 'error-fallback',
       },
       networkVolume: {
         value: 0,
-        prevValue: 0,
+        prevValue: null,
         timestamp: new Date(),
         source: 'error-fallback',
       },

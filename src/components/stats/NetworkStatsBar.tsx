@@ -77,11 +77,11 @@ const NetworkStatsBar = ({ pollIntervalMs = 30000 }: NetworkStatsBarProps) => {
     </Card>
   );
 
-  const txPercentChange = transactions?.prevValue
+  const txPercentChange = transactions?.prevValue !== null && transactions?.prevValue !== undefined
     ? calculatePercentChange(transactions.value, transactions.prevValue)
     : undefined;
 
-  const volumePercentChange = networkVolume?.prevValue
+  const volumePercentChange = networkVolume?.prevValue !== null && networkVolume?.prevValue !== undefined
     ? calculatePercentChange(networkVolume.value, networkVolume.prevValue)
     : undefined;
 
