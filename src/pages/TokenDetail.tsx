@@ -1,18 +1,31 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, ExternalLink, Loader2 } from "lucide-react";
+import { ArrowLeft, ExternalLink, Loader2, Copy, Check } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useTokenByAddress } from "@/hooks/useDexScreener";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import TokenConverter from "@/components/TokenConverter";
 import VoteButton from "@/components/VoteButton";
 import TokenPriceHistory from "@/components/TokenPriceHistory";
 import { FaTwitter, FaTelegram, FaGlobe, FaDiscord } from "react-icons/fa";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const TokenDetail = () => {
   const { address } = useParams<{ address: string }>();
   const { data: pairs, isLoading } = useTokenByAddress(address || "");
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyAddress = () => {
+    if (address) {
+      navigator.clipboard.writeText(address);
+      setCopied(true);
+      toast.success("Contract address copied!");
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -63,9 +76,117 @@ const TokenDetail = () => {
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-          {/* Chart Section */}
+          {/* Left Column - Chart & Token Info */}
           <div className="lg:col-span-2 space-y-6">
-            <Card className="mb-6">
+            {/* Token Header Card */}
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <img 
+                    src={mainPair.info?.imageUrl || "/placeholder.svg"} 
+                    alt={mainPair.baseToken.name}
+                    className="w-20 h-20 rounded-full border-4 border-border"
+                    onError={(e) => {
+                      e.currentTarget.src = "/placeholder.svg";
+                    }}
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between gap-4 mb-3">
+                      <div>
+                        <h1 className="text-4xl font-bold mb-1">{mainPair.baseToken.name}</h1>
+                        <p className="text-xl text-muted-foreground">{mainPair.baseToken.symbol}</p>
+                      </div>
+                      <VoteButton tokenAddress={mainPair.baseToken.address} />
+                    </div>
+                    
+                    {/* Social Links */}
+                    <div className="flex flex-wrap gap-3 mb-4">
+                      {mainPair.info?.websites?.[0] && (
+                        <a
+                          href={mainPair.info.websites[0].url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-secondary hover:bg-secondary/80 transition-colors"
+                        >
+                          <FaGlobe className="h-4 w-4" />
+                          <span className="text-sm">Website</span>
+                        </a>
+                      )}
+                      {mainPair.info?.socials?.map((social, idx) => (
+                        <a
+                          key={idx}
+                          href={social.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-secondary hover:bg-secondary/80 transition-colors"
+                        >
+                          {getSocialIcon(social.type)}
+                          <span className="text-sm capitalize">{social.type}</span>
+                        </a>
+                      ))}
+                    </div>
+
+                    {/* Price Info */}
+                    <div className="space-y-2">
+                      <p className="text-5xl font-bold">${parseFloat(mainPair.priceUsd).toFixed(8)}</p>
+                      <Badge variant={mainPair.priceChange.h24 >= 0 ? "default" : "destructive"} className="text-base px-3 py-1">
+                        {mainPair.priceChange.h24 >= 0 ? "+" : ""}{mainPair.priceChange.h24.toFixed(2)}% (24h)
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card>
+                <CardContent className="pt-6">
+                  <p className="text-sm text-muted-foreground mb-1">Market Cap</p>
+                  <p className="text-xl font-bold">${mainPair.marketCap?.toLocaleString() || 'N/A'}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <p className="text-sm text-muted-foreground mb-1">24h Volume</p>
+                  <p className="text-xl font-bold">${mainPair.volume.h24.toLocaleString()}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <p className="text-sm text-muted-foreground mb-1">Liquidity</p>
+                  <p className="text-xl font-bold">${mainPair.liquidity.usd.toLocaleString()}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <p className="text-sm text-muted-foreground mb-1">FDV</p>
+                  <p className="text-xl font-bold">${mainPair.fdv?.toLocaleString() || 'N/A'}</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Trading Activity */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Trading Activity (24h)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">Buys</p>
+                    <p className="text-3xl font-bold text-green-500">{mainPair.txns.h24.buys}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">Sells</p>
+                    <p className="text-3xl font-bold text-red-500">{mainPair.txns.h24.sells}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Price Chart */}
+            <Card>
               <CardHeader>
                 <CardTitle>Price Chart</CardTitle>
               </CardHeader>
@@ -80,108 +201,75 @@ const TokenDetail = () => {
               </CardContent>
             </Card>
 
-            {/* Main Info */}
-            <div className="space-y-6">
+            {/* Token Information */}
             <Card>
               <CardHeader>
-                <div className="flex items-start gap-4">
-                  <img 
-                    src={mainPair.info?.imageUrl || "/placeholder.svg"} 
-                    alt={mainPair.baseToken.name}
-                    className="w-16 h-16 rounded-full"
-                    onError={(e) => {
-                      e.currentTarget.src = "/placeholder.svg";
-                    }}
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <CardTitle className="text-3xl">{mainPair.baseToken.name}</CardTitle>
-                        <p className="text-muted-foreground">{mainPair.baseToken.symbol}</p>
-                      </div>
-                      <VoteButton tokenAddress={mainPair.baseToken.address} />
-                    </div>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {mainPair.info?.socials?.map((social, idx) => (
-                        <a
-                          key={idx}
-                          href={social.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-muted-foreground hover:text-primary transition-colors"
-                        >
-                          {getSocialIcon(social.type)}
-                        </a>
-                      ))}
-                      {mainPair.info?.websites?.[0] && (
-                        <a
-                          href={mainPair.info.websites[0].url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-muted-foreground hover:text-primary transition-colors"
-                        >
-                          <FaGlobe className="h-4 w-4" />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                <CardTitle>Token Information</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-4xl font-bold">${parseFloat(mainPair.priceUsd).toFixed(8)}</p>
-                    <Badge variant={mainPair.priceChange.h24 >= 0 ? "default" : "destructive"} className="mt-2">
-                      {mainPair.priceChange.h24 >= 0 ? "+" : ""}{mainPair.priceChange.h24.toFixed(2)}%
-                    </Badge>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t">
-                    <div>
-                      <p className="text-sm text-muted-foreground">24h Volume</p>
-                      <p className="font-semibold">${mainPair.volume.h24.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Liquidity</p>
-                      <p className="font-semibold">${mainPair.liquidity.usd.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">24h Buys</p>
-                      <p className="font-semibold text-green-500">{mainPair.txns.h24.buys}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">24h Sells</p>
-                      <p className="font-semibold text-red-500">{mainPair.txns.h24.sells}</p>
-                    </div>
-                  </div>
-
-                  {mainPair.marketCap && (
-                    <div className="pt-4 border-t">
-                      <p className="text-sm text-muted-foreground">Market Cap</p>
-                      <p className="font-semibold text-lg">${mainPair.marketCap.toLocaleString()}</p>
-                    </div>
-                  )}
-
-                  <div className="pt-4 border-t">
-                    <p className="text-sm text-muted-foreground mb-2">Contract Address</p>
-                    <div className="flex items-center gap-2">
-                      <code className="text-xs bg-muted px-2 py-1 rounded flex-1 overflow-x-auto">
-                        {mainPair.baseToken.address}
-                      </code>
+              <CardContent className="space-y-4">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">Contract Address</p>
+                  <div className="flex items-center gap-2">
+                    <code className="text-sm bg-muted px-3 py-2 rounded flex-1 overflow-x-auto">
+                      {mainPair.baseToken.address}
+                    </code>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCopyAddress}
+                      className="shrink-0"
+                    >
+                      {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      asChild
+                      className="shrink-0"
+                    >
                       <a
-                        href={mainPair.url}
+                        href={`https://scan.pulsechain.com/address/${mainPair.baseToken.address}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-primary hover:text-accent transition-colors"
                       >
                         <ExternalLink className="h-4 w-4" />
                       </a>
-                    </div>
+                    </Button>
                   </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">DEX</p>
+                    <p className="font-semibold capitalize">{mainPair.dexId}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Pair Address</p>
+                    <a
+                      href={mainPair.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline font-semibold text-sm"
+                    >
+                      View on DexScreener
+                    </a>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Pair Created</p>
+                  <p className="font-semibold">
+                    {new Date(mainPair.pairCreatedAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </p>
                 </div>
               </CardContent>
             </Card>
-            </div>
           </div>
 
           {/* Converter & Price History */}
