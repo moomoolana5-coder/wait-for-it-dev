@@ -12,8 +12,6 @@ import AddCoin from "./pages/AddCoin";
 import Auth from "./pages/Auth";
 import TokenDetail from "./pages/TokenDetail";
 import Gigacock from "./pages/Gigacock";
-import AdminVerification from "./pages/AdminVerification";
-import AdminInstructions from "./pages/AdminInstructions";
 
 const queryClient = new QueryClient();
 
@@ -31,8 +29,6 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/token/:address" element={<TokenDetail />} />
             <Route path="/gigacock" element={<Gigacock />} />
-            <Route path="/admin/verification" element={<AdminVerification />} />
-            <Route path="/admin/instructions" element={<AdminInstructions />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
