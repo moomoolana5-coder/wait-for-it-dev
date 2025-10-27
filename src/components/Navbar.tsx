@@ -41,12 +41,12 @@ const Navbar = () => {
             <Link to="/" className="text-foreground font-medium hover:text-primary transition-colors">
               Home
             </Link>
-            <Link to="/new-listings" className="text-foreground hover:text-primary transition-colors">
-              New Listings
+            <Link to="/gigacock" className="text-foreground hover:text-primary transition-colors">
+              GIGACOCK
             </Link>
-            <Link to="/add-coin" className="text-foreground hover:text-accent transition-colors">
-              Add Coin
-            </Link>
+            <a href="https://forms.google.com" target="_blank" rel="noopener noreferrer" className="text-foreground hover:text-accent transition-colors">
+              Listing Form
+            </a>
             <a href="#advertise" className="text-accent hover:text-accent/80 transition-colors font-medium">
               Advertise ✨
             </a>
@@ -108,19 +108,21 @@ const Navbar = () => {
                     Home
                   </Link>
                   <Link 
-                    to="/new-listings" 
+                    to="/gigacock" 
                     className="text-lg hover:text-primary transition-colors"
                     onClick={() => setIsOpen(false)}
                   >
-                    New Listings
+                    GIGACOCK
                   </Link>
-                  <Link 
-                    to="/add-coin" 
+                  <a 
+                    href="https://forms.google.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-lg hover:text-accent transition-colors"
                     onClick={() => setIsOpen(false)}
                   >
-                    Add Coin
-                  </Link>
+                    Listing Form
+                  </a>
                   <a 
                     href="#advertise" 
                     className="text-lg text-accent hover:text-accent/80 transition-colors font-medium"
