@@ -1,22 +1,26 @@
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { TrendingUp, Trophy, Flame, Clock, Star } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const TabNavigation = () => {
-  const location = useLocation();
-  
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const activeTab = searchParams.get('tab') || 'all';
+
   const tabs = [
-    { id: "all", label: "All", icon: Star, href: "/" },
-    { id: "trending", label: "Trending", icon: TrendingUp, href: "#trending" },
-    { id: "top-tokens", label: "Top Tokens", icon: Trophy, href: "#top-tokens" },
-    { id: "gainers", label: "Top Gainers", icon: Flame, href: "#gainers" },
-    { id: "new", label: "New Listings", icon: Clock, href: "#new" },
+    { id: "all", label: "All", icon: Star },
+    { id: "trending", label: "Trending", icon: TrendingUp },
+    { id: "top-tokens", label: "Top Tokens", icon: Trophy },
+    { id: "gainers", label: "Top Gainers", icon: Flame },
+    { id: "new", label: "New Listings", icon: Clock },
   ];
 
-  const isActive = (href: string) => {
-    if (href === "/") return location.pathname === "/" && !location.hash;
-    if (href.startsWith("#")) return location.hash === href;
-    return location.pathname === href;
+  const handleTabClick = (tabId: string) => {
+    if (tabId === 'all') {
+      navigate('/');
+    } else {
+      navigate(`/?tab=${tabId}`);
+    }
   };
 
   return (
@@ -25,12 +29,14 @@ const TabNavigation = () => {
         <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
           {tabs.map((tab) => {
             const Icon = tab.icon;
-            const active = isActive(tab.href);
+            const active = activeTab === tab.id;
             
-            const TabContent = (
-              <div
+            return (
+              <button
+                key={tab.id}
+                onClick={() => handleTabClick(tab.id)}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-3 border-b-2 transition-all cursor-pointer whitespace-nowrap",
+                  "flex items-center gap-2 px-4 py-3 border-b-2 transition-all whitespace-nowrap",
                   active
                     ? "border-primary text-primary font-medium"
                     : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
@@ -38,21 +44,7 @@ const TabNavigation = () => {
               >
                 <Icon className="h-4 w-4" />
                 <span>{tab.label}</span>
-              </div>
-            );
-
-            if (tab.href.startsWith("#")) {
-              return (
-                <a key={tab.id} href={tab.href}>
-                  {TabContent}
-                </a>
-              );
-            }
-
-            return (
-              <Link key={tab.id} to={tab.href}>
-                {TabContent}
-              </Link>
+              </button>
             );
           })}
         </div>
