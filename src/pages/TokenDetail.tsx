@@ -80,24 +80,24 @@ const TokenDetail = () => {
           <div className="space-y-6 order-2 xl:order-1">
             {/* Token Header with Complete Info */}
             <Card>
-              <CardContent className="pt-6">
+              <CardContent className="pt-4">
                 {/* Header Section */}
-                <div className="flex flex-col items-center text-center mb-6 pb-6 border-b">
+                <div className="flex flex-col items-center text-center mb-4 pb-4 border-b">
                   <img 
                     src={mainPair.info?.imageUrl || "/placeholder.svg"} 
                     alt={mainPair.baseToken.name}
-                    className="w-20 h-20 rounded-full border-4 border-border mb-3"
+                    className="w-16 h-16 rounded-full border-2 border-border mb-2"
                     onError={(e) => {
                       e.currentTarget.src = "/placeholder.svg";
                     }}
                   />
-                  <h1 className="text-2xl font-bold mb-1">{mainPair.baseToken.name}</h1>
-                  <p className="text-base text-muted-foreground mb-3">{mainPair.baseToken.symbol}</p>
+                  <h1 className="text-xl font-bold mb-1">{mainPair.baseToken.name}</h1>
+                  <p className="text-sm text-muted-foreground mb-2">{mainPair.baseToken.symbol}</p>
                   
                   {/* Price Display */}
-                  <div className="mb-3">
-                    <p className="text-3xl font-bold mb-2">${parseFloat(mainPair.priceUsd).toFixed(8)}</p>
-                    <Badge variant={mainPair.priceChange.h24 >= 0 ? "default" : "destructive"} className="text-sm">
+                  <div className="mb-2">
+                    <p className="text-2xl font-bold mb-1">${parseFloat(mainPair.priceUsd).toFixed(8)}</p>
+                    <Badge variant={mainPair.priceChange.h24 >= 0 ? "default" : "destructive"} className="text-xs">
                       {mainPair.priceChange.h24 >= 0 ? "+" : ""}{mainPair.priceChange.h24.toFixed(2)}% (24h)
                     </Badge>
                   </div>
@@ -106,7 +106,7 @@ const TokenDetail = () => {
                 </div>
 
                 {/* Social Links */}
-                <div className="flex flex-wrap justify-center gap-2 mb-6 pb-6 border-b">
+                <div className="flex flex-wrap justify-center gap-1.5 mb-4 pb-4 border-b">
                   {mainPair.info?.websites?.[0] && (
                     <Button variant="outline" size="sm" asChild>
                       <a
@@ -135,44 +135,44 @@ const TokenDetail = () => {
 
                 {/* Token Details Table */}
                 <div className="space-y-0">
-                  <div className="grid grid-cols-2 py-3 border-b">
-                    <span className="text-sm text-muted-foreground">Market Cap</span>
-                    <span className="text-sm font-semibold text-right">${mainPair.marketCap?.toLocaleString() || 'N/A'}</span>
+                  <div className="grid grid-cols-2 py-2 border-b">
+                    <span className="text-xs text-muted-foreground">Market Cap</span>
+                    <span className="text-xs font-semibold text-right">${mainPair.marketCap?.toLocaleString() || 'N/A'}</span>
                   </div>
                   
-                  <div className="grid grid-cols-2 py-3 border-b">
-                    <span className="text-sm text-muted-foreground">FDV</span>
-                    <span className="text-sm font-semibold text-right">${mainPair.fdv?.toLocaleString() || 'N/A'}</span>
+                  <div className="grid grid-cols-2 py-2 border-b">
+                    <span className="text-xs text-muted-foreground">FDV</span>
+                    <span className="text-xs font-semibold text-right">${mainPair.fdv?.toLocaleString() || 'N/A'}</span>
                   </div>
                   
-                  <div className="grid grid-cols-2 py-3 border-b">
-                    <span className="text-sm text-muted-foreground">24h Volume</span>
-                    <span className="text-sm font-semibold text-right">${mainPair.volume.h24.toLocaleString()}</span>
+                  <div className="grid grid-cols-2 py-2 border-b">
+                    <span className="text-xs text-muted-foreground">24h Volume</span>
+                    <span className="text-xs font-semibold text-right">${mainPair.volume.h24.toLocaleString()}</span>
                   </div>
                   
-                  <div className="grid grid-cols-2 py-3 border-b">
-                    <span className="text-sm text-muted-foreground">Liquidity</span>
-                    <span className="text-sm font-semibold text-right">${mainPair.liquidity.usd.toLocaleString()}</span>
+                  <div className="grid grid-cols-2 py-2 border-b">
+                    <span className="text-xs text-muted-foreground">Liquidity</span>
+                    <span className="text-xs font-semibold text-right">${mainPair.liquidity.usd.toLocaleString()}</span>
                   </div>
                   
-                  <div className="grid grid-cols-2 py-3 border-b">
-                    <span className="text-sm text-muted-foreground">24h Buys</span>
-                    <span className="text-sm font-semibold text-right text-green-500">{mainPair.txns.h24.buys}</span>
+                  <div className="grid grid-cols-2 py-2 border-b">
+                    <span className="text-xs text-muted-foreground">24h Buys</span>
+                    <span className="text-xs font-semibold text-right text-green-500">{mainPair.txns.h24.buys}</span>
                   </div>
                   
-                  <div className="grid grid-cols-2 py-3 border-b">
-                    <span className="text-sm text-muted-foreground">24h Sells</span>
-                    <span className="text-sm font-semibold text-right text-red-500">{mainPair.txns.h24.sells}</span>
+                  <div className="grid grid-cols-2 py-2 border-b">
+                    <span className="text-xs text-muted-foreground">24h Sells</span>
+                    <span className="text-xs font-semibold text-right text-red-500">{mainPair.txns.h24.sells}</span>
                   </div>
                   
-                  <div className="grid grid-cols-2 py-3 border-b">
-                    <span className="text-sm text-muted-foreground">DEX</span>
-                    <span className="text-sm font-semibold text-right capitalize">{mainPair.dexId}</span>
+                  <div className="grid grid-cols-2 py-2 border-b">
+                    <span className="text-xs text-muted-foreground">DEX</span>
+                    <span className="text-xs font-semibold text-right capitalize">{mainPair.dexId}</span>
                   </div>
                   
-                  <div className="grid grid-cols-2 py-3 border-b">
-                    <span className="text-sm text-muted-foreground">Pair Created</span>
-                    <span className="text-sm font-semibold text-right">
+                  <div className="grid grid-cols-2 py-2 border-b">
+                    <span className="text-xs text-muted-foreground">Pair Created</span>
+                    <span className="text-xs font-semibold text-right">
                       {new Date(mainPair.pairCreatedAt).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'short',
@@ -181,9 +181,9 @@ const TokenDetail = () => {
                     </span>
                   </div>
                   
-                  <div className="pt-4">
-                    <p className="text-xs text-muted-foreground mb-2">Contract Address</p>
-                    <code className="text-xs bg-muted px-2 py-2 rounded block break-all mb-2">
+                  <div className="pt-3">
+                    <p className="text-xs text-muted-foreground mb-1.5">Contract Address</p>
+                    <code className="text-xs bg-muted px-2 py-1.5 rounded block break-all mb-1.5">
                       {mainPair.baseToken.address}
                     </code>
                     <div className="grid grid-cols-2 gap-2">
@@ -225,7 +225,7 @@ const TokenDetail = () => {
                       variant="outline"
                       size="sm"
                       asChild
-                      className="w-full mt-2"
+                      className="w-full mt-1.5"
                     >
                       <a
                         href={mainPair.url}
