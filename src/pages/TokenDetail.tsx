@@ -79,161 +79,152 @@ const TokenDetail = () => {
           {/* Left Column - Token Details */}
           <div className="space-y-6 order-2 xl:order-1">
             {/* Token Header with Complete Info */}
-            <Card>
-              <CardContent className="pt-4">
-                {/* Header Section */}
-                <div className="flex flex-col items-center text-center mb-4 pb-4 border-b">
+            <Card className="overflow-hidden">
+              <CardContent className="p-3">
+                {/* Compact Header */}
+                <div className="flex items-center gap-3 mb-3 pb-3 border-b">
                   <img 
                     src={mainPair.info?.imageUrl || "/placeholder.svg"} 
                     alt={mainPair.baseToken.name}
-                    className="w-16 h-16 rounded-full border-2 border-border mb-2"
+                    className="w-12 h-12 rounded-full border border-border"
                     onError={(e) => {
                       e.currentTarget.src = "/placeholder.svg";
                     }}
                   />
-                  <h1 className="text-xl font-bold mb-1">{mainPair.baseToken.name}</h1>
-                  <p className="text-sm text-muted-foreground mb-2">{mainPair.baseToken.symbol}</p>
-                  
-                  {/* Price Display */}
-                  <div className="mb-2">
-                    <p className="text-2xl font-bold mb-1">${parseFloat(mainPair.priceUsd).toFixed(8)}</p>
+                  <div className="flex-1 min-w-0">
+                    <h1 className="text-base font-bold truncate">{mainPair.baseToken.name}</h1>
+                    <p className="text-xs text-muted-foreground">{mainPair.baseToken.symbol}</p>
+                  </div>
+                </div>
+
+                {/* Price Display */}
+                <div className="mb-3 pb-3 border-b">
+                  <p className="text-xl font-bold mb-1">${parseFloat(mainPair.priceUsd).toFixed(8)}</p>
+                  <div className="flex items-center justify-between">
                     <Badge variant={mainPair.priceChange.h24 >= 0 ? "default" : "destructive"} className="text-xs">
                       {mainPair.priceChange.h24 >= 0 ? "+" : ""}{mainPair.priceChange.h24.toFixed(2)}% (24h)
                     </Badge>
+                    <VoteButton tokenAddress={mainPair.baseToken.address} />
                   </div>
-
-                  <VoteButton tokenAddress={mainPair.baseToken.address} />
                 </div>
 
                 {/* Social Links */}
-                <div className="flex flex-wrap justify-center gap-1.5 mb-4 pb-4 border-b">
+                <div className="flex flex-wrap gap-1 mb-3 pb-3 border-b">
                   {mainPair.info?.websites?.[0] && (
-                    <Button variant="outline" size="sm" asChild>
+                    <Button variant="ghost" size="sm" className="h-7 px-2" asChild>
                       <a
                         href={mainPair.info.websites[0].url}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <FaGlobe className="h-3 w-3 mr-2" />
-                        Website
+                        <FaGlobe className="h-3 w-3" />
                       </a>
                     </Button>
                   )}
                   {mainPair.info?.socials?.map((social, idx) => (
-                    <Button key={idx} variant="outline" size="sm" asChild>
+                    <Button key={idx} variant="ghost" size="sm" className="h-7 px-2" asChild>
                       <a
                         href={social.url}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
                         {getSocialIcon(social.type)}
-                        <span className="ml-2 capitalize">{social.type}</span>
                       </a>
                     </Button>
                   ))}
                 </div>
 
-                {/* Token Details Table */}
-                <div className="space-y-0">
-                  <div className="grid grid-cols-2 py-2 border-b">
-                    <span className="text-xs text-muted-foreground">Market Cap</span>
-                    <span className="text-xs font-semibold text-right">${mainPair.marketCap?.toLocaleString() || 'N/A'}</span>
+                {/* Compact Stats Grid */}
+                <div className="space-y-0 mb-3 pb-3 border-b">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-muted/50 rounded p-1.5">
+                      <p className="text-[10px] text-muted-foreground mb-0.5">Market Cap</p>
+                      <p className="text-xs font-semibold">${(mainPair.marketCap / 1000000).toFixed(2)}M</p>
+                    </div>
+                    <div className="bg-muted/50 rounded p-1.5">
+                      <p className="text-[10px] text-muted-foreground mb-0.5">Volume 24h</p>
+                      <p className="text-xs font-semibold">${(mainPair.volume.h24 / 1000).toFixed(1)}K</p>
+                    </div>
                   </div>
-                  
-                  <div className="grid grid-cols-2 py-2 border-b">
-                    <span className="text-xs text-muted-foreground">FDV</span>
-                    <span className="text-xs font-semibold text-right">${mainPair.fdv?.toLocaleString() || 'N/A'}</span>
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    <div className="bg-muted/50 rounded p-1.5">
+                      <p className="text-[10px] text-muted-foreground mb-0.5">Liquidity</p>
+                      <p className="text-xs font-semibold">${(mainPair.liquidity.usd / 1000).toFixed(1)}K</p>
+                    </div>
+                    <div className="bg-muted/50 rounded p-1.5">
+                      <p className="text-[10px] text-muted-foreground mb-0.5">FDV</p>
+                      <p className="text-xs font-semibold">${mainPair.fdv ? (mainPair.fdv / 1000000).toFixed(2) + 'M' : 'N/A'}</p>
+                    </div>
                   </div>
-                  
-                  <div className="grid grid-cols-2 py-2 border-b">
-                    <span className="text-xs text-muted-foreground">24h Volume</span>
-                    <span className="text-xs font-semibold text-right">${mainPair.volume.h24.toLocaleString()}</span>
+                </div>
+
+                {/* Trading Activity */}
+                <div className="space-y-0 mb-3 pb-3 border-b">
+                  <div className="flex items-center justify-between py-1">
+                    <span className="text-[10px] text-muted-foreground">Buys (24h)</span>
+                    <span className="text-xs font-semibold text-green-500">{mainPair.txns.h24.buys}</span>
                   </div>
-                  
-                  <div className="grid grid-cols-2 py-2 border-b">
-                    <span className="text-xs text-muted-foreground">Liquidity</span>
-                    <span className="text-xs font-semibold text-right">${mainPair.liquidity.usd.toLocaleString()}</span>
+                  <div className="flex items-center justify-between py-1">
+                    <span className="text-[10px] text-muted-foreground">Sells (24h)</span>
+                    <span className="text-xs font-semibold text-red-500">{mainPair.txns.h24.sells}</span>
                   </div>
-                  
-                  <div className="grid grid-cols-2 py-2 border-b">
-                    <span className="text-xs text-muted-foreground">24h Buys</span>
-                    <span className="text-xs font-semibold text-right text-green-500">{mainPair.txns.h24.buys}</span>
+                  <div className="flex items-center justify-between py-1">
+                    <span className="text-[10px] text-muted-foreground">DEX</span>
+                    <span className="text-xs font-semibold capitalize">{mainPair.dexId}</span>
                   </div>
-                  
-                  <div className="grid grid-cols-2 py-2 border-b">
-                    <span className="text-xs text-muted-foreground">24h Sells</span>
-                    <span className="text-xs font-semibold text-right text-red-500">{mainPair.txns.h24.sells}</span>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 py-2 border-b">
-                    <span className="text-xs text-muted-foreground">DEX</span>
-                    <span className="text-xs font-semibold text-right capitalize">{mainPair.dexId}</span>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 py-2 border-b">
-                    <span className="text-xs text-muted-foreground">Pair Created</span>
-                    <span className="text-xs font-semibold text-right">
+                  <div className="flex items-center justify-between py-1">
+                    <span className="text-[10px] text-muted-foreground">Created</span>
+                    <span className="text-xs font-semibold">
                       {new Date(mainPair.pairCreatedAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
                         month: 'short',
-                        day: 'numeric'
+                        day: 'numeric',
+                        year: '2-digit'
                       })}
                     </span>
                   </div>
+                </div>
                   
-                  <div className="pt-3">
-                    <p className="text-xs text-muted-foreground mb-1.5">Contract Address</p>
-                    <code className="text-xs bg-muted px-2 py-1.5 rounded block break-all mb-1.5">
+                {/* Contract Section */}
+                <div>
+                  <p className="text-[10px] text-muted-foreground mb-1">Contract</p>
+                  <code className="text-[10px] bg-muted px-1.5 py-1 rounded block break-all mb-1.5">
                       {mainPair.baseToken.address}
                     </code>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleCopyAddress}
-                        className="w-full"
-                      >
-                        {copied ? (
-                          <>
-                            <Check className="h-3 w-3 mr-2" />
-                            Copied
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="h-3 w-3 mr-2" />
-                            Copy
-                          </>
-                        )}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        asChild
-                        className="w-full"
-                      >
-                        <a
-                          href={`https://scan.pulsechain.com/address/${mainPair.baseToken.address}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <ExternalLink className="h-3 w-3 mr-2" />
-                          Explorer
-                        </a>
-                      </Button>
-                    </div>
+                  <div className="flex gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCopyAddress}
+                      className="flex-1 h-7 text-[10px]"
+                    >
+                      {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                    </Button>
                     <Button
                       variant="outline"
                       size="sm"
                       asChild
-                      className="w-full mt-1.5"
+                      className="flex-1 h-7 text-[10px]"
+                    >
+                      <a
+                        href={`https://scan.pulsechain.com/address/${mainPair.baseToken.address}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      asChild
+                      className="flex-1 h-7 text-[10px]"
                     >
                       <a
                         href={mainPair.url}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <ExternalLink className="h-3 w-3 mr-2" />
-                        View on DexScreener
+                        <ExternalLink className="h-3 w-3" />
                       </a>
                     </Button>
                   </div>
