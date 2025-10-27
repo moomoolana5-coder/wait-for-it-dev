@@ -194,6 +194,7 @@ const TokenDetail = () => {
             <TokenPriceHistory
               currentPrice={parseFloat(mainPair.priceUsd)}
               priceChange24h={mainPair.priceChange.h24}
+              priceChange6h={mainPair.priceChange.h6}
               pairCreatedAt={mainPair.pairCreatedAt}
             />
           </div>
