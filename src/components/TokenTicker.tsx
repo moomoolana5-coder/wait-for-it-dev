@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTickerTokens } from "@/hooks/useTickerTokens";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "react-router-dom";
 
 // Helpers to format numbers similar to Dexscreener
 const formatCurrencyShort = (num?: number) => {
@@ -104,9 +105,10 @@ const TokenTicker = ({
             const isPositive = priceChange >= 0;
             
             return (
-              <div
+              <Link
                 key={`${token.pairAddress}-${idx}`}
-                className="ticker-item flex items-center gap-2 px-6 py-2 whitespace-nowrap"
+                to={`/token/${token.baseToken.address}`}
+                className="ticker-item flex items-center gap-2 px-6 py-2 whitespace-nowrap hover:bg-accent/10 transition-colors cursor-pointer"
               >
                 {token.info?.imageUrl && (
                   <img
@@ -135,7 +137,7 @@ const TokenTicker = ({
                 >
                   {isPositive ? '↗' : '↘'} {Number.isFinite(priceChange) ? Math.abs(priceChange).toFixed(2) : '0.00'}%
                 </span>
-              </div>
+              </Link>
             );
           })}
         </div>

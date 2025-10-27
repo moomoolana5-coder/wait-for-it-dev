@@ -7,7 +7,7 @@ import TokenTable from "@/components/TokenTable";
 import NetworkStatsBar from "@/components/stats/NetworkStatsBar";
 import { useAllPlatformTokens } from "@/hooks/useAllPlatformTokens";
 import { usePaginatedTokens } from "@/hooks/usePaginatedTokens";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useStablecoinTicker } from "@/hooks/useStablecoinTicker";
@@ -81,9 +81,10 @@ const Index = () => {
                   const isPositive = priceChange >= 0;
                   
                   return (
-                    <div
+                    <Link
                       key={`${token.pairAddress}-${idx}`}
-                      className="ticker-item flex items-center gap-2 px-6 py-3 whitespace-nowrap"
+                      to={`/token/${token.baseToken.address}`}
+                      className="ticker-item flex items-center gap-2 px-6 py-3 whitespace-nowrap hover:bg-accent/10 transition-colors cursor-pointer"
                     >
                       {token.info?.imageUrl && (
                         <img
@@ -109,7 +110,7 @@ const Index = () => {
                       >
                         {isPositive ? '↗' : '↘'} {Math.abs(priceChange).toFixed(2)}%
                       </span>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>
