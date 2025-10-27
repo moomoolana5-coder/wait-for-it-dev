@@ -212,7 +212,12 @@ export const useTokenByAddress = (address: string) => {
       const response = await fetch(`${DEXSCREENER_API}/tokens/${address}`);
       if (!response.ok) throw new Error('Failed to fetch token');
       const data = await response.json();
-      return data.pairs?.filter((pair: DexPair) => pair.chainId === 'pulsechain') || [];
+      const pulsechainPairs = data.pairs?.filter((pair: DexPair) => pair.chainId === 'pulsechain') || [];
+      
+      // Sort by liquidity to get the most liquid pair (most accurate data)
+      return pulsechainPairs.sort((a: DexPair, b: DexPair) => 
+        (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0)
+      );
     },
     enabled: !!address,
   });
