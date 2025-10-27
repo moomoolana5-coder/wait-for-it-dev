@@ -65,7 +65,7 @@ const TokenPriceHistory = ({
   };
 
   return (
-    <Card className="bg-card/50 backdrop-blur">
+    <Card className="bg-card/50 backdrop-blur relative">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg">Price History</CardTitle>
       </CardHeader>
