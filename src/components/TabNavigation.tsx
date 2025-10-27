@@ -1,5 +1,5 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { TrendingUp, Trophy, Flame, Clock, Star } from "lucide-react";
+import { TrendingUp, Trophy, Flame, Clock, Star, TrendingDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TabNavigation = () => {
@@ -12,6 +12,7 @@ const TabNavigation = () => {
     { id: "trending", label: "Trending", icon: TrendingUp },
     { id: "top-tokens", label: "Top Tokens", icon: Trophy },
     { id: "gainers", label: "Top Gainers", icon: Flame },
+    { id: "losers", label: "Top Losers", icon: TrendingDown },
     { id: "new", label: "New Listings", icon: Clock },
   ];
 

@@ -186,6 +186,27 @@ export const usePaginatedTokens = (allTokens: DexPair[], isLoading: boolean) => 
             return (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0);
           });
 
+      case 'losers':
+        return uniqueTokens
+          .filter(t => {
+            const priceChange = t.priceChange?.h24 || 0;
+            const volume = t.volume?.h24 || 0;
+            const liquidity = t.liquidity?.usd || 0;
+            
+            // Filter: negative change, min volume 5k, min liquidity 2k to avoid noise
+            return priceChange < 0 && volume >= 5000 && liquidity >= 2000;
+          })
+          .sort((a, b) => {
+            // Sort by most negative first (ascending order for negative numbers)
+            const priceDiff = (a.priceChange?.h24 || 0) - (b.priceChange?.h24 || 0);
+            if (priceDiff !== 0) return priceDiff;
+            
+            const volumeDiff = (b.volume?.h24 || 0) - (a.volume?.h24 || 0);
+            if (volumeDiff !== 0) return volumeDiff;
+            
+            return (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0);
+          });
+
       case 'new':
         return uniqueTokens
           .filter(t => {

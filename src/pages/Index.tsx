@@ -35,6 +35,8 @@ const Index = () => {
         return 'Top Tokens';
       case 'gainers':
         return 'Biggest Gainers';
+      case 'losers':
+        return 'Biggest Losers';
       case 'new':
         return 'New Listings';
       default:
