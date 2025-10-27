@@ -84,14 +84,14 @@ const NetworkStatsBar = ({ pollIntervalMs = 30000 }: NetworkStatsBarProps) => {
         <Activity className="h-4 w-4 text-primary" />,
         transactions ? compactNumber(transactions.value) : "0",
         undefined,
-        transactions?.timestamp
+        undefined
       )}
       {renderStatCard(
         "Total Volume 24h",
         <TrendingUp className="h-4 w-4 text-accent" />,
         dexVolume ? formatUSD(dexVolume.value) : "$0",
         undefined,
-        dexVolume?.timestamp
+        undefined
       )}
     </div>
   );
