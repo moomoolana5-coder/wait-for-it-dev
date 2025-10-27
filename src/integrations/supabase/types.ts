@@ -46,6 +46,7 @@ export type Database = {
           transaction_hash: string
           twitter_url: string | null
           user_id: string
+          verified: boolean | null
           website_url: string | null
         }
         Insert: {
@@ -61,6 +62,7 @@ export type Database = {
           transaction_hash: string
           twitter_url?: string | null
           user_id: string
+          verified?: boolean | null
           website_url?: string | null
         }
         Update: {
@@ -76,6 +78,7 @@ export type Database = {
           transaction_hash?: string
           twitter_url?: string | null
           user_id?: string
+          verified?: boolean | null
           website_url?: string | null
         }
         Relationships: []
@@ -101,6 +104,72 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      verification_requests: {
+        Row: {
+          amount_usd: number | null
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          id: string
+          status: string | null
+          token_address: string
+          token_name: string
+          token_symbol: string
+          transaction_hash: string
+          user_id: string
+          wallet_address: string
+        }
+        Insert: {
+          amount_usd?: number | null
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          status?: string | null
+          token_address: string
+          token_name: string
+          token_symbol: string
+          transaction_hash: string
+          user_id: string
+          wallet_address?: string
+        }
+        Update: {
+          amount_usd?: number | null
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          status?: string | null
+          token_address?: string
+          token_name?: string
+          token_symbol?: string
+          transaction_hash?: string
+          user_id?: string
+          wallet_address?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       token_vote_counts: {
@@ -112,10 +181,16 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -242,6 +317,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
