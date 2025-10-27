@@ -82,7 +82,7 @@ export const useAllPlatformTokens = () => {
     queryFn: async () => {
       const platformAddresses = await getPlatformTokenAddresses();
       console.log(`Loading ${platformAddresses.length} platform tokens...`);
-
+      
       const BATCH_SIZE = 30;
       const DELAY_MS = 500;
       const bestByAddress = new Map<string, DexPair>();
@@ -94,7 +94,7 @@ export const useAllPlatformTokens = () => {
 
       for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
         const batch = batches[batchIndex];
-
+        
         try {
           if (batchIndex > 0) {
             await new Promise(resolve => setTimeout(resolve, DELAY_MS));
@@ -111,7 +111,7 @@ export const useAllPlatformTokens = () => {
             if (p.dexId !== 'pulsex') continue;
             const base = p.baseToken.address.toLowerCase();
             if (!platformAddresses.includes(base)) continue;
-
+            
             const current = bestByAddress.get(base);
             if (!current || (p.liquidity?.usd || 0) > (current.liquidity?.usd || 0)) {
               bestByAddress.set(base, p);
@@ -125,9 +125,8 @@ export const useAllPlatformTokens = () => {
       }
 
       const tokens = Array.from(bestByAddress.values());
-      const sortedByLiquidity = tokens.sort((a, b) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0));
-      console.log(`✅ Loaded ${sortedByLiquidity.length} platform tokens`);
-      return sortedByLiquidity;
+      console.log(`✅ Loaded ${tokens.length} platform tokens`);
+      return tokens;
     },
     refetchInterval: 120000, // 2 minutes
     staleTime: 60000,
