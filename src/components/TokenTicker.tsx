@@ -1,29 +1,19 @@
 import { useAllPlatformTokens } from "@/hooks/useAllPlatformTokens";
-import { useEffect, useRef } from "react";
 
 const TokenTicker = () => {
   const { data: allTokens } = useAllPlatformTokens();
-  const tickerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!tickerRef.current || !allTokens || allTokens.length === 0) return;
-
-    const tokenCount = allTokens.length;
-    const duration = Math.max(30, tokenCount * 2);
-
-    tickerRef.current.style.animationDuration = `${duration}s`;
-  }, [allTokens]);
 
   if (!allTokens || allTokens.length === 0) return null;
 
   return (
     <div className="border-b border-border bg-background/95 backdrop-blur-sm overflow-hidden">
       <div className="ticker-container">
-        <div ref={tickerRef} className="ticker-content">
-          {[...allTokens, ...allTokens, ...allTokens].map((token, idx) => {
+        <div className="ticker-content">
+          {/* Duplicate tokens for seamless loop */}
+          {[...allTokens, ...allTokens].map((token, idx) => {
             const priceChange = token.priceChange?.h24 || 0;
             const isPositive = priceChange >= 0;
-
+            
             return (
               <div
                 key={`${token.baseToken.address}-${idx}`}
