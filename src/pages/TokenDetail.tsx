@@ -62,9 +62,9 @@ const TokenDetail = () => {
           Back to Home
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           {/* Chart Section */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
             <Card className="mb-6">
               <CardHeader>
                 <CardTitle>Price Chart</CardTitle>
@@ -80,8 +80,8 @@ const TokenDetail = () => {
               </CardContent>
             </Card>
 
-          {/* Main Info */}
-          <div className="space-y-6">
+            {/* Main Info */}
+            <div className="space-y-6">
             <Card>
               <CardHeader>
                 <div className="flex items-start gap-4">
@@ -181,7 +181,7 @@ const TokenDetail = () => {
                 </div>
               </CardContent>
             </Card>
-          </div>
+            </div>
           </div>
 
           {/* Converter & Price History */}
