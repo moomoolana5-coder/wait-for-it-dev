@@ -252,7 +252,7 @@ const TokenDetail = () => {
           </div>
 
           {/* Right Column - Converter and Price History */}
-          <div className="space-y-14 order-3">
+          <div className="space-y-[60px] order-3">
             <TokenConverter 
               tokenSymbol={mainPair.baseToken.symbol}
               tokenName={mainPair.baseToken.name}
