@@ -55,9 +55,9 @@ export const useTrendingByVotes = () => {
       // Perbaikan: Memastikan hanya mengambil vote > 0
       const { data: voteCounts, error } = await supabase
         .from('token_vote_counts')
-        .select('token_address, vote_count')
-        .gt('vote_count', 0) // <-- Filter Kunci
-        .order('vote_count', { ascending: false })
+        .select('token_address, total_votes')
+        .gt('total_votes', 0) // <-- Filter Kunci
+        .order('total_votes', { ascending: false })
         .limit(20);
 
       if (error) {
@@ -76,7 +76,7 @@ export const useTrendingByVotes = () => {
       // Kami memetakan langsung voteCounts untuk menjamin kecocokan data.
       const tokenDataPromises = voteCounts.map(async (voteData) => {
         const address = voteData.token_address.toLowerCase();
-        const voteCount = voteData.vote_count;
+        const voteCount = voteData.total_votes;
 
         try {
           const response = await fetch(`${DEXSCREENER_API}/tokens/${address}`);

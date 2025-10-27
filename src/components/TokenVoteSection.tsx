@@ -19,7 +19,7 @@ interface TokenVoteSectionProps {
 }
 
 const TokenVoteSection = ({ tokenAddress }: TokenVoteSectionProps) => {
-  const { voteCount, hasVoted, isLoading, vote } = useTokenVotes(tokenAddress);
+  const { voteCount, bullishVotes, bearishVotes, hasVoted, isLoading, vote } = useTokenVotes(tokenAddress);
   const { toast } = useToast();
   const [showDialog, setShowDialog] = useState(false);
   const [isVoting, setIsVoting] = useState(false);
@@ -63,7 +63,7 @@ const TokenVoteSection = ({ tokenAddress }: TokenVoteSectionProps) => {
 
     setIsVoting(true);
     try {
-      await vote(isCaptchaValid);
+      await vote(isCaptchaValid, voteType);
       toast({
         title: 'Vote Successful!',
         description: `You voted ${voteType} for this token`,
@@ -107,10 +107,10 @@ const TokenVoteSection = ({ tokenAddress }: TokenVoteSectionProps) => {
                   <span className="text-xs font-bold text-white">Bullish</span>
                 </div>
                 <div className="text-lg font-black text-white drop-shadow-lg">
-                  {Math.floor(voteCount * 0.6)}
+                  {bullishVotes}
                 </div>
                 <div className="text-[10px] font-semibold text-white/90">
-                  {voteCount > 0 ? '60%' : '0%'}
+                  {voteCount > 0 ? `${Math.round((bullishVotes / voteCount) * 100)}%` : '0%'}
                 </div>
               </div>
 
@@ -136,10 +136,10 @@ const TokenVoteSection = ({ tokenAddress }: TokenVoteSectionProps) => {
                   <span className="text-xs font-bold text-white">Bearish</span>
                 </div>
                 <div className="text-lg font-black text-white drop-shadow-lg">
-                  {Math.floor(voteCount * 0.4)}
+                  {bearishVotes}
                 </div>
                 <div className="text-[10px] font-semibold text-white/90">
-                  {voteCount > 0 ? '40%' : '0%'}
+                  {voteCount > 0 ? `${Math.round((bearishVotes / voteCount) * 100)}%` : '0%'}
                 </div>
               </div>
 
@@ -153,11 +153,11 @@ const TokenVoteSection = ({ tokenAddress }: TokenVoteSectionProps) => {
             <div className="flex h-2 rounded-full overflow-hidden bg-muted shadow-inner">
               <div 
                 className="bg-gradient-to-r from-emerald-500 to-emerald-600 transition-all duration-500"
-                style={{ width: voteCount > 0 ? '60%' : '50%' }}
+                style={{ width: voteCount > 0 ? `${(bullishVotes / voteCount) * 100}%` : '50%' }}
               />
               <div 
                 className="bg-gradient-to-r from-rose-500 to-rose-600 transition-all duration-500"
-                style={{ width: voteCount > 0 ? '40%' : '50%' }}
+                style={{ width: voteCount > 0 ? `${(bearishVotes / voteCount) * 100}%` : '50%' }}
               />
             </div>
             

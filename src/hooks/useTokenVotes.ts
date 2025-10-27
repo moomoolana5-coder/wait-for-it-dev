@@ -3,6 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const useTokenVotes = (tokenAddress: string) => {
   const [voteCount, setVoteCount] = useState<number>(0);
+  const [bullishVotes, setBullishVotes] = useState<number>(0);
+  const [bearishVotes, setBearishVotes] = useState<number>(0);
   const [hasVoted, setHasVoted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   
@@ -23,7 +25,7 @@ export const useTokenVotes = (tokenAddress: string) => {
     try {
       const { data, error } = await supabase
         .from('token_vote_counts')
-        .select('vote_count')
+        .select('total_votes, bullish_votes, bearish_votes')
         .eq('token_address', normalizedAddress)
         .maybeSingle();
 
@@ -31,26 +33,35 @@ export const useTokenVotes = (tokenAddress: string) => {
         console.error('Error fetching vote count from view:', error);
       }
       
-      const countFromView = data?.vote_count || 0;
-      
-      if (countFromView === 0) {
-        const { count, error: countError } = await supabase
+      if (data) {
+        setVoteCount(data.total_votes || 0);
+        setBullishVotes(data.bullish_votes || 0);
+        setBearishVotes(data.bearish_votes || 0);
+      } else {
+        // Fallback: count directly from token_votes
+        const { data: votes, error: countError } = await supabase
           .from('token_votes')
-          .select('*', { count: 'exact', head: true })
+          .select('vote_type')
           .eq('token_address', normalizedAddress);
         
         if (countError) {
           console.error('Error counting votes directly:', countError);
           setVoteCount(0);
+          setBullishVotes(0);
+          setBearishVotes(0);
         } else {
-          setVoteCount(count || 0);
+          const bullish = votes?.filter(v => v.vote_type === 'bullish').length || 0;
+          const bearish = votes?.filter(v => v.vote_type === 'bearish').length || 0;
+          setVoteCount(bullish + bearish);
+          setBullishVotes(bullish);
+          setBearishVotes(bearish);
         }
-      } else {
-        setVoteCount(countFromView);
       }
     } catch (error) {
       console.error('General error fetching vote count:', error);
       setVoteCount(0);
+      setBullishVotes(0);
+      setBearishVotes(0);
     }
   }, [normalizedAddress]);
 
@@ -100,7 +111,7 @@ export const useTokenVotes = (tokenAddress: string) => {
     };
   }, [normalizedAddress, fetchVoteCount, checkHasVoted]);
 
-  const vote = async (captchaValid: boolean) => {
+  const vote = async (captchaValid: boolean, voteType: 'bullish' | 'bearish') => {
     if (!captchaValid) {
       throw new Error('Please complete the captcha');
     }
@@ -109,16 +120,15 @@ export const useTokenVotes = (tokenAddress: string) => {
       throw new Error('You have already voted for this token');
     }
 
-    // --- PERBAIKAN ESLINT DIMULAI DI SINI ---
-    // Menghapus blok try/catch yang tidak perlu dan menghilangkan 'any'
     const voterId = getVoterIdentifier();
     
-    // Insert vote
+    // Insert vote with vote_type
     const { error } = await supabase
       .from('token_votes')
       .insert({
         token_address: normalizedAddress,
-        voter_ip: voterId
+        voter_ip: voterId,
+        vote_type: voteType
       });
 
     if (error) {
@@ -134,8 +144,7 @@ export const useTokenVotes = (tokenAddress: string) => {
     setHasVoted(true);
     
     // Realtime subscription akan menangani pembaruan voteCount
-    // --- PERBAIKAN ESLINT BERAKHIR DI SINI ---
   };
 
-  return { voteCount, hasVoted, isLoading, vote };
+  return { voteCount, bullishVotes, bearishVotes, hasVoted, isLoading, vote };
 };

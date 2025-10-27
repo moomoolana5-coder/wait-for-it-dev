@@ -18,7 +18,7 @@ interface VoteButtonProps {
 }
 
 const VoteButton = ({ tokenAddress }: VoteButtonProps) => {
-  const { voteCount, hasVoted, isLoading, vote } = useTokenVotes(tokenAddress);
+  const { bullishVotes, bearishVotes, hasVoted, isLoading, vote } = useTokenVotes(tokenAddress);
   const { toast } = useToast();
   const [showDialog, setShowDialog] = useState(false);
   const [isVoting, setIsVoting] = useState(false);
@@ -62,7 +62,7 @@ const VoteButton = ({ tokenAddress }: VoteButtonProps) => {
 
     setIsVoting(true);
     try {
-      await vote(isCaptchaValid);
+      await vote(isCaptchaValid, voteType);
       toast({
         title: 'Vote Successful!',
         description: `You voted ${voteType} for this token`,
@@ -79,9 +79,6 @@ const VoteButton = ({ tokenAddress }: VoteButtonProps) => {
       setIsVoting(false);
     }
   };
-
-  const bullishVotes = Math.floor(voteCount * 0.6);
-  const bearishVotes = Math.floor(voteCount * 0.4);
 
   if (isLoading) {
     return (
