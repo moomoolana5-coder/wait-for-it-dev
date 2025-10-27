@@ -19,6 +19,20 @@ const TokenDetail = () => {
   const { data: pairs, isLoading } = useTokenByAddress(address || "");
   const [copied, setCopied] = useState(false);
 
+  const formatLargeNumber = (num: number | undefined) => {
+    if (!num || num === 0) return 'N/A';
+    
+    if (num >= 1e9) {
+      return `$${(num / 1e9).toFixed(2)}B`;
+    } else if (num >= 1e6) {
+      return `$${(num / 1e6).toFixed(2)}M`;
+    } else if (num >= 1e3) {
+      return `$${(num / 1e3).toFixed(2)}K`;
+    } else {
+      return `$${num.toFixed(2)}`;
+    }
+  };
+
   const handleCopyAddress = () => {
     if (address) {
       navigator.clipboard.writeText(address);
@@ -140,21 +154,21 @@ const TokenDetail = () => {
                   <div className="grid grid-cols-2 gap-2">
                     <div className="bg-muted/50 rounded p-1.5">
                       <p className="text-[10px] text-muted-foreground mb-0.5">Market Cap</p>
-                      <p className="text-xs font-semibold">${(mainPair.marketCap / 1000000).toFixed(2)}M</p>
+                      <p className="text-xs font-semibold">{formatLargeNumber(mainPair.marketCap)}</p>
                     </div>
                     <div className="bg-muted/50 rounded p-1.5">
                       <p className="text-[10px] text-muted-foreground mb-0.5">Volume 24h</p>
-                      <p className="text-xs font-semibold">${(mainPair.volume.h24 / 1000).toFixed(1)}K</p>
+                      <p className="text-xs font-semibold">{formatLargeNumber(mainPair.volume.h24)}</p>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-2 mt-2">
                     <div className="bg-muted/50 rounded p-1.5">
                       <p className="text-[10px] text-muted-foreground mb-0.5">Liquidity</p>
-                      <p className="text-xs font-semibold">${(mainPair.liquidity.usd / 1000).toFixed(1)}K</p>
+                      <p className="text-xs font-semibold">{formatLargeNumber(mainPair.liquidity.usd)}</p>
                     </div>
                     <div className="bg-muted/50 rounded p-1.5">
                       <p className="text-[10px] text-muted-foreground mb-0.5">FDV</p>
-                      <p className="text-xs font-semibold">${mainPair.fdv ? (mainPair.fdv / 1000000).toFixed(2) + 'M' : 'N/A'}</p>
+                      <p className="text-xs font-semibold">{formatLargeNumber(mainPair.fdv)}</p>
                     </div>
                   </div>
                 </div>
