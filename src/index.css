@@ -129,6 +129,7 @@ All colors MUST be HSL.
   .ticker-content {
     display: flex;
     animation: ticker 30s linear infinite;
+    will-change: transform;
   }
 
   .ticker-item {
@@ -140,7 +141,7 @@ All colors MUST be HSL.
       transform: translateX(0);
     }
     100% {
-      transform: translateX(-50%);
+      transform: translateX(-33.333%);
     }
   }
 }
