@@ -88,14 +88,14 @@ const NetworkStatsBar = ({ pollIntervalMs = 30000 }: NetworkStatsBarProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
       {renderStatCard(
-        "Total DEX Transactions (24h)",
+        "Total Transactions 24h",
         <Activity className="h-4 w-4 text-primary" />,
         transactions ? compactNumber(transactions.value) : "0",
         txPercentChange,
         transactions?.timestamp
       )}
       {renderStatCard(
-        "Total DEX Volume (24h)",
+        "Total Volume 24h",
         <TrendingUp className="h-4 w-4 text-accent" />,
         dexVolume ? formatUSD(dexVolume.value) : "$0",
         volumePercentChange,
