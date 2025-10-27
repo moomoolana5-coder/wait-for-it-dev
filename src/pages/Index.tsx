@@ -57,7 +57,7 @@ const Index = () => {
         <TabNavigation />
         
         {/* Stablecoin Ticker */}
-        <div className="border-b border-border bg-background/95 backdrop-blur-sm overflow-hidden rounded-lg">
+        <div className="border-b border-border bg-background/95 backdrop-blur-sm overflow-hidden rounded-lg -mt-6">
           {isLoadingStablecoins ? (
             <div className="flex items-center gap-6 px-6 py-3">
               {Array.from({ length: 5 }).map((_, i) => (
