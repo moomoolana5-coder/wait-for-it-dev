@@ -2,3 +2,6 @@ project_id = "ozeefnhzzjotqbtlxqxp"
 
 [functions.pulse-stats]
 verify_jwt = false
+
+[functions.notify-verification-request]
+verify_jwt = false

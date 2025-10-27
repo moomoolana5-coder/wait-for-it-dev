@@ -20,6 +20,7 @@ export function VerificationRequestDialog({ open, onOpenChange }: VerificationRe
   const [contractAddress, setContractAddress] = useState("");
   const [transactionHash, setTransactionHash] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [adminEmail, setAdminEmail] = useState("");
   const { toast } = useToast();
 
   const copyToClipboard = async () => {
@@ -33,7 +34,7 @@ export function VerificationRequestDialog({ open, onOpenChange }: VerificationRe
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!tokenName || !tickerSymbol || !contractAddress || !transactionHash) {
+    if (!tokenName || !tickerSymbol || !contractAddress || !transactionHash || !adminEmail) {
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -62,6 +63,22 @@ export function VerificationRequestDialog({ open, onOpenChange }: VerificationRe
 
       if (error) throw error;
 
+      // Send email notification
+      try {
+        await supabase.functions.invoke('notify-verification-request', {
+          body: {
+            tokenName: tokenName,
+            tokenSymbol: tickerSymbol,
+            tokenAddress: contractAddress,
+            transactionHash: transactionHash,
+            adminEmail: adminEmail,
+          },
+        });
+      } catch (emailError) {
+        console.error("Error sending email notification:", emailError);
+        // Don't fail the submission if email fails
+      }
+
       toast({
         title: "Success! ✅",
         description: "Verification request submitted. We'll review your payment and verify your token.",
@@ -72,6 +89,7 @@ export function VerificationRequestDialog({ open, onOpenChange }: VerificationRe
       setTickerSymbol("");
       setContractAddress("");
       setTransactionHash("");
+      setAdminEmail("");
       onOpenChange(false);
     } catch (error) {
       console.error("Error submitting verification request:", error);
@@ -139,6 +157,18 @@ export function VerificationRequestDialog({ open, onOpenChange }: VerificationRe
               placeholder="0x..."
               value={transactionHash}
               onChange={(e) => setTransactionHash(e.target.value)}
+              className="bg-background border-border"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="adminEmail">Your Email (for notification)</Label>
+            <Input
+              id="adminEmail"
+              type="email"
+              placeholder="your@email.com"
+              value={adminEmail}
+              onChange={(e) => setAdminEmail(e.target.value)}
               className="bg-background border-border"
             />
           </div>
