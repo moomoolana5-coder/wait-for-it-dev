@@ -1,7 +1,7 @@
-import { useAllPlatformTokens } from "@/hooks/useAllPlatformTokens";
+import { usePulseChainTokens } from "@/hooks/useDexScreener";
 
 const TokenTicker = () => {
-  const { data: allTokens } = useAllPlatformTokens();
+  const { data: allTokens } = usePulseChainTokens();
 
   if (!allTokens || allTokens.length === 0) return null;
 
