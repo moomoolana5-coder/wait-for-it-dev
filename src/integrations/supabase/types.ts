@@ -88,18 +88,21 @@ export type Database = {
           created_at: string
           id: string
           token_address: string
+          vote_type: string
           voter_ip: string
         }
         Insert: {
           created_at?: string
           id?: string
           token_address: string
+          vote_type?: string
           voter_ip: string
         }
         Update: {
           created_at?: string
           id?: string
           token_address?: string
+          vote_type?: string
           voter_ip?: string
         }
         Relationships: []
@@ -174,8 +177,10 @@ export type Database = {
     Views: {
       token_vote_counts: {
         Row: {
+          bearish_votes: number | null
+          bullish_votes: number | null
           token_address: string | null
-          vote_count: number | null
+          total_votes: number | null
         }
         Relationships: []
       }
