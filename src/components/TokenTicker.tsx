@@ -1,4 +1,4 @@
-import { usePulseChainTokens } from "@/hooks/useDexScreener";
+import { useTickerTokens } from "@/hooks/useTickerTokens";
 
 // Helpers to format numbers similar to Dexscreener
 const formatCurrencyShort = (num?: number) => {
@@ -20,7 +20,7 @@ const formatPrice = (priceUsd?: string) => {
 };
 
 const TokenTicker = () => {
-  const { data: allTokens } = usePulseChainTokens();
+  const { data: allTokens } = useTickerTokens();
 
   if (!allTokens || allTokens.length === 0) return null;
 
