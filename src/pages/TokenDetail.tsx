@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import TokenConverter from "@/components/TokenConverter";
 import VoteButton from "@/components/VoteButton";
+import TokenVoteSection from "@/components/TokenVoteSection";
 import TokenPriceHistory from "@/components/TokenPriceHistory";
 import { FaTwitter, FaTelegram, FaGlobe, FaDiscord } from "react-icons/fa";
 import { useState } from "react";
@@ -265,6 +266,11 @@ const TokenDetail = () => {
               pairCreatedAt={mainPair.pairCreatedAt}
             />
           </div>
+        </div>
+
+        {/* Vote Section - Full Width Below */}
+        <div className="mt-12">
+          <TokenVoteSection tokenAddress={mainPair.baseToken.address} />
         </div>
       </div>
 
