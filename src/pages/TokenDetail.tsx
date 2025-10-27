@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import TokenConverter from "@/components/TokenConverter";
 import VoteButton from "@/components/VoteButton";
+import TokenPriceHistory from "@/components/TokenPriceHistory";
 import { FaTwitter, FaTelegram, FaGlobe, FaDiscord } from "react-icons/fa";
 
 const TokenDetail = () => {
@@ -183,12 +184,17 @@ const TokenDetail = () => {
           </div>
           </div>
 
-          {/* Converter */}
-          <div className="lg:col-span-1">
+          {/* Converter & Price History */}
+          <div className="lg:col-span-1 space-y-6">
             <TokenConverter 
               tokenSymbol={mainPair.baseToken.symbol}
               tokenName={mainPair.baseToken.name}
               priceUsd={parseFloat(mainPair.priceUsd)}
+            />
+            <TokenPriceHistory
+              currentPrice={parseFloat(mainPair.priceUsd)}
+              priceChange24h={mainPair.priceChange.h24}
+              pairCreatedAt={mainPair.pairCreatedAt}
             />
           </div>
         </div>
