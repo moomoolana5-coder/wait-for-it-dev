@@ -121,26 +121,33 @@ All colors MUST be HSL.
     scrollbar-width: none;
   }
 
+  /* Ticker animation - GPU accelerated */
   .ticker-container {
+    position: relative;
     width: 100%;
     overflow: hidden;
+    will-change: transform;
   }
 
   .ticker-content {
     display: flex;
-    animation: ticker 30s linear infinite;
+    width: fit-content;
+    animation: ticker 60s linear infinite;
+    will-change: transform;
   }
 
   .ticker-item {
     flex-shrink: 0;
+    backface-visibility: hidden;
+    transform: translateZ(0);
   }
 
   @keyframes ticker {
     0% {
-      transform: translateX(0);
+      transform: translate3d(0, 0, 0);
     }
     100% {
-      transform: translateX(-50%);
+      transform: translate3d(-50%, 0, 0);
     }
   }
 }
