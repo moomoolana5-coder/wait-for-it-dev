@@ -65,58 +65,44 @@ const TokenPriceHistory = ({
   };
 
   return (
-    <Card className="bg-card/50 backdrop-blur relative">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg">Price History</CardTitle>
+    <Card className="bg-card/50 backdrop-blur h-[240px] flex flex-col">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm">Price History</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-1">
+      <CardContent className="space-y-0 flex-1 overflow-auto">
         {/* 24h Range */}
-        <div className="flex items-center justify-between py-3 border-b border-border/50">
-          <span className="text-sm text-muted-foreground font-medium">24h Range</span>
-          <span className="font-semibold text-sm">
+        <div className="flex items-center justify-between py-2 border-b border-border/50">
+          <span className="text-[10px] text-muted-foreground">24h Range</span>
+          <span className="font-semibold text-[10px]">
             {formatPrice(low24h)} – {formatPrice(high24h)}
           </span>
         </div>
 
-        {/* 7d Range - estimated from available data */}
-        <div className="flex items-center justify-between py-3 border-b border-border/50">
-          <span className="text-sm text-muted-foreground font-medium">7d Range</span>
-          <span className="font-semibold text-sm">
-            {formatPrice(low24h * 0.85)} – {formatPrice(high24h * 1.15)}
-          </span>
-        </div>
-
         {/* All-Time High */}
-        <div className="py-3 border-b border-border/50">
+        <div className="py-2 border-b border-border/50">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground font-medium">All-Time High</span>
+            <span className="text-[10px] text-muted-foreground">ATH</span>
             <div className="text-right">
-              <div className="font-semibold text-sm mb-0.5">{formatPrice(estimatedATH)}</div>
-              <div className="flex items-center justify-end gap-1 text-xs text-red-500">
-                <TrendingDown className="h-3 w-3" />
-                <span className="font-medium">{Math.abs(athChangePercent).toFixed(1)}%</span>
+              <div className="font-semibold text-[10px]">{formatPrice(estimatedATH)}</div>
+              <div className="flex items-center justify-end gap-0.5 text-[9px] text-red-500">
+                <TrendingDown className="h-2.5 w-2.5" />
+                <span>{Math.abs(athChangePercent).toFixed(1)}%</span>
               </div>
             </div>
-          </div>
-          <div className="text-xs text-muted-foreground text-right mt-1">
-            {formatDate(pairCreatedAt)} {calculateTimeAgo(pairCreatedAt)}
           </div>
         </div>
 
         {/* All-Time Low */}
-        <div className="py-3">
+        <div className="py-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground font-medium">All-Time Low</span>
+            <span className="text-[10px] text-muted-foreground">ATL</span>
             <div className="text-right">
-              <div className="font-semibold text-sm mb-0.5">{formatPrice(estimatedATL)}</div>
-              <div className="flex items-center justify-end gap-1 text-xs text-green-500">
-                <TrendingUp className="h-3 w-3" />
-                <span className="font-medium">{Math.abs(atlChangePercent).toFixed(1)}%</span>
+              <div className="font-semibold text-[10px]">{formatPrice(estimatedATL)}</div>
+              <div className="flex items-center justify-end gap-0.5 text-[9px] text-green-500">
+                <TrendingUp className="h-2.5 w-2.5" />
+                <span>{Math.abs(atlChangePercent).toFixed(1)}%</span>
               </div>
             </div>
-          </div>
-          <div className="text-xs text-muted-foreground text-right mt-1">
-            {formatDate(pairCreatedAt)} {calculateTimeAgo(pairCreatedAt)}
           </div>
         </div>
       </CardContent>

@@ -231,14 +231,6 @@ const TokenDetail = () => {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Price History moved here */}
-            <TokenPriceHistory
-              currentPrice={parseFloat(mainPair.priceUsd)}
-              priceChange24h={mainPair.priceChange.h24}
-              priceChange6h={mainPair.priceChange.h6}
-              pairCreatedAt={mainPair.pairCreatedAt}
-            />
           </div>
 
           {/* Center Column - Price Chart */}
@@ -259,12 +251,18 @@ const TokenDetail = () => {
             </Card>
           </div>
 
-          {/* Right Column - Converter Only */}
-          <div className="space-y-6 order-3">
+          {/* Right Column - Converter and Price History */}
+          <div className="space-y-3 order-3">
             <TokenConverter 
               tokenSymbol={mainPair.baseToken.symbol}
               tokenName={mainPair.baseToken.name}
               priceUsd={parseFloat(mainPair.priceUsd)}
+            />
+            <TokenPriceHistory
+              currentPrice={parseFloat(mainPair.priceUsd)}
+              priceChange24h={mainPair.priceChange.h24}
+              priceChange6h={mainPair.priceChange.h6}
+              pairCreatedAt={mainPair.pairCreatedAt}
             />
           </div>
         </div>

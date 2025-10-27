@@ -44,13 +44,13 @@ const TokenConverter = ({ tokenSymbol, tokenName, priceUsd }: TokenConverterProp
   };
 
   return (
-    <Card className="sticky top-4">
-      <CardHeader>
-        <CardTitle>Converter</CardTitle>
+    <Card className="sticky top-4 h-[240px] flex flex-col">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm">Converter</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="token-amount">{tokenSymbol}</Label>
+      <CardContent className="space-y-2 flex-1 flex flex-col">
+        <div className="space-y-1">
+          <Label htmlFor="token-amount" className="text-xs">{tokenSymbol}</Label>
           <Input
             id="token-amount"
             type="number"
@@ -58,23 +58,23 @@ const TokenConverter = ({ tokenSymbol, tokenName, priceUsd }: TokenConverterProp
             value={tokenAmount}
             onChange={(e) => handleTokenChange(e.target.value)}
             step="any"
+            className="h-8 text-sm"
           />
-          <p className="text-xs text-muted-foreground">{tokenName}</p>
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex justify-center py-1">
           <Button
             variant="ghost"
             size="icon"
             onClick={handleSwap}
-            className="rounded-full"
+            className="rounded-full h-6 w-6"
           >
-            <ArrowDownUp className="h-4 w-4" />
+            <ArrowDownUp className="h-3 w-3" />
           </Button>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="usdt-amount">USDT</Label>
+        <div className="space-y-1">
+          <Label htmlFor="usdt-amount" className="text-xs">USDT</Label>
           <Input
             id="usdt-amount"
             type="number"
@@ -82,13 +82,12 @@ const TokenConverter = ({ tokenSymbol, tokenName, priceUsd }: TokenConverterProp
             value={usdtAmount}
             onChange={(e) => handleUsdtChange(e.target.value)}
             step="any"
+            className="h-8 text-sm"
           />
-          <p className="text-xs text-muted-foreground">Tether USD</p>
         </div>
 
-        <div className="pt-4 border-t text-sm text-muted-foreground">
-          <p>1 {tokenSymbol} = ${priceUsd.toFixed(8)} USDT</p>
-          <p>1 USDT = {(1 / priceUsd).toFixed(8)} {tokenSymbol}</p>
+        <div className="pt-2 border-t text-[10px] text-muted-foreground mt-auto">
+          <p>1 {tokenSymbol} = ${priceUsd.toFixed(8)}</p>
         </div>
       </CardContent>
     </Card>
