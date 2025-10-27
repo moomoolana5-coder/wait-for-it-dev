@@ -80,9 +80,9 @@ const VoteButton = ({ tokenAddress }: VoteButtonProps) => {
 
   if (isLoading) {
     return (
-      <Button variant="ghost" size="sm" disabled className="gap-2">
-        <Loader2 className="h-4 w-4 animate-spin" />
-        <span className="text-sm">{voteCount}</span>
+      <Button variant="ghost" size="sm" disabled className="gap-1 h-7 px-2">
+        <Loader2 className="h-3 w-3 animate-spin" />
+        <span className="text-xs">{voteCount}</span>
       </Button>
     );
   }
@@ -94,10 +94,10 @@ const VoteButton = ({ tokenAddress }: VoteButtonProps) => {
         size="sm"
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleVoteClick(); }}
         disabled={hasVoted}
-        className="gap-2 hover:bg-primary/10"
+        className="gap-1 h-7 px-2 hover:bg-primary/10"
       >
-        <ThumbsUp className={`h-4 w-4 ${hasVoted ? 'fill-current text-primary' : ''}`} />
-        <span className="text-sm font-semibold">{voteCount}</span>
+        <ThumbsUp className={`h-3 w-3 ${hasVoted ? 'fill-current text-primary' : ''}`} />
+        <span className="text-xs font-semibold">{voteCount}</span>
       </Button>
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
