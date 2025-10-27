@@ -2,7 +2,7 @@ import { Wallet, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { Link } from "react-router-dom";
-import projectLogo from "@/assets/project-logo.png";
+import gigacockLogo from "@/assets/gigacock-logo.png";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import TokenSearch from "./TokenSearch";
@@ -27,9 +27,9 @@ const Navbar = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 md:gap-3">
             <img 
-              src={projectLogo} 
+              src={gigacockLogo} 
               alt="GIGACOCK Logo"
-              className="h-8 w-8 md:h-11 md:w-11 rounded-xl shadow-lg shadow-primary/20"
+              className="h-8 w-8 md:h-11 md:w-11 rounded-xl"
             />
             <span className="text-lg md:text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">GIGACOCK</span>
           </Link>
