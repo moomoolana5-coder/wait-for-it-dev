@@ -1,7 +1,7 @@
 import { ArrowUp, ArrowDown, Activity, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useOnChainNetworkStats } from "@/hooks/useOnChainNetworkStats";
+import { useNetworkStats } from "@/hooks/useNetworkStats";
 import { compactNumber, formatUSD, calculatePercentChange, formatTime } from "@/lib/formatters";
 
 interface NetworkStatsBarProps {
@@ -9,7 +9,7 @@ interface NetworkStatsBarProps {
 }
 
 const NetworkStatsBar = ({ pollIntervalMs = 30000 }: NetworkStatsBarProps) => {
-  const { transactions, networkVolume, isLoading, isError } = useOnChainNetworkStats(pollIntervalMs);
+  const { transactions, dexVolume, isLoading, isError } = useNetworkStats(pollIntervalMs);
 
   if (isError) {
     return (
@@ -81,25 +81,25 @@ const NetworkStatsBar = ({ pollIntervalMs = 30000 }: NetworkStatsBarProps) => {
     ? calculatePercentChange(transactions.value, transactions.prevValue)
     : undefined;
 
-  const volumePercentChange = networkVolume?.prevValue !== null && networkVolume?.prevValue !== undefined
-    ? calculatePercentChange(networkVolume.value, networkVolume.prevValue)
+  const volumePercentChange = dexVolume?.prevValue !== null && dexVolume?.prevValue !== undefined
+    ? calculatePercentChange(dexVolume.value, dexVolume.prevValue)
     : undefined;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
       {renderStatCard(
-        "Total Transactions (24h)",
+        "Total DEX Transactions (24h)",
         <Activity className="h-4 w-4 text-primary" />,
         transactions ? compactNumber(transactions.value) : "0",
         txPercentChange,
         transactions?.timestamp
       )}
       {renderStatCard(
-        "Total Network Volume (24h)",
+        "Total DEX Volume (24h)",
         <TrendingUp className="h-4 w-4 text-accent" />,
-        networkVolume ? formatUSD(networkVolume.value) : "$0",
+        dexVolume ? formatUSD(dexVolume.value) : "$0",
         volumePercentChange,
-        networkVolume?.timestamp
+        dexVolume?.timestamp
       )}
     </div>
   );
