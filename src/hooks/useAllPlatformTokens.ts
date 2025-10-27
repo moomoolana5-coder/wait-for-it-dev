@@ -108,7 +108,6 @@ export const useAllPlatformTokens = () => {
 
           for (const p of pairs) {
             if (p.chainId !== 'pulsechain') continue;
-            if (p.dexId !== 'pulsex') continue;
             const base = p.baseToken.address.toLowerCase();
             if (!platformAddresses.includes(base)) continue;
             
