@@ -83,54 +83,91 @@ const TokenVoteSection = ({ tokenAddress }: TokenVoteSectionProps) => {
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle>Vote Sentiment</CardTitle>
+      <Card className="overflow-hidden">
+        <CardHeader className="bg-muted/30">
+          <CardTitle className="text-xl">Vote Sentiment</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <Button
-              variant={hasVoted ? 'secondary' : 'default'}
-              size="lg"
-              onClick={() => handleVoteClick('bullish')}
-              disabled={hasVoted || isLoading}
-              className="flex-1 flex-col gap-2 h-auto py-4 bg-green-500 hover:bg-green-600 text-white"
-            >
-              <div className="flex items-center gap-2">
-                {isLoading ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  <TrendingUp className="h-5 w-5" />
-                )}
-                <span className="font-semibold">Bullish</span>
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            {/* Bullish Button */}
+            <div className="space-y-3">
+              <Button
+                variant={hasVoted ? 'secondary' : 'default'}
+                size="lg"
+                onClick={() => handleVoteClick('bullish')}
+                disabled={hasVoted || isLoading}
+                className="w-full h-24 flex flex-col gap-2 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg hover:shadow-xl transition-all"
+              >
+                <div className="flex items-center gap-2">
+                  {isLoading ? (
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                  ) : (
+                    <TrendingUp className="h-6 w-6" />
+                  )}
+                  <span className="text-lg font-bold">Bullish</span>
+                </div>
+                <div className="text-3xl font-black">{Math.floor(voteCount * 0.6)}</div>
+              </Button>
+              <div className="text-center">
+                <div className="text-sm font-semibold text-green-600">
+                  {voteCount > 0 ? '60%' : '0%'}
+                </div>
               </div>
-              <span className="text-2xl font-bold">{Math.floor(voteCount * 0.6)}</span>
-              <span className="text-xs opacity-90">votes</span>
-            </Button>
+            </div>
+
+            {/* Bearish Button */}
+            <div className="space-y-3">
+              <Button
+                variant={hasVoted ? 'secondary' : 'default'}
+                size="lg"
+                onClick={() => handleVoteClick('bearish')}
+                disabled={hasVoted || isLoading}
+                className="w-full h-24 flex flex-col gap-2 bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl transition-all"
+              >
+                <div className="flex items-center gap-2">
+                  {isLoading ? (
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                  ) : (
+                    <TrendingDown className="h-6 w-6" />
+                  )}
+                  <span className="text-lg font-bold">Bearish</span>
+                </div>
+                <div className="text-3xl font-black">{Math.floor(voteCount * 0.4)}</div>
+              </Button>
+              <div className="text-center">
+                <div className="text-sm font-semibold text-red-600">
+                  {voteCount > 0 ? '40%' : '0%'}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="space-y-2">
+            <div className="flex h-3 rounded-full overflow-hidden bg-muted">
+              <div 
+                className="bg-gradient-to-r from-green-500 to-green-600 transition-all duration-500"
+                style={{ width: voteCount > 0 ? '60%' : '50%' }}
+              />
+              <div 
+                className="bg-gradient-to-r from-red-500 to-red-600 transition-all duration-500"
+                style={{ width: voteCount > 0 ? '40%' : '50%' }}
+              />
+            </div>
             
-            <Button
-              variant={hasVoted ? 'secondary' : 'default'}
-              size="lg"
-              onClick={() => handleVoteClick('bearish')}
-              disabled={hasVoted || isLoading}
-              className="flex-1 flex-col gap-2 h-auto py-4 bg-red-500 hover:bg-red-600 text-white"
-            >
-              <div className="flex items-center gap-2">
-                {isLoading ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  <TrendingDown className="h-5 w-5" />
-                )}
-                <span className="font-semibold">Bearish</span>
-              </div>
-              <span className="text-2xl font-bold">{Math.floor(voteCount * 0.4)}</span>
-              <span className="text-xs opacity-90">votes</span>
-            </Button>
+            <div className="flex items-center justify-center gap-2 pt-2">
+              <span className="text-sm text-muted-foreground">Total Votes:</span>
+              <span className="text-lg font-bold">{voteCount}</span>
+            </div>
           </div>
-          
-          <div className="mt-4 text-center text-sm text-muted-foreground">
-            Total Votes: <span className="font-semibold">{voteCount}</span>
-          </div>
+
+          {hasVoted && (
+            <div className="mt-4 p-3 bg-accent/20 rounded-lg text-center">
+              <p className="text-sm text-muted-foreground">
+                ✓ You have already voted for this token
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
