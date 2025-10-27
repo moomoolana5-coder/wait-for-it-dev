@@ -1,15 +1,17 @@
-import { TrendingUp, Trophy, Flame, Clock, Star } from "lucide-react";
+import { TrendingUp, Trophy, Flame, Clock, Star, Sparkles, BarChart3 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const TabNavigation = () => {
   const location = useLocation();
-  
+
   const tabs = [
     { id: "all", label: "All", icon: Star, href: "/" },
     { id: "trending", label: "Trending", icon: TrendingUp, href: "#trending" },
     { id: "top-tokens", label: "Top Tokens", icon: Trophy, href: "#top-tokens" },
     { id: "gainers", label: "Top Gainers", icon: Flame, href: "#gainers" },
+    { id: "highlights", label: "Highlights", icon: Sparkles, href: "#highlights" },
+    { id: "trade-volume", label: "Trending by Trade Volume", icon: BarChart3, href: "#trade-volume" },
     { id: "new", label: "New Listings", icon: Clock, href: "#new" },
   ];
 

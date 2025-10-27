@@ -11,8 +11,8 @@ const TrendingTables = () => {
   const { data: gainTokens, isLoading: loadingGain } = useTopByPriceGain();
 
   const topVoted = votedTokens?.slice(0, 3) || [];
-  const topVolume = volumeTokens || [];
-  const topGain = gainTokens || [];
+  const topVolume = volumeTokens?.slice(0, 3) || [];
+  const topGain = gainTokens?.slice(0, 3) || [];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

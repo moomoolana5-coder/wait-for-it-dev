@@ -44,53 +44,95 @@ interface DexPair {
 
 const DEXSCREENER_API = 'https://api.dexscreener.com/latest/dex';
 
-// Top tokens by volume on PulseChain
-const TOP_PULSECHAIN_TOKENS = [
-  '0x2b591e99afe9f32eaa6214f7b7629768c40eeb39', // HEX
-  '0x95b303987a60c71504d99aa1b13b4da07b0790ab', // PLSX
-  '0x2fa878ab3f87cc1c9737fc071108f904c0b0c95d', // INC
-  '0x0cb6f5a34ad42ec934882a05265a7d5f59b51a2f', // USDL
-  '0xc10a4ed9b4042222d69ff0b374eddd47ed90fc1f', // PCOCK
-  '0x94534eeee131840b1c0f61847c572228bdfdde93', // pTGC
-  '0x6b0280da12f0977f1cc19861e73682c27ad8ab84', // WETH
-  '0xefd766ccb38eaf1dfd701853bfce31359239f305', // DAI
-];
+import { supabase } from '@/integrations/supabase/client';
+import { FEATURED_TOKENS } from './useDexScreener';
+
+const getPlatformTokenAddresses = async (): Promise<string[]> => {
+  const addresses = new Set<string>();
+
+  FEATURED_TOKENS.forEach(addr => addresses.add(addr.toLowerCase()));
+
+  const { data: newListings } = await supabase
+    .from('new_listing_tokens')
+    .select('token_address')
+    .order('created_at', { ascending: false });
+
+  if (newListings) {
+    newListings.forEach(token => addresses.add(token.token_address.toLowerCase()));
+  }
+
+  const { data: votedTokens } = await supabase
+    .from('token_vote_counts')
+    .select('token_address')
+    .gt('vote_count', 0);
+
+  if (votedTokens) {
+    votedTokens.forEach(token => addresses.add(token.token_address.toLowerCase()));
+  }
+
+  return Array.from(addresses);
+};
 
 export const useTopByVolume = () => {
   return useQuery({
     queryKey: ['top-by-volume'],
     queryFn: async () => {
-      const tokenAddresses = TOP_PULSECHAIN_TOKENS.join(',');
-      const response = await fetch(`${DEXSCREENER_API}/tokens/${tokenAddresses}`);
-      if (!response.ok) throw new Error('Failed to fetch tokens');
-      const data = await response.json();
-      
-      const pulsechainPairs: DexPair[] = [];
-      
-      if (data.pairs) {
-        const tokenBestPairs = new Map<string, DexPair>();
-        
-        data.pairs.forEach((pair: DexPair) => {
-          // Only accept PulseChain tokens from PulseX DEX
-          if (pair.chainId === 'pulsechain' && pair.dexId === 'pulsex' && pair.liquidity?.usd > 1000) {
-            const tokenAddress = pair.baseToken.address.toLowerCase();
-            const existing = tokenBestPairs.get(tokenAddress);
-            
-            // Prefer pairs with higher liquidity
-            if (!existing || (pair.liquidity?.usd || 0) > (existing.liquidity?.usd || 0)) {
-              tokenBestPairs.set(tokenAddress, pair);
+      const platformAddresses = await getPlatformTokenAddresses();
+      console.log(`Loading top by volume from ${platformAddresses.length} tokens...`);
+
+      const BATCH_SIZE = 30;
+      const DELAY_MS = 500;
+      const bestByAddress = new Map<string, DexPair>();
+
+      const batches: string[][] = [];
+      for (let i = 0; i < platformAddresses.length; i += BATCH_SIZE) {
+        batches.push(platformAddresses.slice(i, i + BATCH_SIZE));
+      }
+
+      for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+        const batch = batches[batchIndex];
+
+        try {
+          if (batchIndex > 0) {
+            await new Promise(resolve => setTimeout(resolve, DELAY_MS));
+          }
+
+          const response = await fetch(`${DEXSCREENER_API}/tokens/${batch.join(',')}`);
+          if (!response.ok) continue;
+
+          const data = await response.json();
+          const pairs: DexPair[] = (data.pairs || []);
+
+          for (const p of pairs) {
+            if (p.chainId !== 'pulsechain') continue;
+            if (p.dexId !== 'pulsex') continue;
+            if (p.liquidity?.usd < 1000) continue;
+
+            const base = p.baseToken.address.toLowerCase();
+            if (!platformAddresses.includes(base)) continue;
+
+            const current = bestByAddress.get(base);
+            if (!current || (p.liquidity?.usd || 0) > (current.liquidity?.usd || 0)) {
+              bestByAddress.set(base, p);
             }
           }
-        });
-        
-        pulsechainPairs.push(...tokenBestPairs.values());
+        } catch (error) {
+          console.error(`Error in batch ${batchIndex + 1}:`, error);
+        }
       }
-      
-      const sorted = pulsechainPairs.sort((a, b) => b.volume.h24 - a.volume.h24);
-      
-      return sorted.slice(0, 3);
+
+      const tokens = Array.from(bestByAddress.values());
+
+      const sorted = tokens.sort((a, b) => {
+        const scoreA = a.volume.h24 * (1 + (a.priceChange?.h24 || 0) / 100);
+        const scoreB = b.volume.h24 * (1 + (b.priceChange?.h24 || 0) / 100);
+        return scoreB - scoreA;
+      });
+
+      console.log(`✅ Loaded ${sorted.length} top by volume tokens`);
+      return sorted;
     },
-    refetchInterval: 60000,
-    staleTime: 30000,
+    refetchInterval: 120000,
+    staleTime: 60000,
   });
 };

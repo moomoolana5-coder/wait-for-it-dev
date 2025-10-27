@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { DexPair } from "@/hooks/useAllPlatformTokens";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import VoteButton from "./VoteButton";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -14,9 +16,12 @@ import {
 interface TokenTableProps {
   tokens: DexPair[];
   isLoading?: boolean;
+  itemsPerPage?: number;
 }
 
-const TokenTable = ({ tokens, isLoading }: TokenTableProps) => {
+const TokenTable = ({ tokens, isLoading, itemsPerPage = 20 }: TokenTableProps) => {
+  const [visibleCount, setVisibleCount] = useState(itemsPerPage);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -32,6 +37,9 @@ const TokenTable = ({ tokens, isLoading }: TokenTableProps) => {
       </div>
     );
   }
+
+  const visibleTokens = tokens.slice(0, visibleCount);
+  const hasMore = visibleCount < tokens.length;
 
   const formatNumber = (num: number) => {
     if (num >= 1e9) return `$${(num / 1e9).toFixed(2)}B`;
@@ -49,22 +57,27 @@ const TokenTable = ({ tokens, isLoading }: TokenTableProps) => {
     return `$${num.toFixed(2)}`;
   };
 
+  const handleLoadMore = () => {
+    setVisibleCount(prev => Math.min(prev + itemsPerPage, tokens.length));
+  };
+
   return (
-    <div className="rounded-lg border border-border bg-card overflow-hidden">
-      <Table>
-        <TableHeader>
-          <TableRow className="hover:bg-transparent border-border">
-            <TableHead className="w-12">#</TableHead>
-            <TableHead>Token</TableHead>
-            <TableHead className="text-right">Price</TableHead>
-            <TableHead className="text-right">24h %</TableHead>
-            <TableHead className="text-right">24h Volume</TableHead>
-            <TableHead className="text-right">Liquidity</TableHead>
-            <TableHead className="text-center">Vote</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {tokens.map((token, index) => {
+    <div className="space-y-4">
+      <div className="rounded-lg border border-border bg-card overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-transparent border-border">
+              <TableHead className="w-12">#</TableHead>
+              <TableHead>Token</TableHead>
+              <TableHead className="text-right">Price</TableHead>
+              <TableHead className="text-right">24h %</TableHead>
+              <TableHead className="text-right">24h Volume</TableHead>
+              <TableHead className="text-right">Liquidity</TableHead>
+              <TableHead className="text-center">Vote</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {visibleTokens.map((token, index) => {
             const priceChange = token.priceChange?.h24 || 0;
             const isPositive = priceChange >= 0;
             
@@ -136,6 +149,20 @@ const TokenTable = ({ tokens, isLoading }: TokenTableProps) => {
         </TableBody>
       </Table>
     </div>
+
+    {hasMore && (
+      <div className="flex justify-center">
+        <Button
+          onClick={handleLoadMore}
+          variant="outline"
+          size="lg"
+          className="min-w-[200px]"
+        >
+          Load More ({tokens.length - visibleCount} remaining)
+        </Button>
+      </div>
+    )}
+  </div>
   );
 };
 

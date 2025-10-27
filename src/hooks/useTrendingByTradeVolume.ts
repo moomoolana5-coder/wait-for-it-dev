@@ -46,42 +46,38 @@ export interface DexPair {
 
 const DEXSCREENER_API = 'https://api.dexscreener.com/latest/dex';
 
-// Get all platform token addresses
 const getPlatformTokenAddresses = async (): Promise<string[]> => {
   const addresses = new Set<string>();
-  
-  // Add featured tokens
+
   FEATURED_TOKENS.forEach(addr => addresses.add(addr.toLowerCase()));
-  
-  // Add new listing tokens
+
   const { data: newListings } = await supabase
     .from('new_listing_tokens')
     .select('token_address')
     .order('created_at', { ascending: false });
-  
+
   if (newListings) {
     newListings.forEach(token => addresses.add(token.token_address.toLowerCase()));
   }
-  
-  // Add voted tokens
+
   const { data: votedTokens } = await supabase
     .from('token_vote_counts')
     .select('token_address')
     .gt('vote_count', 0);
-  
+
   if (votedTokens) {
     votedTokens.forEach(token => addresses.add(token.token_address.toLowerCase()));
   }
-  
+
   return Array.from(addresses);
 };
 
-export const useAllPlatformTokens = () => {
+export const useTrendingByTradeVolume = () => {
   return useQuery({
-    queryKey: ['all-platform-tokens'],
+    queryKey: ['trending-by-trade-volume'],
     queryFn: async () => {
       const platformAddresses = await getPlatformTokenAddresses();
-      console.log(`Loading ${platformAddresses.length} platform tokens...`);
+      console.log(`Loading trending by trade volume from ${platformAddresses.length} tokens...`);
 
       const BATCH_SIZE = 30;
       const DELAY_MS = 500;
@@ -117,19 +113,19 @@ export const useAllPlatformTokens = () => {
               bestByAddress.set(base, p);
             }
           }
-
-          console.log(`Batch ${batchIndex + 1}/${batches.length} (${bestByAddress.size} tokens)`);
         } catch (error) {
           console.error(`Error in batch ${batchIndex + 1}:`, error);
         }
       }
 
       const tokens = Array.from(bestByAddress.values());
-      const sortedByLiquidity = tokens.sort((a, b) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0));
-      console.log(`✅ Loaded ${sortedByLiquidity.length} platform tokens`);
-      return sortedByLiquidity;
+
+      const sortedByVolume = tokens.sort((a, b) => (b.volume?.h24 || 0) - (a.volume?.h24 || 0));
+
+      console.log(`✅ Loaded ${sortedByVolume.length} trending by trade volume`);
+      return sortedByVolume;
     },
-    refetchInterval: 120000, // 2 minutes
+    refetchInterval: 120000,
     staleTime: 60000,
   });
 };
