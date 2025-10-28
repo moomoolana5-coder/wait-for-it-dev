@@ -128,11 +128,11 @@ const TokenSale = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Total Supply:</span>
-                    <span className="font-medium">1,000,000,000</span>
+                    <span className="font-medium">1,000,000</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Presale Allocation:</span>
-                    <span className="font-medium">40%</span>
+                    <span className="font-medium">50%</span>
                   </div>
                 </div>
               </CardContent>
@@ -147,15 +147,15 @@ const TokenSale = () => {
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Duration:</span>
-                    <span className="font-medium">7 Days</span>
+                    <span className="font-medium">TBD</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Min Purchase:</span>
-                    <span className="font-medium">0.1 PLS</span>
+                    <span className="font-medium">10 USDC</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Max Purchase:</span>
-                    <span className="font-medium">10,000 PLS</span>
+                    <span className="text-muted-foreground">Hardcap:</span>
+                    <span className="font-medium">$5,000 USDC</span>
                   </div>
                 </div>
               </CardContent>
