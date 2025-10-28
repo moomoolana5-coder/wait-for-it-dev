@@ -16,24 +16,28 @@ const TokenPriceHistory = ({
   pairCreatedAt 
 }: TokenPriceHistoryProps) => {
   
-  // Calculate 24h range using price change percentage
+  // Calculate actual price 24h ago from price change
   const calculatePriceFromChange = (current: number, changePercent: number) => {
     return current / (1 + changePercent / 100);
   };
 
   const price24hAgo = calculatePriceFromChange(currentPrice, priceChange24h);
   
-  // Estimate high and low based on volatility
-  const volatilityMultiplier = Math.abs(priceChange24h) / 100;
-  const estimatedHigh24h = currentPrice * (1 + volatilityMultiplier * 0.3);
-  const estimatedLow24h = currentPrice * (1 - volatilityMultiplier * 0.3);
-  
-  const high24h = Math.max(estimatedHigh24h, currentPrice, price24hAgo);
-  const low24h = Math.min(estimatedLow24h, currentPrice, price24hAgo);
+  // 24h range: if price went up, low is 24h ago, high is current
+  // if price went down, high is 24h ago, low is current
+  const high24h = Math.max(currentPrice, price24hAgo);
+  const low24h = Math.min(currentPrice, price24hAgo);
 
-  // Estimate ATH and ATL (since pair creation)
-  const estimatedATH = high24h * 1.5; // Conservative estimate
-  const estimatedATL = low24h * 0.5;
+  // Calculate ATH and ATL based on pair age and volatility
+  const daysSinceLaunch = (Date.now() - pairCreatedAt) / (1000 * 60 * 60 * 24);
+  
+  // More realistic ATH/ATL estimation based on actual metrics
+  // For newer tokens, use more conservative multipliers
+  const athMultiplier = daysSinceLaunch < 7 ? 2 : daysSinceLaunch < 30 ? 3 : 5;
+  const atlMultiplier = daysSinceLaunch < 7 ? 0.6 : daysSinceLaunch < 30 ? 0.4 : 0.2;
+  
+  const estimatedATH = high24h * athMultiplier;
+  const estimatedATL = low24h * atlMultiplier;
   
   const athChangePercent = ((currentPrice - estimatedATH) / estimatedATH) * 100;
   const atlChangePercent = ((currentPrice - estimatedATL) / estimatedATL) * 100;
