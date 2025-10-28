@@ -41,8 +41,8 @@ const Navbar = () => {
             <Link to="/" className="text-foreground font-medium hover:text-primary transition-colors">
               Home
             </Link>
-            <Link to="/gigacock" className="text-foreground hover:text-primary transition-colors">
-              GIGACOCK
+            <Link to="/token-sale" className="text-foreground hover:text-primary transition-colors">
+              Token Sale
             </Link>
             <a href="https://forms.google.com" target="_blank" rel="noopener noreferrer" className="text-foreground hover:text-accent transition-colors">
               Listing Form
@@ -108,11 +108,11 @@ const Navbar = () => {
                     Home
                   </Link>
                   <Link 
-                    to="/gigacock" 
+                    to="/token-sale" 
                     className="text-lg hover:text-primary transition-colors"
                     onClick={() => setIsOpen(false)}
                   >
-                    GIGACOCK
+                    Token Sale
                   </Link>
                   <a 
                     href="https://forms.google.com"
