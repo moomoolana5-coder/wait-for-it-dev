@@ -277,6 +277,7 @@ const TokenDetail = () => {
               currentPrice={parseFloat(mainPair.priceUsd)}
               priceChange24h={mainPair.priceChange.h24}
               priceChange6h={mainPair.priceChange.h6}
+              priceChange1h={mainPair.priceChange.h1}
               pairCreatedAt={mainPair.pairCreatedAt}
             />
           </div>

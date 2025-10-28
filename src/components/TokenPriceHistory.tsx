@@ -6,6 +6,7 @@ interface TokenPriceHistoryProps {
   currentPrice: number;
   priceChange24h: number;
   priceChange6h?: number;
+  priceChange1h?: number;
   pairCreatedAt: number;
 }
 
@@ -13,34 +14,30 @@ const TokenPriceHistory = ({
   currentPrice, 
   priceChange24h, 
   priceChange6h = 0,
+  priceChange1h = 0,
   pairCreatedAt 
 }: TokenPriceHistoryProps) => {
   
-  // Calculate actual price 24h ago from price change
+  // Calculate historical prices from percentage changes
   const calculatePriceFromChange = (current: number, changePercent: number) => {
     return current / (1 + changePercent / 100);
   };
 
   const price24hAgo = calculatePriceFromChange(currentPrice, priceChange24h);
+  const price6hAgo = calculatePriceFromChange(currentPrice, priceChange6h);
+  const price1hAgo = calculatePriceFromChange(currentPrice, priceChange1h);
   
-  // 24h range: if price went up, low is 24h ago, high is current
-  // if price went down, high is 24h ago, low is current
+  // Calculate actual 24h range
   const high24h = Math.max(currentPrice, price24hAgo);
   const low24h = Math.min(currentPrice, price24hAgo);
-
-  // Calculate ATH and ATL based on pair age and volatility
-  const daysSinceLaunch = (Date.now() - pairCreatedAt) / (1000 * 60 * 60 * 24);
   
-  // More realistic ATH/ATL estimation based on actual metrics
-  // For newer tokens, use more conservative multipliers
-  const athMultiplier = daysSinceLaunch < 7 ? 2 : daysSinceLaunch < 30 ? 3 : 5;
-  const atlMultiplier = daysSinceLaunch < 7 ? 0.6 : daysSinceLaunch < 30 ? 0.4 : 0.2;
+  // Calculate 6h range
+  const high6h = Math.max(currentPrice, price6hAgo);
+  const low6h = Math.min(currentPrice, price6hAgo);
   
-  const estimatedATH = high24h * athMultiplier;
-  const estimatedATL = low24h * atlMultiplier;
-  
-  const athChangePercent = ((currentPrice - estimatedATH) / estimatedATH) * 100;
-  const atlChangePercent = ((currentPrice - estimatedATL) / estimatedATL) * 100;
+  // Calculate 1h range
+  const high1h = Math.max(currentPrice, price1hAgo);
+  const low1h = Math.min(currentPrice, price1hAgo);
 
   // Format price with appropriate decimals
   const formatPrice = (price: number) => {
@@ -75,37 +72,40 @@ const TokenPriceHistory = ({
       </CardHeader>
       <CardContent className="space-y-0 flex-1 px-4 pb-4">
         {/* 24h Range */}
-        <div className="flex items-center justify-between py-2.5 border-b border-border/50">
+        <div className="flex items-center justify-between py-3 border-b border-border/50">
           <span className="text-xs font-medium text-muted-foreground">24h Range</span>
-          <span className="text-xs font-semibold text-right">
-            {formatPrice(low24h)} – {formatPrice(high24h)}
-          </span>
-        </div>
-
-        {/* All-Time High */}
-        <div className="py-2.5 border-b border-border/50">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">All-Time High</span>
-            <div className="text-right">
-              <div className="text-xs font-semibold mb-1">{formatPrice(estimatedATH)}</div>
-              <div className="flex items-center justify-end gap-1 text-[10px] text-red-500 font-medium">
-                <TrendingDown className="h-3 w-3" />
-                <span>{Math.abs(athChangePercent).toFixed(1)}%</span>
-              </div>
+          <div className="text-right">
+            <div className="text-xs font-semibold">
+              {formatPrice(low24h)} – {formatPrice(high24h)}
+            </div>
+            <div className={`text-[10px] font-medium mt-1 ${priceChange24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+              {priceChange24h >= 0 ? '+' : ''}{priceChange24h.toFixed(2)}%
             </div>
           </div>
         </div>
 
-        {/* All-Time Low */}
-        <div className="py-2.5">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">All-Time Low</span>
-            <div className="text-right">
-              <div className="text-xs font-semibold mb-1">{formatPrice(estimatedATL)}</div>
-              <div className="flex items-center justify-end gap-1 text-[10px] text-green-500 font-medium">
-                <TrendingUp className="h-3 w-3" />
-                <span>{Math.abs(atlChangePercent).toFixed(1)}%</span>
-              </div>
+        {/* 6h Range */}
+        <div className="flex items-center justify-between py-3 border-b border-border/50">
+          <span className="text-xs font-medium text-muted-foreground">6h Range</span>
+          <div className="text-right">
+            <div className="text-xs font-semibold">
+              {formatPrice(low6h)} – {formatPrice(high6h)}
+            </div>
+            <div className={`text-[10px] font-medium mt-1 ${priceChange6h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+              {priceChange6h >= 0 ? '+' : ''}{priceChange6h.toFixed(2)}%
+            </div>
+          </div>
+        </div>
+
+        {/* 1h Range */}
+        <div className="flex items-center justify-between py-3">
+          <span className="text-xs font-medium text-muted-foreground">1h Range</span>
+          <div className="text-right">
+            <div className="text-xs font-semibold">
+              {formatPrice(low1h)} – {formatPrice(high1h)}
+            </div>
+            <div className={`text-[10px] font-medium mt-1 ${priceChange1h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+              {priceChange1h >= 0 ? '+' : ''}{priceChange1h.toFixed(2)}%
             </div>
           </div>
         </div>
