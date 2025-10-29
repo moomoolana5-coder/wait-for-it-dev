@@ -17,8 +17,8 @@ const TOKEN_ADDRESS = "0xFb639C16B40ED8595d27D1E4a44C4DCaE78f2dB4" as const;
 const PRESALE_ADDRESS = "0x7FEbA131C382F45e363d1d900DA3fA98223CE91a" as const;
 const USDC_ADDRESS = "0x15D38573d2feeb82e7ad5187aB8c1D52810B1f07" as const;
 
-// Set fixed start date - adjust this timestamp as needed
-const PRESALE_START_TIME = new Date("2025-10-31T00:00:00Z").getTime();
+// Set presale start time - 2 days from now
+const PRESALE_START_TIME = new Date("2025-10-31T12:00:00Z").getTime();
 
 const PRESALE_ABI = [
   { inputs: [], name: "hardcapTokens", outputs: [{ type: "uint256" }], stateMutability: "view", type: "function" },
