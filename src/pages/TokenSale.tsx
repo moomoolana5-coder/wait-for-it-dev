@@ -6,9 +6,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Clock, Wallet, Coins } from "lucide-react";
 
 const TokenSale = () => {
-  // Set presale end date to 3 days from now
-  const presaleEndDate = new Date();
-  presaleEndDate.setDate(presaleEndDate.getDate() + 3);
+  // Get or set presale end date (3 days from first visit)
+  const getPresaleEndDate = () => {
+    const stored = localStorage.getItem('presaleEndDate');
+    if (stored) {
+      return new Date(stored);
+    }
+    const newEndDate = new Date();
+    newEndDate.setDate(newEndDate.getDate() + 3);
+    localStorage.setItem('presaleEndDate', newEndDate.toISOString());
+    return newEndDate;
+  };
+
+  const presaleEndDate = getPresaleEndDate();
   
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
