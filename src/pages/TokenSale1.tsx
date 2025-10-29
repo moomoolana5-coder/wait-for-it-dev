@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,11 +10,14 @@ import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import { formatUnits, parseUnits } from "viem";
 import { pulsechain } from "wagmi/chains";
 import { toast } from "sonner";
-import { Wallet, Settings, ShoppingCart, RefreshCw } from "lucide-react";
+import { Wallet, Settings, ShoppingCart, RefreshCw, Clock } from "lucide-react";
 
 const TOKEN_ADDRESS = "0xFb639C16B40ED8595d27D1E4a44C4DCaE78f2dB4" as const;
 const PRESALE_ADDRESS = "0x7FEbA131C382F45e363d1d900DA3fA98223CE91a" as const;
 const USDC_ADDRESS = "0x15D38573d2feeb82e7ad5187aB8c1D52810B1f07" as const;
+
+// Set fixed end date (2 days from deployment - adjust this timestamp as needed)
+const PRESALE_END_TIME = new Date("2025-10-31T00:00:00Z").getTime();
 
 const PRESALE_ABI = [
   { inputs: [], name: "hardcapTokens", outputs: [{ type: "uint256" }], stateMutability: "view", type: "function" },
@@ -42,6 +44,7 @@ const TokenSale1 = () => {
   const [ownerPrice, setOwnerPrice] = useState("");
   const [buyerAmount, setBuyerAmount] = useState("");
   const [isApproving, setIsApproving] = useState(false);
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   const { data: hardcapTokens, refetch: refetchHardcap } = useReadContract({
     address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "hardcapTokens",
@@ -77,6 +80,29 @@ const TokenSale1 = () => {
     const interval = setInterval(() => {
       refetchHardcap(); refetchPrice(); refetchSold(); refetchLive(); refetchAllowance();
     }, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const updateCountdown = () => {
+      const now = new Date().getTime();
+      const distance = PRESALE_END_TIME - now;
+
+      if (distance < 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+
+      setTimeLeft({
+        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((distance % (1000 * 60)) / 1000),
+      });
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -178,12 +204,38 @@ const TokenSale1 = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-background/95 to-background">
-      <Navbar />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">PulseChain Presale Console</h1>
           <p className="text-sm text-muted-foreground">Network: PulseChain (Chain ID: 369)</p>
         </div>
+
+        <Card className="mb-6 border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Clock className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-semibold">Presale Ends In</h2>
+            </div>
+            <div className="grid grid-cols-4 gap-4 max-w-2xl mx-auto">
+              <div className="text-center p-4 rounded-lg bg-background/50 backdrop-blur">
+                <div className="text-3xl font-bold text-primary">{timeLeft.days}</div>
+                <div className="text-sm text-muted-foreground mt-1">Days</div>
+              </div>
+              <div className="text-center p-4 rounded-lg bg-background/50 backdrop-blur">
+                <div className="text-3xl font-bold text-primary">{timeLeft.hours}</div>
+                <div className="text-sm text-muted-foreground mt-1">Hours</div>
+              </div>
+              <div className="text-center p-4 rounded-lg bg-background/50 backdrop-blur">
+                <div className="text-3xl font-bold text-primary">{timeLeft.minutes}</div>
+                <div className="text-sm text-muted-foreground mt-1">Minutes</div>
+              </div>
+              <div className="text-center p-4 rounded-lg bg-background/50 backdrop-blur">
+                <div className="text-3xl font-bold text-primary">{timeLeft.seconds}</div>
+                <div className="text-sm text-muted-foreground mt-1">Seconds</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {presaleBalanceNum < 50000 && (
           <Card className="mb-6 border-yellow-500/50 bg-yellow-500/10"><CardContent className="p-4">
