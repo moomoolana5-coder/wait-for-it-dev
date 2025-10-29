@@ -13,6 +13,7 @@ import Auth from "./pages/Auth";
 import TokenDetail from "./pages/TokenDetail";
 import Gigacock from "./pages/Gigacock";
 import TokenSale from "./pages/TokenSale";
+import TokenSale1 from "./pages/TokenSale1";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/token/:address" element={<TokenDetail />} />
             <Route path="/gigacock" element={<Gigacock />} />
             <Route path="/token-sale" element={<TokenSale />} />
+            <Route path="/token-sale-1" element={<TokenSale1 />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

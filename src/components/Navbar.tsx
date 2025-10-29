@@ -44,6 +44,9 @@ const Navbar = () => {
             <Link to="/token-sale" className="text-foreground hover:text-primary transition-colors">
               Token Sale
             </Link>
+            <Link to="/token-sale-1" className="text-foreground hover:text-primary transition-colors">
+              Token Sale 1
+            </Link>
             <a href="https://forms.google.com" target="_blank" rel="noopener noreferrer" className="text-foreground hover:text-accent transition-colors">
               Listing Form
             </a>
@@ -113,6 +116,13 @@ const Navbar = () => {
                     onClick={() => setIsOpen(false)}
                   >
                     Token Sale
+                  </Link>
+                  <Link 
+                    to="/token-sale-1" 
+                    className="text-lg hover:text-primary transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Token Sale 1
                   </Link>
                   <a 
                     href="https://forms.google.com"
