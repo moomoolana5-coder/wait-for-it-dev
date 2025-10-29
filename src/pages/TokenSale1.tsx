@@ -77,9 +77,22 @@ const TokenSale1 = () => {
     query: { enabled: !!address }
   });
 
+  const { data: userUsdcBalance, refetch: refetchUserUsdc } = useReadContract({
+    address: USDC_ADDRESS, abi: ERC20_ABI, functionName: "balanceOf",
+    args: address ? [address] : undefined,
+    query: { enabled: !!address }
+  });
+
+  const { data: userTokenBalance, refetch: refetchUserTokens } = useReadContract({
+    address: TOKEN_ADDRESS, abi: ERC20_ABI, functionName: "balanceOf",
+    args: address ? [address] : undefined,
+    query: { enabled: !!address }
+  });
+
   useEffect(() => {
     const interval = setInterval(() => {
       refetchHardcap(); refetchPrice(); refetchSold(); refetchLive(); refetchAllowance();
+      refetchUserUsdc(); refetchUserTokens();
     }, 10000);
     return () => clearInterval(interval);
   }, []);
@@ -118,6 +131,8 @@ const TokenSale1 = () => {
   const estimatedTokens = isValidBuy ? buyerAmountNum * priceNum : 0;
   const hasAllowance = usdcAllowance && usdcAllowance >= parseUnits(buyerAmount || "0", 6);
   const canBuy = isValidBuy && hasAllowance && !isApproving;
+  const userUsdcNum = userUsdcBalance ? Number(formatUnits(userUsdcBalance, 6)) : 0;
+  const userTokenNum = userTokenBalance ? Number(formatUnits(userTokenBalance, 18)) : 0;
 
   const handleSetHardcap = async () => {
     try {
@@ -198,6 +213,8 @@ const TokenSale1 = () => {
       setBuyerAmount("");
       await refetchSold();
       await refetchAllowance();
+      await refetchUserUsdc();
+      await refetchUserTokens();
     } catch (error: any) {
       toast.error(error?.message || "Failed");
     }
@@ -278,18 +295,34 @@ const TokenSale1 = () => {
           )}
 
           {isConnected && !isOwner && (
-            <Card className="border-primary/20 bg-card/50 backdrop-blur-xl">
-              <CardHeader><CardTitle className="flex items-center gap-2"><ShoppingCart className="h-5 w-5" />Buy Tokens</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                <div><Label>USDC Amount (min $1)</Label><Input type="number" placeholder="1" value={buyerAmount} onChange={(e) => setBuyerAmount(e.target.value)} className="mt-1" />
-                {buyerAmount && !isValidBuy && <p className="text-xs text-destructive mt-1">Minimum $1</p>}</div>
-                {isValidBuy && <div className="p-3 bg-primary/10 rounded-lg"><p className="text-sm">≈ <span className="font-bold">{estimatedTokens.toFixed(2)}</span> tokens</p></div>}
-                <Button onClick={handleApproveUSDC} disabled={!isValidBuy || isApproving} className="w-full" variant="outline">
-                  {isApproving ? "Approving..." : hasAllowance ? "✓ Approved" : "1. Approve USDC"}
-                </Button>
-                <Button onClick={handleBuy} disabled={!canBuy} className="w-full bg-gradient-primary">2. Buy</Button>
-              </CardContent>
-            </Card>
+            <>
+              <Card className="border-primary/20 bg-card/50 backdrop-blur-xl">
+                <CardHeader><CardTitle className="flex items-center gap-2"><Wallet className="h-5 w-5" />Your Balances</CardTitle></CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex justify-between items-center p-3 bg-background/50 rounded-lg">
+                    <span className="text-sm text-muted-foreground">USDC</span>
+                    <span className="font-semibold">{userUsdcNum.toLocaleString(undefined, { maximumFractionDigits: 2 })} USDC</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-background/50 rounded-lg">
+                    <span className="text-sm text-muted-foreground">Tokens Owned</span>
+                    <span className="font-semibold text-primary">{userTokenNum.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-primary/20 bg-card/50 backdrop-blur-xl">
+                <CardHeader><CardTitle className="flex items-center gap-2"><ShoppingCart className="h-5 w-5" />Buy Tokens</CardTitle></CardHeader>
+                <CardContent className="space-y-4">
+                  <div><Label>USDC Amount (min $1)</Label><Input type="number" placeholder="1" value={buyerAmount} onChange={(e) => setBuyerAmount(e.target.value)} className="mt-1" />
+                  {buyerAmount && !isValidBuy && <p className="text-xs text-destructive mt-1">Minimum $1</p>}</div>
+                  {isValidBuy && <div className="p-3 bg-primary/10 rounded-lg"><p className="text-sm">≈ <span className="font-bold">{estimatedTokens.toFixed(2)}</span> tokens</p></div>}
+                  <Button onClick={handleApproveUSDC} disabled={!isValidBuy || isApproving} className="w-full" variant="outline">
+                    {isApproving ? "Approving..." : hasAllowance ? "✓ Approved" : "1. Approve USDC"}
+                  </Button>
+                  <Button onClick={handleBuy} disabled={!canBuy} className="w-full bg-gradient-primary">2. Buy</Button>
+                </CardContent>
+              </Card>
+            </>
           )}
 
           {!isConnected && <Card className="border-primary/20 bg-card/50 backdrop-blur-xl"><CardContent className="p-8 text-center"><Wallet className="h-12 w-12 mx-auto mb-4 text-muted-foreground" /><p>Connect wallet to participate</p></CardContent></Card>}
