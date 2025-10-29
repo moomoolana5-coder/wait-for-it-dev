@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import { formatUnits, parseUnits } from "viem";
+import { pulsechain } from "wagmi/chains";
 import { toast } from "sonner";
 import { Wallet, Settings, ShoppingCart, RefreshCw } from "lucide-react";
 
@@ -85,12 +86,12 @@ const TokenSale1 = () => {
   const priceNum = priceTokensPerUSDC ? Number(formatUnits(priceTokensPerUSDC, 18)) : 0;
   const presaleBalanceNum = presaleTokenBalance ? Number(formatUnits(presaleTokenBalance, 18)) : 0;
   const buyerAmountNum = parseFloat(buyerAmount || "0");
-  const isValidBuy = buyerAmountNum >= 10;
+  const isValidBuy = buyerAmountNum >= 1;
   const estimatedTokens = isValidBuy ? buyerAmountNum * priceNum : 0;
 
   const handleSetHardcap = async () => {
     try {
-      await writeContractAsync({ address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "setHardcapTokens", args: [parseUnits(ownerHardcap, 18)] });
+      await writeContractAsync({ address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "setHardcapTokens", args: [parseUnits(ownerHardcap, 18)], account: address!, chain: pulsechain });
       toast.success("Hardcap updated!");
     } catch (error: any) {
       toast.error(error?.message || "Failed");
@@ -99,7 +100,7 @@ const TokenSale1 = () => {
 
   const handleSetPrice = async () => {
     try {
-      await writeContractAsync({ address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "setPrice", args: [parseUnits(ownerPrice, 18)] });
+      await writeContractAsync({ address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "setPrice", args: [parseUnits(ownerPrice, 18)], account: address!, chain: pulsechain });
       toast.success("Price updated!");
     } catch (error: any) {
       toast.error(error?.message || "Failed");
@@ -108,7 +109,7 @@ const TokenSale1 = () => {
 
   const handleSetLive = async (live: boolean) => {
     try {
-      await writeContractAsync({ address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "setLive", args: [live] });
+      await writeContractAsync({ address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "setLive", args: [live], account: address!, chain: pulsechain });
       toast.success(`Presale ${live ? "activated" : "deactivated"}!`);
     } catch (error: any) {
       toast.error(error?.message || "Failed");
@@ -117,11 +118,11 @@ const TokenSale1 = () => {
 
   const handleApplyTargetSettings = async () => {
     try {
-      await writeContractAsync({ address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "setHardcapTokens", args: [parseUnits("50000", 18)] });
+      await writeContractAsync({ address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "setHardcapTokens", args: [parseUnits("50000", 18)], account: address!, chain: pulsechain });
       toast.success("Hardcap set");
-      await writeContractAsync({ address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "setPrice", args: [parseUnits("10", 18)] });
+      await writeContractAsync({ address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "setPrice", args: [parseUnits("10", 18)], account: address!, chain: pulsechain });
       toast.success("Price set");
-      await writeContractAsync({ address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "setLive", args: [true] });
+      await writeContractAsync({ address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "setLive", args: [true], account: address!, chain: pulsechain });
       toast.success("✅ Config OK!");
     } catch (error: any) {
       toast.error(error?.message || "Failed");
@@ -130,7 +131,7 @@ const TokenSale1 = () => {
 
   const handleApproveUSDC = async () => {
     try {
-      await writeContractAsync({ address: USDC_ADDRESS, abi: ERC20_ABI, functionName: "approve", args: [PRESALE_ADDRESS, parseUnits(buyerAmount, 6)] });
+      await writeContractAsync({ address: USDC_ADDRESS, abi: ERC20_ABI, functionName: "approve", args: [PRESALE_ADDRESS, parseUnits(buyerAmount, 6)], account: address!, chain: pulsechain });
       toast.success("USDC approved!");
     } catch (error: any) {
       toast.error(error?.message || "Failed");
@@ -140,7 +141,7 @@ const TokenSale1 = () => {
   const handleBuy = async () => {
     if (!isValidBuy || !confirm(`Confirm ${buyerAmount} USDC for ≈${estimatedTokens.toFixed(2)} tokens?`)) return;
     try {
-      await writeContractAsync({ address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "buy", args: [parseUnits(buyerAmount, 6)] });
+      await writeContractAsync({ address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "buy", args: [parseUnits(buyerAmount, 6)], account: address!, chain: pulsechain });
       toast.success("Purchase successful!");
       setBuyerAmount("");
     } catch (error: any) {
@@ -199,8 +200,8 @@ const TokenSale1 = () => {
             <Card className="border-primary/20 bg-card/50 backdrop-blur-xl">
               <CardHeader><CardTitle className="flex items-center gap-2"><ShoppingCart className="h-5 w-5" />Buy Tokens</CardTitle></CardHeader>
               <CardContent className="space-y-4">
-                <div><Label>USDC Amount (min $10)</Label><Input type="number" placeholder="10" value={buyerAmount} onChange={(e) => setBuyerAmount(e.target.value)} className="mt-1" />
-                {buyerAmount && !isValidBuy && <p className="text-xs text-destructive mt-1">Minimum $10</p>}</div>
+                <div><Label>USDC Amount (min $1)</Label><Input type="number" placeholder="1" value={buyerAmount} onChange={(e) => setBuyerAmount(e.target.value)} className="mt-1" />
+                {buyerAmount && !isValidBuy && <p className="text-xs text-destructive mt-1">Minimum $1</p>}</div>
                 {isValidBuy && <div className="p-3 bg-primary/10 rounded-lg"><p className="text-sm">≈ <span className="font-bold">{estimatedTokens.toFixed(2)}</span> tokens</p></div>}
                 <Button onClick={handleApproveUSDC} disabled={!isValidBuy} className="w-full" variant="outline">1. Approve USDC</Button>
                 <Button onClick={handleBuy} disabled={!isValidBuy} className="w-full bg-gradient-primary">2. Buy</Button>
