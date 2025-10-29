@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -204,6 +205,7 @@ const TokenSale1 = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-background/95 to-background">
+      <Navbar />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">PulseChain Presale Console</h1>
