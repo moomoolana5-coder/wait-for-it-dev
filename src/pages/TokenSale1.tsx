@@ -41,6 +41,7 @@ const TokenSale1 = () => {
   const [ownerHardcap, setOwnerHardcap] = useState("");
   const [ownerPrice, setOwnerPrice] = useState("");
   const [buyerAmount, setBuyerAmount] = useState("");
+  const [isApproving, setIsApproving] = useState(false);
 
   const { data: hardcapTokens, refetch: refetchHardcap } = useReadContract({
     address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "hardcapTokens",
@@ -88,6 +89,8 @@ const TokenSale1 = () => {
   const buyerAmountNum = parseFloat(buyerAmount || "0");
   const isValidBuy = buyerAmountNum >= 1;
   const estimatedTokens = isValidBuy ? buyerAmountNum * priceNum : 0;
+  const hasAllowance = usdcAllowance && usdcAllowance >= parseUnits(buyerAmount || "0", 6);
+  const canBuy = isValidBuy && hasAllowance && !isApproving;
 
   const handleSetHardcap = async () => {
     try {
@@ -130,20 +133,44 @@ const TokenSale1 = () => {
   };
 
   const handleApproveUSDC = async () => {
+    if (!isValidBuy) return;
+    setIsApproving(true);
     try {
-      await writeContractAsync({ address: USDC_ADDRESS, abi: ERC20_ABI, functionName: "approve", args: [PRESALE_ADDRESS, parseUnits(buyerAmount, 6)], account: address!, chain: pulsechain });
+      const hash = await writeContractAsync({ 
+        address: USDC_ADDRESS, 
+        abi: ERC20_ABI, 
+        functionName: "approve", 
+        args: [PRESALE_ADDRESS, parseUnits(buyerAmount, 6)], 
+        account: address!, 
+        chain: pulsechain 
+      });
+      toast.success("Approval submitted, waiting for confirmation...");
+      // Wait a bit for the transaction to be mined
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      await refetchAllowance();
       toast.success("USDC approved!");
     } catch (error: any) {
       toast.error(error?.message || "Failed");
+    } finally {
+      setIsApproving(false);
     }
   };
 
   const handleBuy = async () => {
-    if (!isValidBuy || !confirm(`Confirm ${buyerAmount} USDC for ≈${estimatedTokens.toFixed(2)} tokens?`)) return;
+    if (!canBuy || !confirm(`Confirm ${buyerAmount} USDC for ≈${estimatedTokens.toFixed(2)} tokens?`)) return;
     try {
-      await writeContractAsync({ address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "buy", args: [parseUnits(buyerAmount, 6)], account: address!, chain: pulsechain });
+      await writeContractAsync({ 
+        address: PRESALE_ADDRESS, 
+        abi: PRESALE_ABI, 
+        functionName: "buy", 
+        args: [parseUnits(buyerAmount, 6)], 
+        account: address!, 
+        chain: pulsechain 
+      });
       toast.success("Purchase successful!");
       setBuyerAmount("");
+      await refetchSold();
+      await refetchAllowance();
     } catch (error: any) {
       toast.error(error?.message || "Failed");
     }
@@ -203,8 +230,10 @@ const TokenSale1 = () => {
                 <div><Label>USDC Amount (min $1)</Label><Input type="number" placeholder="1" value={buyerAmount} onChange={(e) => setBuyerAmount(e.target.value)} className="mt-1" />
                 {buyerAmount && !isValidBuy && <p className="text-xs text-destructive mt-1">Minimum $1</p>}</div>
                 {isValidBuy && <div className="p-3 bg-primary/10 rounded-lg"><p className="text-sm">≈ <span className="font-bold">{estimatedTokens.toFixed(2)}</span> tokens</p></div>}
-                <Button onClick={handleApproveUSDC} disabled={!isValidBuy} className="w-full" variant="outline">1. Approve USDC</Button>
-                <Button onClick={handleBuy} disabled={!isValidBuy} className="w-full bg-gradient-primary">2. Buy</Button>
+                <Button onClick={handleApproveUSDC} disabled={!isValidBuy || isApproving} className="w-full" variant="outline">
+                  {isApproving ? "Approving..." : hasAllowance ? "✓ Approved" : "1. Approve USDC"}
+                </Button>
+                <Button onClick={handleBuy} disabled={!canBuy} className="w-full bg-gradient-primary">2. Buy</Button>
               </CardContent>
             </Card>
           )}
