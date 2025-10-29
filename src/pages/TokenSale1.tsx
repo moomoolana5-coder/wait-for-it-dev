@@ -16,8 +16,8 @@ const TOKEN_ADDRESS = "0xFb639C16B40ED8595d27D1E4a44C4DCaE78f2dB4" as const;
 const PRESALE_ADDRESS = "0x7FEbA131C382F45e363d1d900DA3fA98223CE91a" as const;
 const USDC_ADDRESS = "0x15D38573d2feeb82e7ad5187aB8c1D52810B1f07" as const;
 
-// Set fixed end date (2 days from deployment - adjust this timestamp as needed)
-const PRESALE_END_TIME = new Date("2025-10-31T00:00:00Z").getTime();
+// Set fixed start date - adjust this timestamp as needed
+const PRESALE_START_TIME = new Date("2025-10-31T00:00:00Z").getTime();
 
 const PRESALE_ABI = [
   { inputs: [], name: "hardcapTokens", outputs: [{ type: "uint256" }], stateMutability: "view", type: "function" },
@@ -86,7 +86,7 @@ const TokenSale1 = () => {
   useEffect(() => {
     const updateCountdown = () => {
       const now = new Date().getTime();
-      const distance = PRESALE_END_TIME - now;
+      const distance = PRESALE_START_TIME - now;
 
       if (distance < 0) {
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -214,7 +214,7 @@ const TokenSale1 = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Clock className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-semibold">Presale Ends In</h2>
+              <h2 className="text-xl font-semibold">Presale Starts In</h2>
             </div>
             <div className="grid grid-cols-4 gap-4 max-w-2xl mx-auto">
               <div className="text-center p-4 rounded-lg bg-background/50 backdrop-blur">
