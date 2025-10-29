@@ -262,28 +262,9 @@ const TokenSale1 = () => {
           </CardContent></Card>
         )}
 
-        <div className="grid lg:grid-cols-2 gap-6">
-          <Card className="border-primary/20 bg-card/50 backdrop-blur-xl">
-            <CardHeader><CardTitle className="flex items-center gap-2"><RefreshCw className="h-5 w-5" />Status</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <div className="flex justify-between mb-2">
-                  <span className="text-sm text-muted-foreground">Hardcap</span>
-                  <span>{hardcapNum.toLocaleString()} tokens</span>
-                </div>
-                <Progress value={progressPercent} />
-                <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                  <span>Sold: {soldNum.toLocaleString()}</span>
-                  <span>{progressPercent.toFixed(1)}%</span>
-                </div>
-              </div>
-              <div className="flex justify-between"><span className="text-sm text-muted-foreground">Price</span><span>{priceNum} tokens / 1 USDC</span></div>
-              <div className="flex justify-between"><span className="text-sm text-muted-foreground">Status</span><Badge variant={isLive ? "default" : "secondary"}>{isLive ? "LIVE" : "OFF"}</Badge></div>
-            </CardContent>
-          </Card>
-
+        <div className="max-w-4xl mx-auto">
           {isOwner && (
-            <Card className="border-accent/20 bg-card/50 backdrop-blur-xl">
+            <Card className="border-accent/20 bg-card/50 backdrop-blur-xl mb-6">
               <CardHeader><CardTitle className="flex items-center gap-2"><Settings className="h-5 w-5" />Owner Controls</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <div><Label>Hardcap (tokens)</Label><div className="flex gap-2 mt-1"><Input type="number" placeholder="50000" value={ownerHardcap} onChange={(e) => setOwnerHardcap(e.target.value)} /><Button onClick={handleSetHardcap}>Set</Button></div></div>
@@ -294,38 +275,141 @@ const TokenSale1 = () => {
             </Card>
           )}
 
-          {isConnected && !isOwner && (
-            <>
-              <Card className="border-primary/20 bg-card/50 backdrop-blur-xl">
-                <CardHeader><CardTitle className="flex items-center gap-2"><Wallet className="h-5 w-5" />Your Balances</CardTitle></CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex justify-between items-center p-3 bg-background/50 rounded-lg">
-                    <span className="text-sm text-muted-foreground">USDC</span>
-                    <span className="font-semibold">{userUsdcNum.toLocaleString(undefined, { maximumFractionDigits: 2 })} USDC</span>
+          <Card className="border-primary/20 bg-card/50 backdrop-blur-xl shadow-xl">
+            <CardHeader className="border-b border-border/50 pb-6">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                  Presale Dashboard
+                </CardTitle>
+                <Badge variant={isLive ? "default" : "secondary"} className="text-sm px-4 py-1">
+                  {isLive ? "🟢 LIVE" : "⚫ OFFLINE"}
+                </Badge>
+              </div>
+            </CardHeader>
+            
+            <CardContent className="p-8 space-y-8">
+              {/* Status Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <RefreshCw className="h-5 w-5 text-primary" />
+                  <h3 className="text-lg font-semibold">Presale Status</h3>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg border border-primary/20">
+                    <div className="text-sm text-muted-foreground mb-1">Hardcap</div>
+                    <div className="text-2xl font-bold text-primary">{hardcapNum.toLocaleString()}</div>
+                    <div className="text-xs text-muted-foreground mt-1">tokens</div>
                   </div>
-                  <div className="flex justify-between items-center p-3 bg-background/50 rounded-lg">
-                    <span className="text-sm text-muted-foreground">Tokens Owned</span>
-                    <span className="font-semibold text-primary">{userTokenNum.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                  <div className="p-4 bg-gradient-to-br from-accent/10 to-accent/5 rounded-lg border border-accent/20">
+                    <div className="text-sm text-muted-foreground mb-1">Price</div>
+                    <div className="text-2xl font-bold text-accent">{priceNum}</div>
+                    <div className="text-xs text-muted-foreground mt-1">tokens per USDC</div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
 
-              <Card className="border-primary/20 bg-card/50 backdrop-blur-xl">
-                <CardHeader><CardTitle className="flex items-center gap-2"><ShoppingCart className="h-5 w-5" />Buy Tokens</CardTitle></CardHeader>
-                <CardContent className="space-y-4">
-                  <div><Label>USDC Amount (min $1)</Label><Input type="number" placeholder="1" value={buyerAmount} onChange={(e) => setBuyerAmount(e.target.value)} className="mt-1" />
-                  {buyerAmount && !isValidBuy && <p className="text-xs text-destructive mt-1">Minimum $1</p>}</div>
-                  {isValidBuy && <div className="p-3 bg-primary/10 rounded-lg"><p className="text-sm">≈ <span className="font-bold">{estimatedTokens.toFixed(2)}</span> tokens</p></div>}
-                  <Button onClick={handleApproveUSDC} disabled={!isValidBuy || isApproving} className="w-full" variant="outline">
-                    {isApproving ? "Approving..." : hasAllowance ? "✓ Approved" : "1. Approve USDC"}
-                  </Button>
-                  <Button onClick={handleBuy} disabled={!canBuy} className="w-full bg-gradient-primary">2. Buy</Button>
-                </CardContent>
-              </Card>
-            </>
-          )}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Progress</span>
+                    <span className="font-semibold">{soldNum.toLocaleString()} / {hardcapNum.toLocaleString()} tokens</span>
+                  </div>
+                  <Progress value={progressPercent} className="h-3" />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Sold</span>
+                    <span className="font-semibold text-primary">{progressPercent.toFixed(1)}%</span>
+                  </div>
+                </div>
+              </div>
 
-          {!isConnected && <Card className="border-primary/20 bg-card/50 backdrop-blur-xl"><CardContent className="p-8 text-center"><Wallet className="h-12 w-12 mx-auto mb-4 text-muted-foreground" /><p>Connect wallet to participate</p></CardContent></Card>}
+              {isConnected && !isOwner && (
+                <>
+                  {/* Your Balances Section */}
+                  <div className="pt-6 border-t border-border/50 space-y-4">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Wallet className="h-5 w-5 text-primary" />
+                      <h3 className="text-lg font-semibold">Your Balances</h3>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-4 bg-background/80 rounded-lg border border-border/50 hover:border-primary/30 transition-colors">
+                        <div className="text-sm text-muted-foreground mb-2">USDC Balance</div>
+                        <div className="text-xl font-bold">{userUsdcNum.toLocaleString(undefined, { maximumFractionDigits: 2 })}</div>
+                        <div className="text-xs text-muted-foreground mt-1">USDC</div>
+                      </div>
+                      <div className="p-4 bg-background/80 rounded-lg border border-border/50 hover:border-primary/30 transition-colors">
+                        <div className="text-sm text-muted-foreground mb-2">Tokens Owned</div>
+                        <div className="text-xl font-bold text-primary">{userTokenNum.toLocaleString(undefined, { maximumFractionDigits: 2 })}</div>
+                        <div className="text-xs text-muted-foreground mt-1">Tokens</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Buy Tokens Section */}
+                  <div className="pt-6 border-t border-border/50 space-y-4">
+                    <div className="flex items-center gap-2 mb-4">
+                      <ShoppingCart className="h-5 w-5 text-primary" />
+                      <h3 className="text-lg font-semibold">Buy Tokens</h3>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="usdc-amount" className="text-base">USDC Amount</Label>
+                        <Input 
+                          id="usdc-amount"
+                          type="number" 
+                          placeholder="Minimum $1" 
+                          value={buyerAmount} 
+                          onChange={(e) => setBuyerAmount(e.target.value)} 
+                          className="mt-2 h-12 text-lg"
+                        />
+                        {buyerAmount && !isValidBuy && (
+                          <p className="text-xs text-destructive mt-2">Minimum purchase is $1</p>
+                        )}
+                      </div>
+
+                      {isValidBuy && (
+                        <div className="p-4 bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 rounded-lg border border-primary/30">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">You will receive</span>
+                            <div className="text-right">
+                              <div className="text-2xl font-bold text-primary">≈ {estimatedTokens.toFixed(2)}</div>
+                              <div className="text-xs text-muted-foreground">tokens</div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="grid grid-cols-2 gap-3 pt-2">
+                        <Button 
+                          onClick={handleApproveUSDC} 
+                          disabled={!isValidBuy || isApproving}
+                          variant="outline"
+                          className="h-12 text-base"
+                        >
+                          {isApproving ? "Approving..." : hasAllowance ? "✓ Approved" : "1. Approve USDC"}
+                        </Button>
+                        <Button 
+                          onClick={handleBuy} 
+                          disabled={!canBuy}
+                          className="h-12 text-base bg-gradient-primary hover:opacity-90"
+                        >
+                          2. Buy Tokens
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {!isConnected && (
+                <div className="pt-6 text-center">
+                  <Wallet className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+                  <h3 className="text-xl font-semibold mb-2">Connect Your Wallet</h3>
+                  <p className="text-muted-foreground">Connect your wallet to view balances and participate in the presale</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </main>
       <Footer />
