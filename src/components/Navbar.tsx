@@ -41,9 +41,6 @@ const Navbar = () => {
             <Link to="/" className="text-foreground font-medium hover:text-primary transition-colors">
               Home
             </Link>
-            <Link to="/token-sale" className="text-foreground hover:text-primary transition-colors">
-              Token Sale
-            </Link>
             <Link to="/token-sale-1" className="text-foreground hover:text-primary transition-colors">
               Token Sale 1
             </Link>
@@ -109,13 +106,6 @@ const Navbar = () => {
                     onClick={() => setIsOpen(false)}
                   >
                     Home
-                  </Link>
-                  <Link 
-                    to="/token-sale" 
-                    className="text-lg hover:text-primary transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Token Sale
                   </Link>
                   <Link 
                     to="/token-sale-1" 
