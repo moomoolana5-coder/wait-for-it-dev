@@ -206,6 +206,13 @@ export const TradeBox = ({ market, defaultSide }: TradeBoxProps) => {
           Market is {market.status.toLowerCase()}
         </p>
       )}
+
+      {/* Beta Notice */}
+      <div className="pt-4 border-t">
+        <p className="text-xs text-center text-muted-foreground">
+          ⚠️ Beta Testing Phase - Trade at your own risk
+        </p>
+      </div>
     </Card>
   );
 };

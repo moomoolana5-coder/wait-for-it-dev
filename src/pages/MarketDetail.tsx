@@ -1,19 +1,25 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { TradeBox } from '@/components/markets/TradeBox';
 import { RulesPanel } from '@/components/markets/RulesPanel';
+import { ActivityPanel } from '@/components/markets/ActivityPanel';
+import { HoldersPanel } from '@/components/markets/HoldersPanel';
+import { TimelinePanel } from '@/components/markets/TimelinePanel';
 import { useMarketsStore } from '@/stores/markets';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, TrendingUp, Clock } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ArrowLeft, TrendingUp, Clock, AlertCircle } from 'lucide-react';
 import { formatUSD, formatTimeRemaining } from '@/lib/format';
 
 const MarketDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { getMarket, incrementTrending, init, initialized } = useMarketsStore();
+  const [activeTab, setActiveTab] = useState('activity');
 
   useEffect(() => {
     if (!initialized) init();
@@ -106,14 +112,41 @@ const MarketDetail = () => {
             </div>
           </div>
 
+          {/* Beta Notice */}
+          <Alert className="border-yellow-500/50 bg-yellow-500/10">
+            <AlertCircle className="h-4 w-4 text-yellow-500" />
+            <AlertDescription className="text-yellow-500">
+              This platform is currently in <strong>beta testing phase</strong>. Please trade carefully and report any issues you encounter.
+            </AlertDescription>
+          </Alert>
+
           {/* Main Content */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
-              <RulesPanel market={market} />
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="activity">Activity</TabsTrigger>
+                  <TabsTrigger value="holders">Holders</TabsTrigger>
+                  <TabsTrigger value="rules">Rules</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="activity" className="mt-6">
+                  <ActivityPanel market={market} />
+                </TabsContent>
+
+                <TabsContent value="holders" className="mt-6">
+                  <HoldersPanel market={market} />
+                </TabsContent>
+
+                <TabsContent value="rules" className="mt-6">
+                  <RulesPanel market={market} />
+                </TabsContent>
+              </Tabs>
             </div>
 
             <div className="space-y-6">
               <TradeBox market={market} />
+              <TimelinePanel market={market} />
             </div>
           </div>
         </div>
