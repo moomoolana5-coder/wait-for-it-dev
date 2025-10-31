@@ -163,12 +163,12 @@ const TokenSale1 = () => {
 
   const handleApplyTargetSettings = async () => {
     try {
-      await writeContractAsync({ address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "setHardcapTokens", args: [parseUnits("50000", 18)], account: address!, chain: pulsechain });
-      toast.success("Hardcap set");
-      await writeContractAsync({ address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "setPrice", args: [parseUnits("10", 18)], account: address!, chain: pulsechain });
-      toast.success("Price set");
+      await writeContractAsync({ address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "setHardcapTokens", args: [parseUnits("500000", 18)], account: address!, chain: pulsechain });
+      toast.success("Hardcap set to 500,000");
+      await writeContractAsync({ address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "setPrice", args: [parseUnits("100", 18)], account: address!, chain: pulsechain });
+      toast.success("Price set to $0.01 per token");
       await writeContractAsync({ address: PRESALE_ADDRESS, abi: PRESALE_ABI, functionName: "setLive", args: [true], account: address!, chain: pulsechain });
-      toast.success("✅ Config OK!");
+      toast.success("✅ Presale configuration complete!");
     } catch (error: any) {
       toast.error(error?.message || "Failed");
     }
@@ -256,9 +256,9 @@ const TokenSale1 = () => {
           </CardContent>
         </Card>
 
-        {presaleBalanceNum < 50000 && (
+        {presaleBalanceNum < 500000 && (
           <Card className="mb-6 border-yellow-500/50 bg-yellow-500/10"><CardContent className="p-4">
-            <p className="text-sm">⚠️ Top up presale with ≥50,000 tokens</p>
+            <p className="text-sm">⚠️ Top up presale contract with ≥500,000 tokens</p>
           </CardContent></Card>
         )}
 
@@ -267,8 +267,8 @@ const TokenSale1 = () => {
             <Card className="border-accent/20 bg-card/50 backdrop-blur-xl mb-6">
               <CardHeader><CardTitle className="flex items-center gap-2"><Settings className="h-5 w-5" />Owner Controls</CardTitle></CardHeader>
               <CardContent className="space-y-4">
-                <div><Label>Hardcap (tokens)</Label><div className="flex gap-2 mt-1"><Input type="number" placeholder="50000" value={ownerHardcap} onChange={(e) => setOwnerHardcap(e.target.value)} /><Button onClick={handleSetHardcap}>Set</Button></div></div>
-                <div><Label>Price (tokens/USDC)</Label><div className="flex gap-2 mt-1"><Input type="number" placeholder="10" value={ownerPrice} onChange={(e) => setOwnerPrice(e.target.value)} /><Button onClick={handleSetPrice}>Set</Button></div></div>
+                <div><Label>Hardcap (tokens)</Label><div className="flex gap-2 mt-1"><Input type="number" placeholder="500000" value={ownerHardcap} onChange={(e) => setOwnerHardcap(e.target.value)} /><Button onClick={handleSetHardcap}>Set</Button></div></div>
+                <div><Label>Price (tokens/USDC)</Label><div className="flex gap-2 mt-1"><Input type="number" placeholder="100" value={ownerPrice} onChange={(e) => setOwnerPrice(e.target.value)} /><Button onClick={handleSetPrice}>Set</Button></div></div>
                 <div className="flex gap-2"><Button onClick={() => handleSetLive(true)} className="flex-1">Set LIVE</Button><Button variant="secondary" onClick={() => handleSetLive(false)} className="flex-1">Set OFF</Button></div>
                 <Button onClick={handleApplyTargetSettings} className="w-full bg-gradient-primary">Apply Target Settings</Button>
               </CardContent>
