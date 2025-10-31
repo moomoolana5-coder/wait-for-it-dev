@@ -13,8 +13,8 @@ import { pulsechain } from "wagmi/chains";
 import { toast } from "sonner";
 import { Wallet, Settings, ShoppingCart, RefreshCw, Clock } from "lucide-react";
 
-const TOKEN_ADDRESS = "0xFb639C16B40ED8595d27D1E4a44C4DCaE78f2dB4" as const;
-const PRESALE_ADDRESS = "0x7FEbA131C382F45e363d1d900DA3fA98223CE91a" as const;
+const TOKEN_ADDRESS = "0x818ec0672F65B634F94F234aC132678009064CdF" as const;
+const PRESALE_ADDRESS = "0xf03324d4a2518f4279543068F2C4248F1f732d3F" as const;
 const USDC_ADDRESS = "0x15D38573d2feeb82e7ad5187aB8c1D52810B1f07" as const;
 
 // Set presale start time - 2 days from now
