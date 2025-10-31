@@ -15,6 +15,7 @@ import Gigacock from "./pages/Gigacock";
 import TokenSale from "./pages/TokenSale";
 import TokenSale1 from "./pages/TokenSale1";
 import GigaMarkets from "./pages/GigaMarkets";
+import MarketDetail from "./pages/MarketDetail";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/token-sale" element={<TokenSale />} />
             <Route path="/token-sale-1" element={<TokenSale1 />} />
             <Route path="/giga-markets" element={<GigaMarkets />} />
+            <Route path="/market/:id" element={<MarketDetail />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
