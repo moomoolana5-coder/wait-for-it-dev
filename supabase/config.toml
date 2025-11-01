@@ -2,3 +2,6 @@ project_id = "ozeefnhzzjotqbtlxqxp"
 
 [functions.pulse-stats]
 verify_jwt = false
+
+[functions.coingecko-proxy]
+verify_jwt = false
