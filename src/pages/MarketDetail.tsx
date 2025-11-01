@@ -159,16 +159,19 @@ const MarketDetail = () => {
 
                 {/* Price Display */}
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-bold">${totalStake > 0 ? market.source.threshold?.toLocaleString() : '0'}</span>
-                  {totalStake > 0 && (
+                  <span className="text-4xl font-bold">
+                    ${totalStake > 0 ? totalStake.toLocaleString() : '0'}
+                  </span>
+                  {totalStake > 0 ? (
                     <>
-                      <span className="text-lg text-primary">↑ {yesPercent.toFixed(1)}%</span>
+                      <span className={`text-lg ${yesPercent > 50 ? 'text-primary' : 'text-destructive'}`}>
+                        {yesPercent > 50 ? '↑' : '↓'} {Math.abs(yesPercent - 50).toFixed(1)}%
+                      </span>
                       <span className="text-sm text-muted-foreground ml-2">
                         {yesPercent.toFixed(1)}% chance
                       </span>
                     </>
-                  )}
-                  {totalStake === 0 && (
+                  ) : (
                     <span className="text-sm text-muted-foreground ml-2">
                       No trades yet
                     </span>
