@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { calculateTrade } from '@/lib/amm';
 import { formatPoints, formatPercent, formatUSD } from '@/lib/format';
@@ -90,13 +91,43 @@ export const TradeBox = ({ market, defaultSide }: TradeBoxProps) => {
   const sideLabel = market.outcomes.find((o) => o.key === side)?.label || side;
   const isBullish = side === 'YES' || side === 'A';
 
+  // Calculate probabilities
+  const yesStake = market.yesStake || 0;
+  const noStake = market.noStake || 0;
+  const totalStake = yesStake + noStake;
+  const yesPercent = totalStake > 0 ? (yesStake / totalStake) * 100 : 50;
+  const noPercent = totalStake > 0 ? (noStake / totalStake) * 100 : 50;
+
   return (
     <Card className="sticky top-20 glass-card border-border/50 p-6 space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold">Trade</h3>
-        <p className="text-sm text-muted-foreground">
-          Pick a side and enter amount
-        </p>
+      {/* Buy/Sell Tabs */}
+      <Tabs defaultValue="buy" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 bg-card/50">
+          <TabsTrigger value="buy" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
+            Buy
+          </TabsTrigger>
+          <TabsTrigger value="sell" className="data-[state=active]:bg-secondary/20 data-[state=active]:text-secondary">
+            Sell
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
+
+      {/* Probability Bar */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-sm font-medium">
+          <span>{yesPercent.toFixed(0)}%</span>
+          <span>{noPercent.toFixed(0)}%</span>
+        </div>
+        <div className="h-2 w-full rounded-full overflow-hidden flex">
+          <div 
+            className="bg-primary transition-all"
+            style={{ width: `${yesPercent}%` }}
+          />
+          <div 
+            className="bg-secondary transition-all"
+            style={{ width: `${noPercent}%` }}
+          />
+        </div>
       </div>
 
       <Separator />
