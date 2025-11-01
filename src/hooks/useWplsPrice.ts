@@ -1,11 +1,22 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 
 interface WplsPrice {
   price: number;
   priceChange24h: number;
   volume24h: number;
   timestamp: string;
+}
+
+interface DexScreenerResponse {
+  pairs?: Array<{
+    priceUsd: string;
+    priceChange?: {
+      h24?: number;
+    };
+    volume?: {
+      h24?: number;
+    };
+  }>;
 }
 
 export const useWplsPrice = () => {
@@ -15,20 +26,35 @@ export const useWplsPrice = () => {
 
   const fetchPrice = async () => {
     try {
-      const { data, error: invokeError } = await supabase.functions.invoke('get-wpls-price');
+      // WPLS/DAI pair on PulseX
+      const pairAddress = '0x6753560538ECa67617A9Ce605178F788bE7E524E';
+      
+      const response = await fetch(
+        `https://api.dexscreener.com/latest/dex/pairs/pulsechain/${pairAddress}`
+      );
 
-      if (invokeError) {
-        console.error('Error fetching WPLS price:', invokeError);
-        setError(invokeError.message);
-        return;
+      if (!response.ok) {
+        throw new Error(`DexScreener API error: ${response.status}`);
       }
 
-      if (data) {
-        setPriceData(data);
-        setError(null);
+      const data: DexScreenerResponse = await response.json();
+
+      if (!data.pairs || data.pairs.length === 0) {
+        throw new Error('No pairs found');
       }
+
+      const pair = data.pairs[0];
+      const newPriceData: WplsPrice = {
+        price: parseFloat(pair.priceUsd),
+        priceChange24h: pair.priceChange?.h24 || 0,
+        volume24h: pair.volume?.h24 || 0,
+        timestamp: new Date().toISOString(),
+      };
+
+      setPriceData(newPriceData);
+      setError(null);
     } catch (err) {
-      console.error('Error:', err);
+      console.error('Error fetching WPLS price:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch price');
     } finally {
       setLoading(false);

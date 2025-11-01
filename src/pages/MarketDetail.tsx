@@ -17,6 +17,7 @@ import { ArrowLeft, Search, Share2, Clock } from 'lucide-react';
 import { formatUSD, formatTimeRemaining, formatPoints } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import { useWplsPrice } from '@/hooks/useWplsPrice';
+import { useAutoResolve } from '@/hooks/useAutoResolve';
 import { Badge } from '@/components/ui/badge';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
@@ -55,6 +56,9 @@ const MarketDetail = () => {
   }, [id, incrementTrending]);
 
   const market = id ? getMarket(id) : undefined;
+  
+  // Auto-resolve market when time is up
+  useAutoResolve(market);
 
   // Update countdown every second
   useEffect(() => {
