@@ -14,7 +14,6 @@ import { usePositionsStore } from '@/stores/positions';
 import { formatPoints, formatDate } from '@/lib/format';
 import { toast } from 'sonner';
 import { 
-  Coins, 
   Users, 
   Gift, 
   TrendingUp, 
@@ -26,6 +25,7 @@ import {
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import coinIcon from '@/assets/coin-icon.png';
 
 export default function Earn() {
   const navigate = useNavigate();
@@ -228,8 +228,13 @@ export default function Earn() {
           <TabsContent value="faucet" className="space-y-6">
             <Card className="glass-card p-8 max-w-2xl mx-auto">
               <div className="text-center space-y-6">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/20 mb-4">
-                  <Coins className="h-8 w-8 text-primary" />
+                <div className="inline-flex items-center justify-center mb-4 relative">
+                  <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full animate-pulse" />
+                  <img 
+                    src={coinIcon} 
+                    alt="Coin" 
+                    className="h-24 w-24 relative z-10 drop-shadow-[0_0_20px_rgba(34,197,94,0.6)]"
+                  />
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold mb-2">Daily Faucet</h2>
