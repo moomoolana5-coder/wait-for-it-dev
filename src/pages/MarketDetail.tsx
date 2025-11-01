@@ -7,6 +7,7 @@ import { RulesPanel } from '@/components/markets/RulesPanel';
 import { ActivityPanel } from '@/components/markets/ActivityPanel';
 import { HoldersPanel } from '@/components/markets/HoldersPanel';
 import { TimelinePanel } from '@/components/markets/TimelinePanel';
+import { PriceChart } from '@/components/markets/PriceChart';
 import { useMarketsStore } from '@/stores/markets';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -123,6 +124,9 @@ const MarketDetail = () => {
           {/* Main Content */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
+              {/* Price Chart */}
+              <PriceChart market={market} />
+              
               <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="activity">Activity</TabsTrigger>

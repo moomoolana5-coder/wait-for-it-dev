@@ -16,6 +16,9 @@ import TokenSale from "./pages/TokenSale";
 import TokenSale1 from "./pages/TokenSale1";
 import GigaMarkets from "./pages/GigaMarkets";
 import MarketDetail from "./pages/MarketDetail";
+import Leaderboard from "./pages/Leaderboard";
+import Earn from "./pages/Earn";
+import Integrations from "./pages/Integrations";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +40,9 @@ const App = () => (
             <Route path="/token-sale-1" element={<TokenSale1 />} />
             <Route path="/giga-markets" element={<GigaMarkets />} />
             <Route path="/market/:id" element={<MarketDetail />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/earn" element={<Earn />} />
+            <Route path="/integrations" element={<Integrations />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
