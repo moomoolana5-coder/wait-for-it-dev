@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      earnings: {
+        Row: {
+          amount_pts: number
+          claimed: boolean
+          created_at: string
+          earning_type: string
+          id: string
+          metadata: Json | null
+          source_id: string | null
+          user_id: string | null
+          wallet_address: string
+        }
+        Insert: {
+          amount_pts: number
+          claimed?: boolean
+          created_at?: string
+          earning_type: string
+          id?: string
+          metadata?: Json | null
+          source_id?: string | null
+          user_id?: string | null
+          wallet_address: string
+        }
+        Update: {
+          amount_pts?: number
+          claimed?: boolean
+          created_at?: string
+          earning_type?: string
+          id?: string
+          metadata?: Json | null
+          source_id?: string | null
+          user_id?: string | null
+          wallet_address?: string
+        }
+        Relationships: []
+      }
       markets: {
         Row: {
           a_stake: number | null
@@ -104,6 +140,84 @@ export type Database = {
           created_at?: string
           id?: string
           token_address?: string
+        }
+        Relationships: []
+      }
+      positions: {
+        Row: {
+          claimed: boolean
+          cost_basis: number
+          created_at: string
+          id: string
+          market_id: string
+          shares: number
+          side: string
+          updated_at: string
+          user_id: string | null
+          wallet_address: string
+        }
+        Insert: {
+          claimed?: boolean
+          cost_basis?: number
+          created_at?: string
+          id?: string
+          market_id: string
+          shares?: number
+          side: string
+          updated_at?: string
+          user_id?: string | null
+          wallet_address: string
+        }
+        Update: {
+          claimed?: boolean
+          cost_basis?: number
+          created_at?: string
+          id?: string
+          market_id?: string
+          shares?: number
+          side?: string
+          updated_at?: string
+          user_id?: string | null
+          wallet_address?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          bonus_claimed: boolean
+          created_at: string
+          id: string
+          referee_bonus: number
+          referee_user_id: string | null
+          referee_wallet: string | null
+          referrer_bonus: number
+          referrer_code: string
+          referrer_user_id: string | null
+          referrer_wallet: string
+        }
+        Insert: {
+          bonus_claimed?: boolean
+          created_at?: string
+          id?: string
+          referee_bonus?: number
+          referee_user_id?: string | null
+          referee_wallet?: string | null
+          referrer_bonus?: number
+          referrer_code: string
+          referrer_user_id?: string | null
+          referrer_wallet: string
+        }
+        Update: {
+          bonus_claimed?: boolean
+          created_at?: string
+          id?: string
+          referee_bonus?: number
+          referee_user_id?: string | null
+          referee_wallet?: string | null
+          referrer_bonus?: number
+          referrer_code?: string
+          referrer_user_id?: string | null
+          referrer_wallet?: string
         }
         Relationships: []
       }
@@ -351,6 +465,17 @@ export type Database = {
       }
     }
     Views: {
+      referral_stats: {
+        Row: {
+          pending_earnings: number | null
+          referrer_code: string | null
+          referrer_user_id: string | null
+          referrer_wallet: string | null
+          total_earned: number | null
+          total_referrals: number | null
+        }
+        Relationships: []
+      }
       token_vote_counts: {
         Row: {
           bearish_votes: number | null
@@ -362,6 +487,7 @@ export type Database = {
       }
     }
     Functions: {
+      generate_referral_code: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
