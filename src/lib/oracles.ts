@@ -31,22 +31,42 @@ export class OracleService {
 
   static async getDexScreenerPrice(pairAddress: string): Promise<PriceData | null> {
     try {
-      const response = await this.fetchWithTimeout(
+      // Try pairs endpoint first
+      let response = await this.fetchWithTimeout(
         `https://api.dexscreener.com/latest/dex/pairs/pulsechain/${pairAddress}`
       );
       
-      if (!response.ok) return null;
+      let data = await response.json();
+      let pair = data.pair || data.pairs?.[0];
       
-      const data = await response.json();
-      const pair = data.pair || data.pairs?.[0];
+      // If no pair found, try tokens endpoint (in case it's a token address)
+      if (!pair) {
+        console.log('No pair found, trying tokens endpoint for:', pairAddress);
+        response = await this.fetchWithTimeout(
+          `https://api.dexscreener.com/latest/dex/tokens/${pairAddress}`
+        );
+        
+        data = await response.json();
+        // Get the pair with highest liquidity on pulsechain
+        const pairs = data.pairs?.filter((p: any) => p.chainId === 'pulsechain') || [];
+        pair = pairs.sort((a: any, b: any) => 
+          (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0)
+        )[0];
+      }
       
-      if (!pair) return null;
+      if (!pair) {
+        console.warn(`No pair data found for ${pairAddress}`);
+        return null;
+      }
+      
+      console.log('Found pair data:', pair.baseToken?.symbol, pair.priceUsd);
       
       return {
         price: parseFloat(pair.priceUsd || pair.priceNative || '0'),
         timestamp: Date.now(),
       };
-    } catch {
+    } catch (error) {
+      console.error('DexScreener fetch error:', error);
       return null;
     }
   }
@@ -149,11 +169,23 @@ export class OracleService {
     days: number
   ): Promise<CandleData[]> {
     try {
+      console.log('Fetching DexScreener candles for:', pairAddress);
+      
       // Get current price first
       const priceData = await this.getDexScreenerPrice(pairAddress);
-      if (!priceData) return [];
+      if (!priceData) {
+        console.warn('No price data available, cannot generate candles');
+        return [];
+      }
       
       const currentPrice = priceData.price;
+      if (currentPrice === 0) {
+        console.warn('Price is 0, cannot generate candles');
+        return [];
+      }
+      
+      console.log('Current price:', currentPrice, 'Generating', days, 'days of candles');
+      
       const now = Date.now() / 1000;
       const interval = days <= 1 ? 3600 : 86400; // 1h or 1d
       const count = days <= 1 ? 24 : days;
@@ -194,8 +226,10 @@ export class OracleService {
         lastCandle.low = Math.min(lastCandle.low, currentPrice);
       }
       
+      console.log('Generated', candles.length, 'candles');
       return candles;
-    } catch {
+    } catch (error) {
+      console.error('Error generating DexScreener candles:', error);
       return [];
     }
   }
