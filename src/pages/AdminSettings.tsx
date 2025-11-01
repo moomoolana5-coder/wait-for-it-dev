@@ -749,93 +749,184 @@ const AdminSettings = () => {
                           </Button>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-3">
-                          <Button
-                            variant="outline"
-                            onClick={async () => {
-                              const newClosesAt = dayjs().add(1, 'minute').toISOString();
-                              const newResolvesAt = dayjs().add(2, 'minute').toISOString();
-                              try {
-                                await updateMarket(editingMarket.id, {
-                                  closesAt: newClosesAt,
-                                  resolvesAt: newResolvesAt,
-                                  status: 'OPEN',
-                                });
-                                toast({
-                                  title: 'Duration Updated',
-                                  description: 'Market will close in 1 minute',
-                                });
-                                handleCancel();
-                              } catch (error) {
-                                toast({
-                                  title: 'Error',
-                                  description: 'Failed to update duration',
-                                  variant: 'destructive',
-                                });
-                              }
-                            }}
-                          >
-                            <CalendarIcon className="h-4 w-4 mr-2" />
-                            1 Minute
-                          </Button>
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-3 gap-3">
+                            <Button
+                              variant="outline"
+                              onClick={async () => {
+                                const newClosesAt = dayjs().add(30, 'second').toISOString();
+                                const newResolvesAt = dayjs().add(1, 'minute').toISOString();
+                                try {
+                                  await updateMarket(editingMarket.id, {
+                                    closesAt: newClosesAt,
+                                    resolvesAt: newResolvesAt,
+                                    status: 'OPEN',
+                                  });
+                                  toast({
+                                    title: 'Duration Updated',
+                                    description: 'Market will close in 30 seconds',
+                                  });
+                                  handleCancel();
+                                } catch (error) {
+                                  toast({
+                                    title: 'Error',
+                                    description: 'Failed to update duration',
+                                    variant: 'destructive',
+                                  });
+                                }
+                              }}
+                            >
+                              <CalendarIcon className="h-4 w-4 mr-2" />
+                              30 Seconds
+                            </Button>
 
-                          <Button
-                            variant="outline"
-                            onClick={async () => {
-                              const newClosesAt = dayjs().add(30, 'minute').toISOString();
-                              const newResolvesAt = dayjs().add(31, 'minute').toISOString();
-                              try {
-                                await updateMarket(editingMarket.id, {
-                                  closesAt: newClosesAt,
-                                  resolvesAt: newResolvesAt,
-                                  status: 'OPEN',
-                                });
-                                toast({
-                                  title: 'Duration Updated',
-                                  description: 'Market will close in 30 minutes',
-                                });
-                                handleCancel();
-                              } catch (error) {
-                                toast({
-                                  title: 'Error',
-                                  description: 'Failed to update duration',
-                                  variant: 'destructive',
-                                });
-                              }
-                            }}
-                          >
-                            <CalendarIcon className="h-4 w-4 mr-2" />
-                            30 Minutes
-                          </Button>
+                            <Button
+                              variant="outline"
+                              onClick={async () => {
+                                const newClosesAt = dayjs().add(1, 'minute').toISOString();
+                                const newResolvesAt = dayjs().add(2, 'minute').toISOString();
+                                try {
+                                  await updateMarket(editingMarket.id, {
+                                    closesAt: newClosesAt,
+                                    resolvesAt: newResolvesAt,
+                                    status: 'OPEN',
+                                  });
+                                  toast({
+                                    title: 'Duration Updated',
+                                    description: 'Market will close in 1 minute',
+                                  });
+                                  handleCancel();
+                                } catch (error) {
+                                  toast({
+                                    title: 'Error',
+                                    description: 'Failed to update duration',
+                                    variant: 'destructive',
+                                  });
+                                }
+                              }}
+                            >
+                              <CalendarIcon className="h-4 w-4 mr-2" />
+                              1 Minute
+                            </Button>
 
-                          <Button
-                            variant="outline"
-                            onClick={async () => {
-                              const newClosesAt = dayjs().add(1, 'hour').toISOString();
-                              const newResolvesAt = dayjs().add(1, 'hour').add(1, 'minute').toISOString();
-                              try {
-                                await updateMarket(editingMarket.id, {
-                                  closesAt: newClosesAt,
-                                  resolvesAt: newResolvesAt,
-                                  status: 'OPEN',
-                                });
-                                toast({
-                                  title: 'Duration Updated',
-                                  description: 'Market will close in 1 hour',
-                                });
-                                handleCancel();
-                              } catch (error) {
-                                toast({
-                                  title: 'Error',
-                                  description: 'Failed to update duration',
-                                  variant: 'destructive',
-                                });
-                              }
-                            }}
-                          >
-                            <CalendarIcon className="h-4 w-4 mr-2" />
-                            1 Hour
-                          </Button>
+                            <Button
+                              variant="outline"
+                              onClick={async () => {
+                                const newClosesAt = dayjs().add(2, 'minute').toISOString();
+                                const newResolvesAt = dayjs().add(3, 'minute').toISOString();
+                                try {
+                                  await updateMarket(editingMarket.id, {
+                                    closesAt: newClosesAt,
+                                    resolvesAt: newResolvesAt,
+                                    status: 'OPEN',
+                                  });
+                                  toast({
+                                    title: 'Duration Updated',
+                                    description: 'Market will close in 2 minutes',
+                                  });
+                                  handleCancel();
+                                } catch (error) {
+                                  toast({
+                                    title: 'Error',
+                                    description: 'Failed to update duration',
+                                    variant: 'destructive',
+                                  });
+                                }
+                              }}
+                            >
+                              <CalendarIcon className="h-4 w-4 mr-2" />
+                              2 Minutes
+                            </Button>
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-3">
+                            <Button
+                              variant="outline"
+                              onClick={async () => {
+                                const newClosesAt = dayjs().add(5, 'minute').toISOString();
+                                const newResolvesAt = dayjs().add(6, 'minute').toISOString();
+                                try {
+                                  await updateMarket(editingMarket.id, {
+                                    closesAt: newClosesAt,
+                                    resolvesAt: newResolvesAt,
+                                    status: 'OPEN',
+                                  });
+                                  toast({
+                                    title: 'Duration Updated',
+                                    description: 'Market will close in 5 minutes',
+                                  });
+                                  handleCancel();
+                                } catch (error) {
+                                  toast({
+                                    title: 'Error',
+                                    description: 'Failed to update duration',
+                                    variant: 'destructive',
+                                  });
+                                }
+                              }}
+                            >
+                              <CalendarIcon className="h-4 w-4 mr-2" />
+                              5 Minutes
+                            </Button>
+
+                            <Button
+                              variant="outline"
+                              onClick={async () => {
+                                const newClosesAt = dayjs().add(30, 'minute').toISOString();
+                                const newResolvesAt = dayjs().add(31, 'minute').toISOString();
+                                try {
+                                  await updateMarket(editingMarket.id, {
+                                    closesAt: newClosesAt,
+                                    resolvesAt: newResolvesAt,
+                                    status: 'OPEN',
+                                  });
+                                  toast({
+                                    title: 'Duration Updated',
+                                    description: 'Market will close in 30 minutes',
+                                  });
+                                  handleCancel();
+                                } catch (error) {
+                                  toast({
+                                    title: 'Error',
+                                    description: 'Failed to update duration',
+                                    variant: 'destructive',
+                                  });
+                                }
+                              }}
+                            >
+                              <CalendarIcon className="h-4 w-4 mr-2" />
+                              30 Minutes
+                            </Button>
+
+                            <Button
+                              variant="outline"
+                              onClick={async () => {
+                                const newClosesAt = dayjs().add(1, 'hour').toISOString();
+                                const newResolvesAt = dayjs().add(1, 'hour').add(1, 'minute').toISOString();
+                                try {
+                                  await updateMarket(editingMarket.id, {
+                                    closesAt: newClosesAt,
+                                    resolvesAt: newResolvesAt,
+                                    status: 'OPEN',
+                                  });
+                                  toast({
+                                    title: 'Duration Updated',
+                                    description: 'Market will close in 1 hour',
+                                  });
+                                  handleCancel();
+                                } catch (error) {
+                                  toast({
+                                    title: 'Error',
+                                    description: 'Failed to update duration',
+                                    variant: 'destructive',
+                                  });
+                                }
+                              }}
+                            >
+                              <CalendarIcon className="h-4 w-4 mr-2" />
+                              1 Hour
+                            </Button>
+                          </div>
                         </div>
 
                         <Alert>
