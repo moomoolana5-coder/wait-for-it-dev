@@ -167,12 +167,15 @@ export const TradeBox = ({ market, defaultSide }: TradeBoxProps) => {
               <ToggleGroupItem
                 key={outcome.key}
                 value={outcome.key}
-                className={cn(
-                  'h-14 font-bold text-base transition-all border-2',
-                  isSelected && isYes && 'bg-primary text-primary-foreground border-primary shadow-[0_0_20px_hsl(var(--primary)/0.3)]',
-                  isSelected && !isYes && 'bg-red-600 text-white border-red-600 shadow-[0_0_20px_rgba(220,38,38,0.3)]',
-                  !isSelected && 'border-border/50 hover:border-border bg-card/50 hover:bg-card'
-                )}
+                  className={cn(
+                    'h-14 font-bold text-base transition-all border-2',
+                    isYes
+                      ? 'data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary'
+                      : 'data-[state=on]:bg-destructive data-[state=on]:text-destructive-foreground data-[state=on]:border-destructive',
+                    isSelected && isYes && 'bg-primary text-primary-foreground border-primary shadow-[0_0_20px_hsl(var(--primary)/0.3)]',
+                    isSelected && !isYes && 'bg-destructive text-destructive-foreground border-destructive shadow-[0_0_20px_hsl(var(--destructive)/0.3)]',
+                    !isSelected && 'border-border/50 hover:border-border bg-card/50 hover:bg-card'
+                  )}
               >
                 {outcome.label}
               </ToggleGroupItem>
