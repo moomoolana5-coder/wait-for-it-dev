@@ -29,13 +29,16 @@ const MarketDetail = () => {
     if (!initialized) init();
     if (!walletStore.wallet.address) walletStore.init();
     if (!tradesStore.initialized) tradesStore.init();
+    
+    // Subscribe to realtime updates
+    const unsubscribeTrades = tradesStore.subscribeToTrades();
+    const unsubscribeMarkets = useMarketsStore.getState().subscribeToMarkets();
+    
+    return () => {
+      unsubscribeTrades();
+      unsubscribeMarkets();
+    };
   }, [initialized, init, walletStore, tradesStore]);
-
-  // Subscribe to realtime trades updates
-  useEffect(() => {
-    const unsubscribe = tradesStore.subscribeToTrades();
-    return () => unsubscribe();
-  }, [tradesStore]);
 
   useEffect(() => {
     if (id) incrementTrending(id);
