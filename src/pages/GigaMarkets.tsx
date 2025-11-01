@@ -96,69 +96,72 @@ const GigaMarkets = () => {
 
           {/* Filters */}
           <div className="flex items-center gap-2 flex-wrap">
-            <div className="relative flex-1 max-w-xs">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search markets"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-card/50 border-border/50"
-              />
-            </div>
-
             <Button
               variant={activeFilter === 'newest' ? 'default' : 'outline'}
               onClick={() => setActiveFilter('newest')}
               className={cn(
-                'text-foreground',
-                activeFilter === 'newest' && 'bg-primary text-primary-foreground'
+                'flex items-center gap-2',
+                activeFilter === 'newest' 
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
+                  : 'text-foreground hover:bg-muted/50'
               )}
+              aria-label="Filter by newest"
             >
-              <Filter className="h-4 w-4 mr-2" />
-              Newest
+              <Filter className="h-4 w-4" />
+              <span>Newest</span>
             </Button>
 
             <Button
               variant={activeFilter === 'trending' ? 'default' : 'outline'}
               onClick={() => setActiveFilter('trending')}
               className={cn(
-                'text-foreground',
-                activeFilter === 'trending' && 'bg-primary text-primary-foreground'
+                'flex items-center gap-2',
+                activeFilter === 'trending' 
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
+                  : 'text-foreground hover:bg-muted/50'
               )}
+              aria-label="Filter by trending"
             >
-              <TrendingUp className="h-4 w-4 mr-2" />
-              Trending
+              <TrendingUp className="h-4 w-4" />
+              <span>Trending</span>
             </Button>
 
             <Button
               variant={activeFilter === 'volume' ? 'default' : 'outline'}
               onClick={() => setActiveFilter('volume')}
               className={cn(
-                'text-foreground',
-                activeFilter === 'volume' && 'bg-primary text-primary-foreground'
+                'flex items-center gap-2',
+                activeFilter === 'volume' 
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
+                  : 'text-foreground hover:bg-muted/50'
               )}
+              aria-label="Filter by volume"
             >
-              <Volume2 className="h-4 w-4 mr-2" />
-              Volume
+              <Volume2 className="h-4 w-4" />
+              <span>Volume</span>
             </Button>
 
             <Button
               variant={activeFilter === 'ending' ? 'default' : 'outline'}
               onClick={() => setActiveFilter('ending')}
               className={cn(
-                'text-foreground',
-                activeFilter === 'ending' && 'bg-primary text-primary-foreground'
+                'flex items-center gap-2',
+                activeFilter === 'ending' 
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
+                  : 'text-foreground hover:bg-muted/50'
               )}
+              aria-label="Filter by ending soon"
             >
-              <Clock className="h-4 w-4 mr-2" />
-              Ending
+              <Clock className="h-4 w-4" />
+              <span>Ending</span>
             </Button>
 
             <Select value={activeFilter} onValueChange={(v) => setActiveFilter(v as any)}>
-              <SelectTrigger className="w-32 bg-card text-foreground border-border">
-                <SelectValue placeholder="Status" />
+              <SelectTrigger className="w-36 bg-card text-foreground border-border hover:bg-muted/50" aria-label="Filter by status">
+                <Menu className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="All Filters" />
               </SelectTrigger>
-              <SelectContent className="bg-card border-border">
+              <SelectContent className="bg-popover border-border">
                 <SelectItem value="open">Open</SelectItem>
                 <SelectItem value="closed">Closed</SelectItem>
                 <SelectItem value="all">All</SelectItem>
@@ -166,10 +169,10 @@ const GigaMarkets = () => {
             </Select>
 
             <Select value={tokenFilter} onValueChange={setTokenFilter}>
-              <SelectTrigger className="w-40 bg-card text-foreground border-border">
+              <SelectTrigger className="w-40 bg-card text-foreground border-border hover:bg-muted/50" aria-label="Filter by token type">
                 <SelectValue placeholder="All Tokens" />
               </SelectTrigger>
-              <SelectContent className="bg-card border-border">
+              <SelectContent className="bg-popover border-border">
                 <SelectItem value="all">All Tokens</SelectItem>
                 <SelectItem value="crypto">Crypto</SelectItem>
                 <SelectItem value="stocks">Stocks</SelectItem>
