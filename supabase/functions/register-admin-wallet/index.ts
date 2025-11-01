@@ -60,7 +60,8 @@ Deno.serve(async (req) => {
       );
     }
 
-    // For new wallets, create anonymous user first
+    // Try to create user, or get existing if email already exists
+    let userId: string;
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email: `${wallet_address.toLowerCase()}@wallet.giga`,
       email_confirm: true,
@@ -70,35 +71,56 @@ Deno.serve(async (req) => {
     });
 
     if (authError) {
-      console.error('Error creating user:', authError);
-      throw authError;
+      // If user already exists, fetch the existing user
+      if (authError.message?.includes('already been registered')) {
+        console.log('User already exists, fetching existing user');
+        const { data: users } = await supabase.auth.admin.listUsers();
+        const existingUser = users.users.find(
+          u => u.email === `${wallet_address.toLowerCase()}@wallet.giga`
+        );
+        
+        if (!existingUser) {
+          throw new Error('User exists but could not be found');
+        }
+        
+        userId = existingUser.id;
+        console.log('Found existing user:', userId);
+      } else {
+        console.error('Error creating user:', authError);
+        throw authError;
+      }
+    } else {
+      userId = authData.user.id;
+      console.log('Created new user:', userId);
     }
 
-    console.log('Created user:', authData.user.id);
-
-    // Register wallet address
+    // Register wallet address (ignore if already exists)
     const { error: walletError } = await supabase
       .from('wallet_addresses')
       .insert({
         wallet_address: wallet_address.toLowerCase(),
-        user_id: authData.user.id,
-      });
+        user_id: userId,
+      })
+      .select()
+      .single();
 
-    if (walletError) {
+    if (walletError && !walletError.message?.includes('duplicate')) {
       console.error('Error inserting wallet:', walletError);
       throw walletError;
     }
 
-    // If it's the admin wallet, assign admin role
+    // If it's the admin wallet, assign admin role (ignore if already exists)
     if (wallet_address.toLowerCase() === ADMIN_WALLET.toLowerCase()) {
       const { error: roleError } = await supabase
         .from('user_roles')
         .insert({
-          user_id: authData.user.id,
+          user_id: userId,
           role: 'admin',
-        });
+        })
+        .select()
+        .single();
 
-      if (roleError) {
+      if (roleError && !roleError.message?.includes('duplicate')) {
         console.error('Error assigning admin role:', roleError);
         throw roleError;
       }
