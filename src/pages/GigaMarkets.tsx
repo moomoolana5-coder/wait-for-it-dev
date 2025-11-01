@@ -61,7 +61,7 @@ const GigaMarkets = () => {
             </div>
 
             {/* Wallet Info */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <div className="text-right">
                 <p className="text-xs text-muted-foreground">Limbo 🎲</p>
                 <p className="text-sm font-bold">12,5k pts</p>
@@ -74,6 +74,19 @@ const GigaMarkets = () => {
                 <p className="text-xs text-muted-foreground">USDC</p>
                 <p className="text-sm font-bold">$0</p>
               </div>
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={() => {
+                  if (walletStore.canClaimFaucet()) {
+                    walletStore.claimFaucet();
+                  }
+                }}
+                disabled={!walletStore.canClaimFaucet()}
+                className="border-primary/50 text-primary hover:bg-primary/10"
+              >
+                🎁 Claim Test Tokens
+              </Button>
               <Button size="sm" className="bg-primary hover:bg-primary/90">
                 + Deposit
               </Button>
