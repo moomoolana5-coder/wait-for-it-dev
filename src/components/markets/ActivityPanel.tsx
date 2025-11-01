@@ -12,45 +12,9 @@ type ActivityPanelProps = {
   market: Market;
 };
 
-// Mock comments data
-const mockComments = [
-  {
-    id: '1',
-    user: 'Ramboz',
-    time: '35 minutes ago',
-    content: 'IZI',
-    likes: 0,
-    avatar: '#ff6b9d'
-  },
-  {
-    id: '2',
-    user: '0xDFB9...0B57',
-    time: '12 days ago',
-    content: 'MtThongchai',
-    likes: 0,
-    avatar: '#4ecdc4'
-  },
-  {
-    id: '3',
-    user: '0x0E64...D92A',
-    time: '12 days ago',
-    content: 'need more liquidity please',
-    likes: 0,
-    avatar: '#ff6b9d'
-  },
-  {
-    id: '4',
-    user: 'Cryptoquest',
-    time: '15 days ago',
-    content: 'Easy $4500',
-    likes: 0,
-    avatar: '#45b7d1'
-  }
-];
-
 export const ActivityPanel = ({ market }: ActivityPanelProps) => {
   const [opinion, setOpinion] = useState('');
-  const [comments, setComments] = useState(mockComments);
+  const [comments, setComments] = useState<any[]>([]);
 
   const handlePostOpinion = () => {
     if (!opinion.trim()) return;
