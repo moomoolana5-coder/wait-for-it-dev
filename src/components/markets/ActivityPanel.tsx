@@ -4,7 +4,6 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { useTradesStore } from '@/stores/trades';
 import { formatDate } from '@/lib/format';
 import { Heart, MessageCircle, MoreVertical, Bold, Italic, Strikethrough } from 'lucide-react';
 import { cn } from '@/lib/utils';

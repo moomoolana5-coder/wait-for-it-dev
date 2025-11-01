@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { TradeBox } from '@/components/markets/TradeBox';
 import { RulesPanel } from '@/components/markets/RulesPanel';
 import { ActivityPanel } from '@/components/markets/ActivityPanel';
+import { HoldersPanel } from '@/components/markets/HoldersPanel';
+import { TradingActivity } from '@/components/markets/TradingActivity';
 import { PriceChart } from '@/components/markets/PriceChart';
 import { useMarketsStore } from '@/stores/markets';
 import { useWalletStore } from '@/stores/wallet';
@@ -180,24 +182,22 @@ const MarketDetail = () => {
               {/* Tabs Section */}
               <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList className="grid w-full grid-cols-4 bg-card/50">
-                  <TabsTrigger value="opinions">Opinions (3)</TabsTrigger>
+                  <TabsTrigger value="comments">Comments</TabsTrigger>
                   <TabsTrigger value="holders">Holders</TabsTrigger>
                   <TabsTrigger value="activity">Activity</TabsTrigger>
                   <TabsTrigger value="news">News</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="opinions" className="mt-6">
+                <TabsContent value="comments" className="mt-6">
                   <ActivityPanel market={market} />
                 </TabsContent>
 
                 <TabsContent value="holders" className="mt-6">
-                  <div className="glass-card border-border/50 rounded-lg p-6">
-                    <p className="text-muted-foreground text-center py-8">No holders yet</p>
-                  </div>
+                  <HoldersPanel market={market} />
                 </TabsContent>
 
                 <TabsContent value="activity" className="mt-6">
-                  <ActivityPanel market={market} />
+                  <TradingActivity market={market} />
                 </TabsContent>
 
                 <TabsContent value="news" className="mt-6">
