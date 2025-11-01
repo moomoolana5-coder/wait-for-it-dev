@@ -73,8 +73,9 @@ export class OracleService {
 
   static async getCoinGeckoPrice(coinId: string): Promise<PriceData | null> {
     try {
+      const baseUrl = import.meta.env.VITE_SUPABASE_URL;
       const response = await this.fetchWithTimeout(
-        `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`
+        `${baseUrl}/functions/v1/coingecko-proxy?type=price&coinId=${coinId}`
       );
       
       if (!response.ok) return null;
@@ -98,8 +99,9 @@ export class OracleService {
     days: number
   ): Promise<CandleData[]> {
     try {
+      const baseUrl = import.meta.env.VITE_SUPABASE_URL;
       const response = await this.fetchWithTimeout(
-        `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`
+        `${baseUrl}/functions/v1/coingecko-proxy?type=chart&coinId=${coinId}&days=${days}`
       );
       
       if (!response.ok) return [];
@@ -139,8 +141,9 @@ export class OracleService {
 
   static async getCoinGeckoRank(coinId: string): Promise<number | null> {
     try {
+      const baseUrl = import.meta.env.VITE_SUPABASE_URL;
       const response = await this.fetchWithTimeout(
-        `https://api.coingecko.com/api/v3/coins/${coinId}`
+        `${baseUrl}/functions/v1/coingecko-proxy?type=coin&coinId=${coinId}`
       );
       
       if (!response.ok) return null;

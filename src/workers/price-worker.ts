@@ -37,7 +37,8 @@ async function fetchDexPrice(contract: string): Promise<number> {
 }
 
 async function fetchCGPrice(id: string): Promise<number> {
-  const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`);
+  const baseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const res = await fetch(`${baseUrl}/functions/v1/coingecko-proxy?type=price&coinId=${id}`);
   if (!res.ok) throw new Error('CG fetch failed');
   const data = await res.json();
   return data[id]?.usd || 0;

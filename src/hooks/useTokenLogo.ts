@@ -51,9 +51,8 @@ export const useTokenLogo = (
             };
           }
         } else if (provider === 'COINGECKO' && options.baseId) {
-          const response = await fetch(
-            `https://api.coingecko.com/api/v3/coins/${options.baseId}`
-          );
+          const baseUrl = import.meta.env.VITE_SUPABASE_URL;
+          const response = await fetch(`${baseUrl}/functions/v1/coingecko-proxy?type=coin&coinId=${encodeURIComponent(options.baseId)}`);
           const data = await response.json();
           
           if (data.image?.large) {
