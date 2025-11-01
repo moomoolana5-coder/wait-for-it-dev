@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { TradeBox } from '@/components/markets/TradeBox';
 import { RulesPanel } from '@/components/markets/RulesPanel';
 import { ActivityPanel } from '@/components/markets/ActivityPanel';
-import { TimelinePanel } from '@/components/markets/TimelinePanel';
 import { PriceChart } from '@/components/markets/PriceChart';
 import { useMarketsStore } from '@/stores/markets';
 import { useWalletStore } from '@/stores/wallet';
@@ -209,10 +208,9 @@ const MarketDetail = () => {
               </Tabs>
             </div>
 
-            {/* Right Column - Trade Box & Timeline */}
+            {/* Right Column - Trade Box */}
             <div className="space-y-6">
               <TradeBox market={market} />
-              <TimelinePanel market={market} />
             </div>
           </div>
         </div>

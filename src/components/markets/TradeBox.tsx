@@ -7,13 +7,14 @@ import { Label } from '@/components/ui/label';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { calculateTrade } from '@/lib/amm';
-import { formatPoints, formatPercent, formatUSD } from '@/lib/format';
+import { formatPoints, formatPercent, formatUSD, formatDate } from '@/lib/format';
 import { useWalletStore } from '@/stores/wallet';
 import { useMarketsStore } from '@/stores/markets';
 import { useTradesStore } from '@/stores/trades';
 import { toast } from '@/hooks/use-toast';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, CheckCircle2, Circle, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type TradeBoxProps = {
@@ -30,6 +31,7 @@ export const TradeBox = ({ market, defaultSide }: TradeBoxProps) => {
     defaultSide || market.outcomes[0].key
   );
   const [amount, setAmount] = useState('');
+  const [isTimelineOpen, setIsTimelineOpen] = useState(true);
 
   useEffect(() => {
     if (defaultSide) setSide(defaultSide);
@@ -264,6 +266,90 @@ export const TradeBox = ({ market, defaultSide }: TradeBoxProps) => {
           ⚠️ Beta Testing Phase - Trade at your own risk
         </p>
       </div>
+
+      {/* Timeline Section */}
+      <Separator />
+      
+      <Collapsible open={isTimelineOpen} onOpenChange={setIsTimelineOpen}>
+        <CollapsibleTrigger className="w-full py-3 flex items-center justify-between hover:bg-accent/50 transition-colors rounded-lg px-2">
+          <h3 className="text-base font-semibold">Timeline</h3>
+          <ChevronDown 
+            className={cn(
+              "h-4 w-4 transition-transform",
+              isTimelineOpen && "transform rotate-180"
+            )}
+          />
+        </CollapsibleTrigger>
+
+        <CollapsibleContent>
+          <div className="mt-2 border border-border/50 rounded-lg overflow-hidden">
+            <table className="w-full text-sm">
+              <tbody>
+                <tr className="bg-accent/20 border-b border-border/30">
+                  <td className="p-3">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 mt-0.5 flex-shrink-0 text-primary" />
+                      <div className="flex-1 space-y-0.5">
+                        <p className="font-medium text-xs">Market published</p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDate(market.createdAt)}, {new Date(market.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })} GMT+7
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                
+                <tr className={cn(
+                  "border-b border-border/30",
+                  new Date() >= new Date(market.closesAt) && "bg-accent/20"
+                )}>
+                  <td className="p-3">
+                    <div className="flex items-start gap-2">
+                      {new Date() >= new Date(market.closesAt) ? (
+                        <CheckCircle2 className="h-4 w-4 mt-0.5 flex-shrink-0 text-yellow-500" />
+                      ) : (
+                        <Circle className="h-4 w-4 mt-0.5 flex-shrink-0 text-muted-foreground" />
+                      )}
+                      <div className="flex-1 space-y-0.5">
+                        <p className="font-medium text-xs">Market closes</p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDate(market.closesAt)}, {new Date(market.closesAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })} GMT+7
+                        </p>
+                        <p className="text-xs text-muted-foreground italic">
+                          Only when an outcome is reached.
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                
+                <tr className={cn(
+                  market.status === 'RESOLVED' && "bg-accent/20"
+                )}>
+                  <td className="p-3">
+                    <div className="flex items-start gap-2">
+                      {market.status === 'RESOLVED' ? (
+                        <CheckCircle2 className="h-4 w-4 mt-0.5 flex-shrink-0 text-primary" />
+                      ) : (
+                        <Circle className="h-4 w-4 mt-0.5 flex-shrink-0 text-muted-foreground" />
+                      )}
+                      <div className="flex-1 space-y-0.5">
+                        <p className="font-medium text-xs">Resolution</p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDate(market.resolvesAt)}, {new Date(market.resolvesAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })} GMT+7
+                        </p>
+                        <p className="text-xs text-muted-foreground italic">
+                          The outcome will be validated by the team within 24 hours of its occurrence.
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
     </Card>
   );
 };
