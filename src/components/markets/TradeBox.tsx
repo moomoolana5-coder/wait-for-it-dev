@@ -107,12 +107,12 @@ export const TradeBox = ({ market, defaultSide }: TradeBoxProps) => {
   const sideLabel = market.outcomes.find((o) => o.key === side)?.label || side;
   const isBullish = side === 'YES' || side === 'A';
 
-  // Calculate probabilities
+  // Calculate probabilities based on real trade data
   const yesStake = market.yesStake || 0;
   const noStake = market.noStake || 0;
   const totalStake = yesStake + noStake;
-  const yesPercent = totalStake > 0 ? (yesStake / totalStake) * 100 : 50;
-  const noPercent = totalStake > 0 ? (noStake / totalStake) * 100 : 50;
+  const yesPercent = totalStake > 0 ? (yesStake / totalStake) * 100 : 0;
+  const noPercent = totalStake > 0 ? (noStake / totalStake) * 100 : 0;
 
   return (
     <Card className="sticky top-20 glass-card border-border/50 p-6 space-y-6">

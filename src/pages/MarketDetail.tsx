@@ -70,12 +70,12 @@ const MarketDetail = () => {
     }
   };
 
-  // Calculate outcome probabilities
+  // Calculate outcome probabilities based on real trade data
   const yesStake = market.yesStake || 0;
   const noStake = market.noStake || 0;
   const totalStake = yesStake + noStake;
-  const yesPercent = totalStake > 0 ? (yesStake / totalStake) * 100 : 50;
-  const noPercent = totalStake > 0 ? (noStake / totalStake) * 100 : 50;
+  const yesPercent = totalStake > 0 ? (yesStake / totalStake) * 100 : 0;
+  const noPercent = totalStake > 0 ? (noStake / totalStake) * 100 : 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -156,22 +156,31 @@ const MarketDetail = () => {
 
                 {/* Price Display */}
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-bold">${market.source.threshold?.toLocaleString()}</span>
-                  <span className="text-lg text-primary">↑ 4.5%</span>
-                  <span className="text-sm text-muted-foreground ml-2">
-                    {yesPercent.toFixed(1)}% chance
-                  </span>
+                  <span className="text-4xl font-bold">${totalStake > 0 ? market.source.threshold?.toLocaleString() : '0'}</span>
+                  {totalStake > 0 && (
+                    <>
+                      <span className="text-lg text-primary">↑ {yesPercent.toFixed(1)}%</span>
+                      <span className="text-sm text-muted-foreground ml-2">
+                        {yesPercent.toFixed(1)}% chance
+                      </span>
+                    </>
+                  )}
+                  {totalStake === 0 && (
+                    <span className="text-sm text-muted-foreground ml-2">
+                      No trades yet
+                    </span>
+                  )}
                 </div>
 
                 {/* Outcome Probabilities */}
                 <div className="flex items-center gap-4 text-sm">
                   <div className="flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-primary" />
-                    <span>${market.outcomes[0]?.label} {yesPercent.toFixed(1)}%</span>
+                    <span>{market.outcomes[0]?.label} {yesPercent.toFixed(1)}%</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-secondary" />
-                    <span>${market.outcomes[1]?.label} {noPercent.toFixed(1)}%</span>
+                    <div className="h-2 w-2 rounded-full bg-destructive" />
+                    <span>{market.outcomes[1]?.label} {noPercent.toFixed(1)}%</span>
                   </div>
                 </div>
               </div>
