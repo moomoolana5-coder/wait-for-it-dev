@@ -173,12 +173,6 @@ const MarketDetail = () => {
               {/* Chart */}
               <PriceChart market={market} />
 
-              {/* Rules Section */}
-              <div className="glass-card border-border/50 rounded-lg p-6 space-y-4">
-                <h2 className="text-xl font-bold">Rules</h2>
-                <RulesPanel market={market} />
-              </div>
-
               {/* Tabs Section */}
               <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList className="grid w-full grid-cols-4 bg-card/50">
@@ -206,6 +200,12 @@ const MarketDetail = () => {
                   </div>
                 </TabsContent>
               </Tabs>
+
+              {/* Rules Section */}
+              <div className="glass-card border-border/50 rounded-lg p-6 space-y-4">
+                <h2 className="text-xl font-bold">Rules</h2>
+                <RulesPanel market={market} />
+              </div>
             </div>
 
             {/* Right Column - Trade Box */}
