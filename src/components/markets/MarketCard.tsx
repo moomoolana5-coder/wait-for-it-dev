@@ -16,6 +16,7 @@ export const MarketCard = ({ market }: MarketCardProps) => {
   const navigate = useNavigate();
   
   const { data: tokenLogo } = useTokenLogo(market.source.provider, {
+    tokenAddress: market.source.tokenAddress,
     pairAddress: market.source.pairAddress,
     baseId: market.source.baseId,
   });

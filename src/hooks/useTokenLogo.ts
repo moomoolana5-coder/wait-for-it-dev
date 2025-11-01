@@ -10,14 +10,33 @@ export const useTokenLogo = (
   provider: 'DEXSCREENER' | 'COINGECKO',
   options: {
     pairAddress?: string;
+    tokenAddress?: string;
     baseId?: string;
   }
 ) => {
   return useQuery<TokenLogoResult>({
-    queryKey: ['token-logo', provider, options.pairAddress, options.baseId],
+    queryKey: ['token-logo', provider, options.pairAddress, options.tokenAddress, options.baseId],
     queryFn: async () => {
       try {
-        if (provider === 'DEXSCREENER' && options.pairAddress) {
+        if (provider === 'DEXSCREENER' && options.tokenAddress) {
+          // Use token address endpoint
+          const response = await fetch(
+            `https://api.dexscreener.com/latest/dex/tokens/${options.tokenAddress}`
+          );
+          const data = await response.json();
+          
+          // Get the first pair from PulseChain if available
+          const pulsechainPair = data.pairs?.find((p: any) => p.chainId === 'pulsechain');
+          
+          if (pulsechainPair && pulsechainPair.info?.imageUrl) {
+            return {
+              logoUrl: pulsechainPair.info.imageUrl,
+              tokenSymbol: pulsechainPair.baseToken?.symbol || null,
+              tokenName: pulsechainPair.baseToken?.name || null,
+            };
+          }
+        } else if (provider === 'DEXSCREENER' && options.pairAddress) {
+          // Fallback to pair address
           const response = await fetch(
             `https://api.dexscreener.com/latest/dex/pairs/pulsechain/${options.pairAddress}`
           );
@@ -55,7 +74,7 @@ export const useTokenLogo = (
       };
     },
     enabled: Boolean(
-      (provider === 'DEXSCREENER' && options.pairAddress) ||
+      (provider === 'DEXSCREENER' && (options.tokenAddress || options.pairAddress)) ||
       (provider === 'COINGECKO' && options.baseId)
     ),
     staleTime: 1000 * 60 * 60, // 1 hour

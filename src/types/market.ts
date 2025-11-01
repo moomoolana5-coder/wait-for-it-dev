@@ -16,6 +16,7 @@ export type Market = {
     provider: 'DEXSCREENER' | 'COINGECKO';
     baseId?: string;
     pairAddress?: string;
+    tokenAddress?: string;
     threshold?: number;
     aId?: string;
     bId?: string;
