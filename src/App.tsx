@@ -20,6 +20,7 @@ import Leaderboard from "./pages/Leaderboard";
 import Earn from "./pages/Earn";
 import Integrations from "./pages/Integrations";
 import AdminSettings from "./pages/AdminSettings";
+import Staking from "./pages/Staking";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="/earn" element={<Earn />} />
             <Route path="/integrations" element={<Integrations />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
+            <Route path="/staking" element={<Staking />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
