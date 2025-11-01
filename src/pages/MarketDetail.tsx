@@ -16,6 +16,12 @@ import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, Search, Share2, Clock } from 'lucide-react';
 import { formatUSD, formatTimeRemaining, formatPoints } from '@/lib/format';
 import { cn } from '@/lib/utils';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(duration);
+dayjs.extend(relativeTime);
 
 const MarketDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,6 +30,7 @@ const MarketDetail = () => {
   const walletStore = useWalletStore();
   const tradesStore = useTradesStore();
   const [activeTab, setActiveTab] = useState('activity');
+  const [timeRemaining, setTimeRemaining] = useState('');
 
   useEffect(() => {
     if (!initialized) init();
@@ -45,6 +52,40 @@ const MarketDetail = () => {
   }, [id, incrementTrending]);
 
   const market = id ? getMarket(id) : undefined;
+
+  // Update countdown every second
+  useEffect(() => {
+    if (!market) return;
+
+    const updateTimeRemaining = () => {
+      const now = dayjs();
+      const closesAt = dayjs(market.closesAt);
+      const diff = closesAt.diff(now);
+
+      if (diff <= 0) {
+        setTimeRemaining('Market Closed');
+        return;
+      }
+
+      const duration = dayjs.duration(diff);
+      const hours = Math.floor(duration.asHours());
+      const minutes = duration.minutes();
+      const seconds = duration.seconds();
+
+      if (hours > 0) {
+        setTimeRemaining(`Closes in ${hours}h ${minutes}m`);
+      } else if (minutes > 0) {
+        setTimeRemaining(`Closes in ${minutes}m ${seconds}s`);
+      } else {
+        setTimeRemaining(`Closes in ${seconds}s`);
+      }
+    };
+
+    updateTimeRemaining();
+    const interval = setInterval(updateTimeRemaining, 1000);
+
+    return () => clearInterval(interval);
+  }, [market]);
 
   if (!market) {
     return (
@@ -154,9 +195,16 @@ const MarketDetail = () => {
                         💎 {formatUSD(market.poolUSD)}
                       </span>
                       <Separator orientation="vertical" className="h-4" />
-                      <span className="flex items-center gap-1">
+                      <span className={cn(
+                        "flex items-center gap-1 font-medium",
+                        market.status === 'CLOSED' ? "text-yellow-500" : 
+                        timeRemaining.includes('Closed') ? "text-red-500" :
+                        timeRemaining.includes('s') && !timeRemaining.includes('m') && !timeRemaining.includes('h') ? "text-red-500 animate-pulse" :
+                        timeRemaining.includes('m') && parseInt(timeRemaining.split('m')[0].split(' ').pop() || '0') < 5 ? "text-orange-500" :
+                        "text-primary"
+                      )}>
                         <Clock className="h-3 w-3" />
-                        {market.status === 'OPEN' ? formatTimeRemaining(market.closesAt) : market.status}
+                        {timeRemaining}
                       </span>
                     </div>
                   </div>
