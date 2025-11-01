@@ -155,10 +155,10 @@ const GigaMarkets = () => {
             </Button>
 
             <Select value={activeFilter} onValueChange={(v) => setActiveFilter(v as any)}>
-              <SelectTrigger className="w-32">
-                <SelectValue placeholder="Open" />
+              <SelectTrigger className="w-32 bg-card text-foreground border-border">
+                <SelectValue placeholder="Status" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-card border-border">
                 <SelectItem value="open">Open</SelectItem>
                 <SelectItem value="closed">Closed</SelectItem>
                 <SelectItem value="all">All</SelectItem>
@@ -166,10 +166,10 @@ const GigaMarkets = () => {
             </Select>
 
             <Select value={tokenFilter} onValueChange={setTokenFilter}>
-              <SelectTrigger className="w-40">
+              <SelectTrigger className="w-40 bg-card text-foreground border-border">
                 <SelectValue placeholder="All Tokens" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-card border-border">
                 <SelectItem value="all">All Tokens</SelectItem>
                 <SelectItem value="crypto">Crypto</SelectItem>
                 <SelectItem value="stocks">Stocks</SelectItem>
