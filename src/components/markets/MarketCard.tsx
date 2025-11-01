@@ -35,23 +35,29 @@ export const MarketCard = ({ market }: MarketCardProps) => {
       onClick={() => navigate(`/market/${market.id}`)}
     >
       {/* Market Image */}
-      <div className="relative h-40 overflow-hidden">
+      <div className="relative h-40 overflow-hidden bg-gradient-to-br from-background via-muted/20 to-background">
         <img
           src={market.cover}
           alt={market.title}
-          className="w-full h-full object-cover transition-transform group-hover:scale-105"
+          className="w-full h-full object-cover transition-transform group-hover:scale-105 opacity-30"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/50 to-transparent" />
         
-        {/* Token Logo Overlay */}
+        {/* Token Logo - Large and Centered */}
         {tokenLogo?.logoUrl && (
-          <div className="absolute top-3 left-3">
-            <Avatar className="h-12 w-12 border-2 border-background shadow-lg">
-              <AvatarImage src={tokenLogo.logoUrl} alt={tokenLogo.tokenSymbol || 'Token'} />
-              <AvatarFallback className="bg-muted text-xs">
-                {tokenLogo.tokenSymbol?.slice(0, 2) || '??'}
-              </AvatarFallback>
-            </Avatar>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="relative">
+              <img
+                src={tokenLogo.logoUrl}
+                alt={tokenLogo.tokenSymbol || 'Token'}
+                className="h-24 w-24 object-contain drop-shadow-2xl transition-transform group-hover:scale-110"
+              />
+              {tokenLogo.tokenSymbol && (
+                <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-background/90 backdrop-blur-sm px-3 py-1 rounded-full border border-border/50">
+                  <span className="text-xs font-bold">{tokenLogo.tokenSymbol}</span>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
