@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { HeroCarousel } from '@/components/markets/HeroCarousel';
 import { MarketCard } from '@/components/markets/MarketCard';
 import { useMarketsStore } from '@/stores/markets';
-import { useWalletStore } from '@/stores/wallet';
+import { useWalletDbStore } from '@/stores/walletDb';
 import { useTradesStore } from '@/stores/trades';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -13,8 +15,10 @@ import { cn } from '@/lib/utils';
 import Navbar from '@/components/Navbar';
 
 const GigaMarkets = () => {
+  const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const { markets, initialized, init } = useMarketsStore();
-  const walletStore = useWalletStore();
+  const walletStore = useWalletDbStore();
   const tradesStore = useTradesStore();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -22,10 +26,17 @@ const GigaMarkets = () => {
   const [tokenFilter, setTokenFilter] = useState('all');
 
   useEffect(() => {
-    if (!initialized) init();
-    if (!walletStore.wallet.address) walletStore.init();
-    if (!tradesStore.initialized) tradesStore.init();
-  }, [initialized, walletStore, tradesStore, init]);
+    if (authLoading) return;
+    
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+
+    init();
+    walletStore.init();
+    tradesStore.init();
+  }, [user, authLoading, init, walletStore, tradesStore, navigate]);
 
   const filteredMarkets = markets
     .filter((m) => {

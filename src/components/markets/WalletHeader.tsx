@@ -1,15 +1,16 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useWalletStore } from '@/stores/wallet';
+import { useWalletDbStore } from '@/stores/walletDb';
 import { formatPoints, formatUSD } from '@/lib/format';
 import { Wallet, Droplet, TrendingUp, TrendingDown } from 'lucide-react';
 import { toast } from 'sonner';
 
 export const WalletHeader = () => {
-  const { wallet, claimFaucet, canClaimFaucet, getTimeUntilNextClaim } = useWalletStore();
+  const { wallet, claimFaucet, canClaimFaucet, getTimeUntilNextClaim } = useWalletDbStore();
 
-  const handleClaimFaucet = () => {
-    if (claimFaucet()) {
+  const handleClaimFaucet = async () => {
+    const success = await claimFaucet();
+    if (success) {
       toast.success('10,000 points claimed!');
     } else {
       const hoursLeft = Math.ceil(getTimeUntilNextClaim() / (1000 * 60 * 60));
