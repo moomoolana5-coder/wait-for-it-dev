@@ -7,9 +7,10 @@ import { useTradesStore } from '@/stores/trades';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, TrendingUp, Volume2, Clock, Filter, Menu } from 'lucide-react';
+import { Search, TrendingUp, Volume2, Clock, Filter } from 'lucide-react';
 import { formatPoints } from '@/lib/format';
 import { cn } from '@/lib/utils';
+import Navbar from '@/components/Navbar';
 
 const GigaMarkets = () => {
   const { markets, initialized, init } = useMarketsStore();
@@ -45,48 +46,8 @@ const GigaMarkets = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between gap-4">
-            {/* Search */}
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search markets"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-background/50 border-border/50"
-              />
-            </div>
-
-            {/* Wallet Info */}
-            <div className="flex items-center gap-3">
-              <div className="text-right">
-                <p className="text-xs text-muted-foreground">Points</p>
-                <p className="text-sm font-bold">{formatPoints(walletStore.wallet.points)}</p>
-              </div>
-              <Button 
-                size="sm" 
-                variant="outline"
-                onClick={() => {
-                  if (walletStore.canClaimFaucet()) {
-                    walletStore.claimFaucet();
-                  }
-                }}
-                disabled={!walletStore.canClaimFaucet()}
-                className="border-primary/50 text-primary hover:bg-primary/10"
-              >
-                🎁 Claim Test Tokens
-              </Button>
-              <Button size="sm" className="bg-primary hover:bg-primary/90">
-                + Deposit
-              </Button>
-              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-secondary" />
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* Navbar */}
+      <Navbar />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6">
