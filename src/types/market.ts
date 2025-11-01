@@ -22,6 +22,7 @@ export type Market = {
     snapshotDateISO?: string;
   };
   createdAt: string;
+  createdBy?: string;
   closesAt: string;
   resolvesAt: string;
   status: MarketStatus;

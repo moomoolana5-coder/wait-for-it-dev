@@ -53,6 +53,7 @@ export const useMarketsStore = create<MarketsStore>((set, get) => ({
         resolutionType: m.resolution_type,
         source: m.source,
         createdAt: m.created_at,
+        createdBy: m.created_by,
         closesAt: m.closes_at,
         resolvesAt: m.resolves_at,
         status: m.status,
@@ -87,6 +88,7 @@ export const useMarketsStore = create<MarketsStore>((set, get) => ({
         resolution_type: m.resolutionType,
         source: m.source,
         created_at: m.createdAt,
+        created_by: '0x720a8ee141577dc8f3190417264bf91f59821169', // Admin wallet for seed data
         closes_at: m.closesAt,
         resolves_at: m.resolvesAt,
         status: m.status,
@@ -128,6 +130,7 @@ export const useMarketsStore = create<MarketsStore>((set, get) => ({
         resolution_type: market.resolutionType,
         source: market.source,
         created_at: market.createdAt,
+        created_by: market.createdBy || '0x720a8ee141577dc8f3190417264bf91f59821169',
         closes_at: market.closesAt,
         resolves_at: market.resolvesAt,
         status: market.status,

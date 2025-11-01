@@ -24,7 +24,7 @@ import dayjs from 'dayjs';
 
 const AdminSettings = () => {
   const navigate = useNavigate();
-  const { isAdmin, loading: adminLoading } = useWalletAdmin();
+  const { isAdmin, loading: adminLoading, walletAddress } = useWalletAdmin();
   const { markets, init, initialized, addMarket, updateMarket, deleteMarket } = useMarketsStore();
   
   const [editingMarket, setEditingMarket] = useState<Market | null>(null);
@@ -174,6 +174,7 @@ const AdminSettings = () => {
             threshold: formData.threshold,
           },
           createdAt: new Date().toISOString(),
+          createdBy: walletAddress || '0x720a8ee141577dc8f3190417264bf91f59821169',
           closesAt: formData.closesAt,
           resolvesAt: formData.resolvesAt,
           status: 'OPEN',
