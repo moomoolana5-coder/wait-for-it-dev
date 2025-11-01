@@ -94,16 +94,29 @@ const GigaMarkets = () => {
           {/* Hero Carousel */}
           <HeroCarousel markets={markets.slice(0, 5)} />
 
-          {/* Filters */}
-          <div className="flex items-center gap-2 flex-wrap">
+          {/* Search + Filters */}
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Search */}
+            <div className="relative w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search markets"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 rounded-full bg-background/50 border-border/50 h-9"
+              />
+            </div>
+
+            {/* Filter Buttons */}
             <Button
               variant={activeFilter === 'newest' ? 'default' : 'outline'}
+              size="sm"
               onClick={() => setActiveFilter('newest')}
               className={cn(
-                'flex items-center gap-2',
+                'rounded-full h-9 px-4 flex items-center gap-2',
                 activeFilter === 'newest' 
-                  ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
-                  : 'text-foreground hover:bg-muted/50'
+                  ? 'bg-white text-black hover:bg-white/90 border-0' 
+                  : 'bg-transparent border-border/50 text-foreground hover:bg-muted/30'
               )}
               aria-label="Filter by newest"
             >
@@ -113,12 +126,13 @@ const GigaMarkets = () => {
 
             <Button
               variant={activeFilter === 'trending' ? 'default' : 'outline'}
+              size="sm"
               onClick={() => setActiveFilter('trending')}
               className={cn(
-                'flex items-center gap-2',
+                'rounded-full h-9 px-4 flex items-center gap-2',
                 activeFilter === 'trending' 
-                  ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
-                  : 'text-foreground hover:bg-muted/50'
+                  ? 'bg-white text-black hover:bg-white/90 border-0' 
+                  : 'bg-transparent border-border/50 text-foreground hover:bg-muted/30'
               )}
               aria-label="Filter by trending"
             >
@@ -128,12 +142,13 @@ const GigaMarkets = () => {
 
             <Button
               variant={activeFilter === 'volume' ? 'default' : 'outline'}
+              size="sm"
               onClick={() => setActiveFilter('volume')}
               className={cn(
-                'flex items-center gap-2',
+                'rounded-full h-9 px-4 flex items-center gap-2',
                 activeFilter === 'volume' 
-                  ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
-                  : 'text-foreground hover:bg-muted/50'
+                  ? 'bg-white text-black hover:bg-white/90 border-0' 
+                  : 'bg-transparent border-border/50 text-foreground hover:bg-muted/30'
               )}
               aria-label="Filter by volume"
             >
@@ -143,12 +158,13 @@ const GigaMarkets = () => {
 
             <Button
               variant={activeFilter === 'ending' ? 'default' : 'outline'}
+              size="sm"
               onClick={() => setActiveFilter('ending')}
               className={cn(
-                'flex items-center gap-2',
+                'rounded-full h-9 px-4 flex items-center gap-2',
                 activeFilter === 'ending' 
-                  ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
-                  : 'text-foreground hover:bg-muted/50'
+                  ? 'bg-white text-black hover:bg-white/90 border-0' 
+                  : 'bg-transparent border-border/50 text-foreground hover:bg-muted/30'
               )}
               aria-label="Filter by ending soon"
             >
@@ -156,10 +172,10 @@ const GigaMarkets = () => {
               <span>Ending</span>
             </Button>
 
+            {/* Dropdowns */}
             <Select value={activeFilter} onValueChange={(v) => setActiveFilter(v as any)}>
-              <SelectTrigger className="w-36 bg-card text-foreground border-border hover:bg-muted/50" aria-label="Filter by status">
-                <Menu className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="All Filters" />
+              <SelectTrigger className="w-28 h-9 rounded-full bg-transparent border-border/50 text-foreground hover:bg-muted/30" aria-label="Filter by status">
+                <SelectValue placeholder="Open" />
               </SelectTrigger>
               <SelectContent className="bg-popover border-border">
                 <SelectItem value="open">Open</SelectItem>
@@ -169,7 +185,7 @@ const GigaMarkets = () => {
             </Select>
 
             <Select value={tokenFilter} onValueChange={setTokenFilter}>
-              <SelectTrigger className="w-40 bg-card text-foreground border-border hover:bg-muted/50" aria-label="Filter by token type">
+              <SelectTrigger className="w-36 h-9 rounded-full bg-transparent border-border/50 text-foreground hover:bg-muted/30" aria-label="Filter by token type">
                 <SelectValue placeholder="All Tokens" />
               </SelectTrigger>
               <SelectContent className="bg-popover border-border">
