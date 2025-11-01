@@ -191,6 +191,7 @@ export type Database = {
           shares: number
           side: string
           ts: string
+          user_id: string | null
           wallet: string
         }
         Insert: {
@@ -201,6 +202,7 @@ export type Database = {
           shares: number
           side: string
           ts?: string
+          user_id?: string | null
           wallet: string
         }
         Update: {
@@ -211,6 +213,7 @@ export type Database = {
           shares?: number
           side?: string
           ts?: string
+          user_id?: string | null
           wallet?: string
         }
         Relationships: [
@@ -307,6 +310,39 @@ export type Database = {
           id?: string
           user_id?: string | null
           wallet_address?: string
+        }
+        Relationships: []
+      }
+      wallets: {
+        Row: {
+          created_at: string
+          id: string
+          last_faucet_claim: string | null
+          pnl_realized: number
+          points: number
+          updated_at: string
+          user_id: string
+          wallet_address: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_faucet_claim?: string | null
+          pnl_realized?: number
+          points?: number
+          updated_at?: string
+          user_id: string
+          wallet_address?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_faucet_claim?: string | null
+          pnl_realized?: number
+          points?: number
+          updated_at?: string
+          user_id?: string
+          wallet_address?: string | null
         }
         Relationships: []
       }
