@@ -36,14 +36,7 @@ export const MarketCard = ({ market }: MarketCardProps) => {
       onClick={() => navigate(`/market/${market.id}`)}
     >
       {/* Market Image */}
-      <div className="relative h-40 overflow-hidden bg-gradient-to-br from-background via-muted/20 to-background">
-        <img
-          src={market.cover}
-          alt={market.title}
-          className="w-full h-full object-cover transition-transform group-hover:scale-105 opacity-30"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/50 to-transparent" />
-        
+      <div className="relative h-40 overflow-hidden bg-gray-900">
         {/* Token Logo - Large and Centered */}
         {tokenLogo?.logoUrl && (
           <div className="absolute inset-0 flex items-center justify-center">
