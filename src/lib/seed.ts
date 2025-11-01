@@ -18,7 +18,7 @@ export const generateSeedMarkets = (): Market[] => {
       resolutionType: 'PRICE_GE',
       source: {
         provider: 'DEXSCREENER',
-        pairAddress: '0x95B303987A60C71504D99Aa1b13B4DA07b0790ab',
+        pairAddress: '0xE56043671df55dE5CDf8459710433C10324DE0aE',
         threshold: 0.0001,
       },
       createdAt: now.subtract(5, 'day').toISOString(),
@@ -43,7 +43,7 @@ export const generateSeedMarkets = (): Market[] => {
       resolutionType: 'PRICE_GE',
       source: {
         provider: 'DEXSCREENER',
-        pairAddress: '0xA1077a294dDE1B09bB078844df40758a5D0f9a27',
+        pairAddress: '0x6753560538ECa67617A9Ce605178F788bE7E524E',
         threshold: 0.00001,
       },
       createdAt: now.subtract(4, 'day').toISOString(),
@@ -68,7 +68,7 @@ export const generateSeedMarkets = (): Market[] => {
       resolutionType: 'PRICE_GE',
       source: {
         provider: 'DEXSCREENER',
-        pairAddress: '0x2b591e99afE9f32eAA6214f7B7629768c40Eeb39',
+        pairAddress: '0xf1F4ee610b2bAbB05C635F726eF8B0C568c8dc65',
         threshold: 0.01,
       },
       createdAt: now.subtract(3, 'day').toISOString(),
@@ -93,7 +93,7 @@ export const generateSeedMarkets = (): Market[] => {
       resolutionType: 'PRICE_GE',
       source: {
         provider: 'DEXSCREENER',
-        pairAddress: '0x2fa878Ab3F87CC1C9737Fc071108F904c0B0C95d',
+        pairAddress: '0x92972f6A136bD4a5cDc6b34b0f462B19B6e59aA7',
         threshold: 0.10,
       },
       createdAt: now.subtract(2, 'day').toISOString(),
