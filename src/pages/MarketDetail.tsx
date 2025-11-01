@@ -31,6 +31,12 @@ const MarketDetail = () => {
     if (!tradesStore.initialized) tradesStore.init();
   }, [initialized, init, walletStore, tradesStore]);
 
+  // Subscribe to realtime trades updates
+  useEffect(() => {
+    const unsubscribe = tradesStore.subscribeToTrades();
+    return () => unsubscribe();
+  }, [tradesStore]);
+
   useEffect(() => {
     if (id) incrementTrending(id);
   }, [id, incrementTrending]);

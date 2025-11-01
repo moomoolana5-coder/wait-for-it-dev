@@ -12,13 +12,20 @@ type TradingActivityProps = {
 };
 
 export const TradingActivity = ({ market }: TradingActivityProps) => {
-  const { getTrades } = useTradesStore();
+  const { getTrades, subscribeToTrades, trades: allTrades } = useTradesStore();
   const [trades, setTrades] = useState<any[]>([]);
 
+  // Subscribe to realtime trades updates
+  useEffect(() => {
+    const unsubscribe = subscribeToTrades();
+    return () => unsubscribe();
+  }, [subscribeToTrades]);
+
+  // Update trades when allTrades changes
   useEffect(() => {
     const marketTrades = getTrades(market.id);
     setTrades(marketTrades.slice(0, 20));
-  }, [market.id, getTrades]);
+  }, [market.id, getTrades, allTrades]);
 
   if (trades.length === 0) {
     return (
