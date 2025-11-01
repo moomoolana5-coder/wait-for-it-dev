@@ -271,6 +271,7 @@ const AdminSettings = () => {
             <TabsList>
               <TabsTrigger value="markets">Markets Management</TabsTrigger>
               <TabsTrigger value="create">Create Market</TabsTrigger>
+              <TabsTrigger value="presets">Duration Presets</TabsTrigger>
             </TabsList>
 
             <TabsContent value="markets" className="space-y-4">
@@ -699,6 +700,153 @@ const AdminSettings = () => {
                     <Plus className="h-4 w-4 mr-2" />
                     {uploadingCover ? 'Uploading...' : 'Create Market'}
                   </Button>
+                </div>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="presets" className="space-y-4">
+              <Card className="glass-card border-border/50 p-6">
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-2xl font-semibold mb-2">Event Duration Presets</h2>
+                    <p className="text-muted-foreground">
+                      Quick presets untuk mengatur durasi event dari sekarang. Berguna untuk testing.
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Select Market to Update:</h3>
+                    <Select
+                      value={editingMarket?.id || ''}
+                      onValueChange={(id) => {
+                        const market = markets.find((m) => m.id === id);
+                        if (market) handleEdit(market);
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose a market" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {markets.map((market) => (
+                          <SelectItem key={market.id} value={market.id}>
+                            {market.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    {editingMarket && (
+                      <div className="space-y-4 pt-4 border-t">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-medium">{editingMarket.title}</h4>
+                            <p className="text-sm text-muted-foreground">
+                              Current closes at: {format(new Date(editingMarket.closesAt), "PPP HH:mm")}
+                            </p>
+                          </div>
+                          <Button variant="ghost" size="sm" onClick={handleCancel}>
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-3">
+                          <Button
+                            variant="outline"
+                            onClick={async () => {
+                              const newClosesAt = dayjs().add(1, 'minute').toISOString();
+                              const newResolvesAt = dayjs().add(2, 'minute').toISOString();
+                              try {
+                                await updateMarket(editingMarket.id, {
+                                  closesAt: newClosesAt,
+                                  resolvesAt: newResolvesAt,
+                                  status: 'OPEN',
+                                });
+                                toast({
+                                  title: 'Duration Updated',
+                                  description: 'Market will close in 1 minute',
+                                });
+                                handleCancel();
+                              } catch (error) {
+                                toast({
+                                  title: 'Error',
+                                  description: 'Failed to update duration',
+                                  variant: 'destructive',
+                                });
+                              }
+                            }}
+                          >
+                            <CalendarIcon className="h-4 w-4 mr-2" />
+                            1 Minute
+                          </Button>
+
+                          <Button
+                            variant="outline"
+                            onClick={async () => {
+                              const newClosesAt = dayjs().add(30, 'minute').toISOString();
+                              const newResolvesAt = dayjs().add(31, 'minute').toISOString();
+                              try {
+                                await updateMarket(editingMarket.id, {
+                                  closesAt: newClosesAt,
+                                  resolvesAt: newResolvesAt,
+                                  status: 'OPEN',
+                                });
+                                toast({
+                                  title: 'Duration Updated',
+                                  description: 'Market will close in 30 minutes',
+                                });
+                                handleCancel();
+                              } catch (error) {
+                                toast({
+                                  title: 'Error',
+                                  description: 'Failed to update duration',
+                                  variant: 'destructive',
+                                });
+                              }
+                            }}
+                          >
+                            <CalendarIcon className="h-4 w-4 mr-2" />
+                            30 Minutes
+                          </Button>
+
+                          <Button
+                            variant="outline"
+                            onClick={async () => {
+                              const newClosesAt = dayjs().add(1, 'hour').toISOString();
+                              const newResolvesAt = dayjs().add(1, 'hour').add(1, 'minute').toISOString();
+                              try {
+                                await updateMarket(editingMarket.id, {
+                                  closesAt: newClosesAt,
+                                  resolvesAt: newResolvesAt,
+                                  status: 'OPEN',
+                                });
+                                toast({
+                                  title: 'Duration Updated',
+                                  description: 'Market will close in 1 hour',
+                                });
+                                handleCancel();
+                              } catch (error) {
+                                toast({
+                                  title: 'Error',
+                                  description: 'Failed to update duration',
+                                  variant: 'destructive',
+                                });
+                              }
+                            }}
+                          >
+                            <CalendarIcon className="h-4 w-4 mr-2" />
+                            1 Hour
+                          </Button>
+                        </div>
+
+                        <Alert>
+                          <AlertDescription>
+                            Preset akan mengatur closes_at dari waktu sekarang dan resolves_at 1 menit setelahnya. 
+                            Status market akan diset ke OPEN.
+                          </AlertDescription>
+                        </Alert>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </Card>
             </TabsContent>
