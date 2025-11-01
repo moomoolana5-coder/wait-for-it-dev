@@ -353,17 +353,54 @@ const AdminSettings = () => {
                                 </Button>
                               </PopoverTrigger>
                               <PopoverContent className="w-auto p-0" align="start">
-                                <Calendar
-                                  mode="single"
-                                  selected={formData.closesAt ? new Date(formData.closesAt) : undefined}
-                                  onSelect={(date) => {
-                                    if (date) {
-                                      setFormData({ ...formData, closesAt: date.toISOString() });
-                                    }
-                                  }}
-                                  initialFocus
-                                  className={cn("p-3 pointer-events-auto")}
-                                />
+                                <div className="space-y-3">
+                                  <Calendar
+                                    mode="single"
+                                    selected={formData.closesAt ? new Date(formData.closesAt) : undefined}
+                                    onSelect={(date) => {
+                                      if (date) {
+                                        const currentDate = formData.closesAt ? new Date(formData.closesAt) : new Date();
+                                        date.setHours(currentDate.getHours());
+                                        date.setMinutes(currentDate.getMinutes());
+                                        setFormData({ ...formData, closesAt: date.toISOString() });
+                                      }
+                                    }}
+                                    initialFocus
+                                    className={cn("p-3 pointer-events-auto")}
+                                  />
+                                  <div className="px-3 pb-3 flex gap-2 items-center border-t pt-3">
+                                    <Label className="text-sm">Time:</Label>
+                                    <Input
+                                      type="number"
+                                      min="0"
+                                      max="23"
+                                      placeholder="HH"
+                                      className="w-16"
+                                      value={formData.closesAt ? new Date(formData.closesAt).getHours() : ''}
+                                      onChange={(e) => {
+                                        const hours = parseInt(e.target.value) || 0;
+                                        const date = formData.closesAt ? new Date(formData.closesAt) : new Date();
+                                        date.setHours(hours);
+                                        setFormData({ ...formData, closesAt: date.toISOString() });
+                                      }}
+                                    />
+                                    <span>:</span>
+                                    <Input
+                                      type="number"
+                                      min="0"
+                                      max="59"
+                                      placeholder="MM"
+                                      className="w-16"
+                                      value={formData.closesAt ? new Date(formData.closesAt).getMinutes() : ''}
+                                      onChange={(e) => {
+                                        const minutes = parseInt(e.target.value) || 0;
+                                        const date = formData.closesAt ? new Date(formData.closesAt) : new Date();
+                                        date.setMinutes(minutes);
+                                        setFormData({ ...formData, closesAt: date.toISOString() });
+                                      }}
+                                    />
+                                  </div>
+                                </div>
                               </PopoverContent>
                             </Popover>
                           </div>
@@ -383,17 +420,54 @@ const AdminSettings = () => {
                                 </Button>
                               </PopoverTrigger>
                               <PopoverContent className="w-auto p-0" align="start">
-                                <Calendar
-                                  mode="single"
-                                  selected={formData.resolvesAt ? new Date(formData.resolvesAt) : undefined}
-                                  onSelect={(date) => {
-                                    if (date) {
-                                      setFormData({ ...formData, resolvesAt: date.toISOString() });
-                                    }
-                                  }}
-                                  initialFocus
-                                  className={cn("p-3 pointer-events-auto")}
-                                />
+                                <div className="space-y-3">
+                                  <Calendar
+                                    mode="single"
+                                    selected={formData.resolvesAt ? new Date(formData.resolvesAt) : undefined}
+                                    onSelect={(date) => {
+                                      if (date) {
+                                        const currentDate = formData.resolvesAt ? new Date(formData.resolvesAt) : new Date();
+                                        date.setHours(currentDate.getHours());
+                                        date.setMinutes(currentDate.getMinutes());
+                                        setFormData({ ...formData, resolvesAt: date.toISOString() });
+                                      }
+                                    }}
+                                    initialFocus
+                                    className={cn("p-3 pointer-events-auto")}
+                                  />
+                                  <div className="px-3 pb-3 flex gap-2 items-center border-t pt-3">
+                                    <Label className="text-sm">Time:</Label>
+                                    <Input
+                                      type="number"
+                                      min="0"
+                                      max="23"
+                                      placeholder="HH"
+                                      className="w-16"
+                                      value={formData.resolvesAt ? new Date(formData.resolvesAt).getHours() : ''}
+                                      onChange={(e) => {
+                                        const hours = parseInt(e.target.value) || 0;
+                                        const date = formData.resolvesAt ? new Date(formData.resolvesAt) : new Date();
+                                        date.setHours(hours);
+                                        setFormData({ ...formData, resolvesAt: date.toISOString() });
+                                      }}
+                                    />
+                                    <span>:</span>
+                                    <Input
+                                      type="number"
+                                      min="0"
+                                      max="59"
+                                      placeholder="MM"
+                                      className="w-16"
+                                      value={formData.resolvesAt ? new Date(formData.resolvesAt).getMinutes() : ''}
+                                      onChange={(e) => {
+                                        const minutes = parseInt(e.target.value) || 0;
+                                        const date = formData.resolvesAt ? new Date(formData.resolvesAt) : new Date();
+                                        date.setMinutes(minutes);
+                                        setFormData({ ...formData, resolvesAt: date.toISOString() });
+                                      }}
+                                    />
+                                  </div>
+                                </div>
                               </PopoverContent>
                             </Popover>
                           </div>
