@@ -38,7 +38,7 @@ const GigaMarkets = () => {
       walletStore.init(user.id);
     }
     tradesStore.init();
-  }, [user, betaLoading, init, walletStore, tradesStore, navigate]);
+  }, [user, betaLoading, navigate]);
 
   const filteredMarkets = markets
     .filter((m) => {
