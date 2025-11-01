@@ -2,14 +2,16 @@ import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Market } from '@/types/market';
-import { OracleService } from '@/lib/oracles';
+import { useTradesStore } from '@/stores/trades';
+import { computePrice } from '@/lib/amm';
 import { Loader2 } from 'lucide-react';
 
 type TimeRange = '24H' | '7D' | '30D' | 'ALL';
 
 type ChartDataPoint = {
   time: number;
-  price: number;
+  yesProb: number;
+  noProb: number;
 };
 
 type PriceChartProps = {
@@ -20,52 +22,83 @@ export const PriceChart = ({ market }: PriceChartProps) => {
   const [timeRange, setTimeRange] = useState<TimeRange>('7D');
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentPrice, setCurrentPrice] = useState<number | null>(null);
+  const { getTrades, trades: allTrades } = useTradesStore();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const generateProbabilityChart = () => {
       setLoading(true);
       
-      const daysMap: Record<TimeRange, number> = {
-        '24H': 1,
-        '7D': 7,
-        '30D': 30,
-        'ALL': 365,
-      };
-      
-      const days = daysMap[timeRange];
-      
       try {
-        const candles = await OracleService.getCandles(
-          market.source.provider,
-          {
-            pairAddress: market.source.pairAddress,
-            baseId: market.source.baseId,
-            days,
-          }
-        );
+        const trades = getTrades(market.id);
         
-        if (candles.length > 0) {
-          const data = candles.map(c => ({
-            time: c.time * 1000,
-            price: c.close,
-          }));
-          setChartData(data);
-          setCurrentPrice(data[data.length - 1]?.price || null);
+        if (trades.length === 0) {
+          // Initial state - equal probability
+          const now = Date.now();
+          setChartData([
+            { time: now - 7 * 24 * 60 * 60 * 1000, yesProb: 0.5, noProb: 0.5 },
+            { time: now, yesProb: 0.5, noProb: 0.5 }
+          ]);
+          setLoading(false);
+          return;
         }
+
+        // Calculate cumulative stakes over time
+        let yesStake = 0;
+        let noStake = 0;
+        const EPSILON = 100;
+        
+        const dataPoints: ChartDataPoint[] = [];
+        
+        // Add initial point
+        const firstTradeTime = new Date(trades[trades.length - 1].ts).getTime();
+        dataPoints.push({
+          time: firstTradeTime - 1000,
+          yesProb: 0.5,
+          noProb: 0.5
+        });
+
+        // Process trades in chronological order
+        for (let i = trades.length - 1; i >= 0; i--) {
+          const trade = trades[i];
+          
+          if (trade.side === 'YES') {
+            yesStake += trade.amountPts;
+          } else {
+            noStake += trade.amountPts;
+          }
+          
+          const total = yesStake + noStake + 2 * EPSILON;
+          const yesProb = (EPSILON + yesStake) / total;
+          const noProb = (EPSILON + noStake) / total;
+          
+          dataPoints.push({
+            time: new Date(trade.ts).getTime(),
+            yesProb,
+            noProb
+          });
+        }
+
+        // Add current point
+        dataPoints.push({
+          time: Date.now(),
+          yesProb: dataPoints[dataPoints.length - 1].yesProb,
+          noProb: dataPoints[dataPoints.length - 1].noProb
+        });
+        
+        setChartData(dataPoints);
       } catch (error) {
-        console.error('Failed to fetch chart data:', error);
+        console.error('Failed to generate probability chart:', error);
       } finally {
         setLoading(false);
       }
     };
     
-    fetchData();
-  }, [timeRange, market]);
+    generateProbabilityChart();
+  }, [timeRange, market, getTrades, allTrades]);
 
-  const maxPrice = Math.max(...chartData.map(d => d.price));
-  const minPrice = Math.min(...chartData.map(d => d.price));
-  const priceRange = maxPrice - minPrice || 1;
+  // Probability range is always 0-1
+  const maxProb = 1;
+  const minProb = 0;
 
   return (
     <Card className="glass-card border-border/50 p-6 space-y-4">
@@ -121,7 +154,7 @@ export const PriceChart = ({ market }: PriceChartProps) => {
               <path
                 d={chartData.map((d, i) => {
                   const x = (i / (chartData.length - 1)) * 800;
-                  const y = 320 - ((d.price - minPrice) / priceRange) * 200 - 60;
+                  const y = 320 - (d.yesProb * 320);
                   return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
                 }).join(' ')}
                 fill="none"
@@ -133,7 +166,7 @@ export const PriceChart = ({ market }: PriceChartProps) => {
               <path
                 d={chartData.map((d, i) => {
                   const x = (i / (chartData.length - 1)) * 800;
-                  const y = 320 - (320 - ((d.price - minPrice) / priceRange) * 200 - 60);
+                  const y = 320 - (d.noProb * 320);
                   return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
                 }).join(' ')}
                 fill="none"
