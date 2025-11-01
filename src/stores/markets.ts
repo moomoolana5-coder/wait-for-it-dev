@@ -3,6 +3,8 @@ import { Market } from '@/types/market';
 import { persist } from '@/lib/persist';
 import { generateSeedMarkets } from '@/lib/seed';
 
+const MARKETS_VERSION = 2; // Increment to force refresh
+
 type MarketsStore = {
   markets: Market[];
   initialized: boolean;
@@ -19,6 +21,15 @@ export const useMarketsStore = create<MarketsStore>((set, get) => ({
   initialized: false,
 
   init: () => {
+    const storedVersion = localStorage.getItem('pm_markets_version');
+    const currentVersion = MARKETS_VERSION.toString();
+    
+    // Force refresh if version changed
+    if (storedVersion !== currentVersion) {
+      localStorage.removeItem('pm_markets');
+      localStorage.setItem('pm_markets_version', currentVersion);
+    }
+    
     const existing = persist.getMarkets();
     
     if (existing.length === 0) {
