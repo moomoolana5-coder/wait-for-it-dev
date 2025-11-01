@@ -247,8 +247,8 @@ export const TradeBox = ({ market, defaultSide }: TradeBoxProps) => {
         className={cn(
           'w-full gap-2 font-semibold',
           isBullish
-            ? 'bg-primary hover:bg-primary/90 glow-yes'
-            : 'bg-secondary hover:bg-secondary/90 glow-no'
+            ? 'bg-primary text-primary-foreground hover:bg-primary/90 glow-yes'
+            : 'bg-destructive text-destructive-foreground hover:bg-destructive/90 glow-no'
         )}
       >
         {isTrading ? (
