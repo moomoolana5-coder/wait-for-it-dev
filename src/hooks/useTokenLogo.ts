@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { dexFetch } from '@/lib/dex';
 
 interface TokenLogoResult {
   logoUrl: string | null;
@@ -20,7 +21,7 @@ export const useTokenLogo = (
       try {
         if (provider === 'DEXSCREENER' && options.tokenAddress) {
           // Use token address endpoint
-          const response = await fetch(
+          const response = await dexFetch(
             `https://api.dexscreener.com/latest/dex/tokens/${options.tokenAddress}`
           );
           const data = await response.json();
@@ -37,7 +38,7 @@ export const useTokenLogo = (
           }
         } else if (provider === 'DEXSCREENER' && options.pairAddress) {
           // Fallback to pair address
-          const response = await fetch(
+          const response = await dexFetch(
             `https://api.dexscreener.com/latest/dex/pairs/pulsechain/${options.pairAddress}`
           );
           const data = await response.json();

@@ -18,6 +18,17 @@ export const HeroCarousel = ({ markets }: HeroCarouselProps) => {
   const [isPaused, setIsPaused] = useState(false);
 
   const featuredMarkets = markets.slice(0, 5);
+  const currentMarket = featuredMarkets[currentIndex];
+
+  // CRITICAL: Call all hooks BEFORE any conditional returns
+  const { data: tokenLogo } = useTokenLogo(
+    currentMarket?.source?.provider || 'DEXSCREENER',
+    {
+      tokenAddress: currentMarket?.source?.tokenAddress,
+      pairAddress: currentMarket?.source?.pairAddress,
+      baseId: currentMarket?.source?.baseId,
+    }
+  );
 
   useEffect(() => {
     if (isPaused || featuredMarkets.length <= 1) return;
@@ -43,20 +54,14 @@ export const HeroCarousel = ({ markets }: HeroCarouselProps) => {
     setCurrentIndex((prev) => (prev + 1) % featuredMarkets.length);
   };
 
+  // Now safe to return early after all hooks are called
   if (featuredMarkets.length === 0) return null;
 
-  const currentMarket = featuredMarkets[currentIndex];
   const yesStake = currentMarket.yesStake || 0;
   const noStake = currentMarket.noStake || 0;
   const totalStake = yesStake + noStake;
   const yesPercent = totalStake > 0 ? (yesStake / totalStake) * 100 : 50;
   const noPercent = totalStake > 0 ? (noStake / totalStake) * 100 : 50;
-
-  const { data: tokenLogo } = useTokenLogo(currentMarket.source.provider, {
-    tokenAddress: currentMarket.source.tokenAddress,
-    pairAddress: currentMarket.source.pairAddress,
-    baseId: currentMarket.source.baseId,
-  });
 
   return (
     <div 
