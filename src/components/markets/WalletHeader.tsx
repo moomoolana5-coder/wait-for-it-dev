@@ -1,15 +1,19 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useWalletDbStore } from '@/stores/walletDb';
+import { useWalletBetaStore } from '@/stores/walletBeta';
+import { useBetaTest } from '@/hooks/useBetaTest';
 import { formatPoints, formatUSD } from '@/lib/format';
 import { Wallet, Droplet, TrendingUp, TrendingDown } from 'lucide-react';
 import { toast } from 'sonner';
 
 export const WalletHeader = () => {
-  const { wallet, claimFaucet, canClaimFaucet, getTimeUntilNextClaim } = useWalletDbStore();
+  const { user } = useBetaTest();
+  const { wallet, claimFaucet, canClaimFaucet, getTimeUntilNextClaim } = useWalletBetaStore();
 
   const handleClaimFaucet = async () => {
-    const success = await claimFaucet();
+    if (!user?.id) return;
+    
+    const success = await claimFaucet(user.id);
     if (success) {
       toast.success('10,000 points claimed!');
     } else {

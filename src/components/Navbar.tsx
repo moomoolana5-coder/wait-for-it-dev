@@ -1,4 +1,4 @@
-import { Wallet, Menu, Shield, LogOut, LogIn } from "lucide-react";
+import { Wallet, Menu, Shield, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { Link, useLocation } from "react-router-dom";
@@ -7,7 +7,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import TokenSearch from "./TokenSearch";
 import { useWalletAdmin } from "@/hooks/useWalletAdmin";
-import { useAuth } from "@/hooks/useAuth";
+import { useBetaTest } from "@/hooks/useBetaTest";
 
 const Navbar = () => {
   const location = useLocation();
@@ -16,7 +16,7 @@ const Navbar = () => {
   const { disconnect } = useDisconnect();
   const [isOpen, setIsOpen] = useState(false);
   const { isAdmin } = useWalletAdmin();
-  const { user, signOut } = useAuth();
+  const { user: betaUser, signOut } = useBetaTest();
   const isGigaMarketsRoute = location.pathname === '/giga-markets' || location.pathname.startsWith('/market/');
 
   const handleConnect = () => {
@@ -66,22 +66,27 @@ const Navbar = () => {
               Advertise ✨
             </a>
             
-            {/* Show Auth button for Giga Markets, otherwise show Web3 Wallet */}
+            {/* Show Beta Test button for Giga Markets, otherwise show Web3 Wallet */}
             {isGigaMarketsRoute ? (
-              user ? (
-                <Button 
-                  onClick={() => signOut()}
-                  variant="outline"
-                  className="border-primary/50"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
-                </Button>
+              betaUser ? (
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <p className="text-xs text-muted-foreground">Beta Tester</p>
+                    <p className="text-sm font-semibold">{betaUser.displayName}</p>
+                  </div>
+                  <Button 
+                    onClick={() => signOut()}
+                    variant="outline"
+                    size="sm"
+                    className="border-primary/50"
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </Button>
+                </div>
               ) : (
                 <Link to="/auth">
                   <Button className="bg-gradient-primary hover:opacity-90">
-                    <LogIn className="h-4 w-4 mr-2" />
-                    Sign In
+                    Join Beta Test
                   </Button>
                 </Link>
               )

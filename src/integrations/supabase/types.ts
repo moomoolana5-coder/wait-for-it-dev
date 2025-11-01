@@ -316,32 +316,35 @@ export type Database = {
       wallets: {
         Row: {
           created_at: string
+          display_name: string | null
           id: string
           last_faucet_claim: string | null
           pnl_realized: number
           points: number
           updated_at: string
-          user_id: string
+          user_id: string | null
           wallet_address: string | null
         }
         Insert: {
           created_at?: string
+          display_name?: string | null
           id?: string
           last_faucet_claim?: string | null
           pnl_realized?: number
           points?: number
           updated_at?: string
-          user_id: string
+          user_id?: string | null
           wallet_address?: string | null
         }
         Update: {
           created_at?: string
+          display_name?: string | null
           id?: string
           last_faucet_claim?: string | null
           pnl_realized?: number
           points?: number
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
           wallet_address?: string | null
         }
         Relationships: []
