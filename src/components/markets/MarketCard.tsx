@@ -91,10 +91,9 @@ export const MarketCard = ({ market }: MarketCardProps) => {
         {/* Outcome Buttons */}
         <div className="grid grid-cols-2 gap-2">
           <Button
-            variant="outline"
             className={cn(
-              "h-auto py-3 font-semibold border-2 hover:scale-105 transition-transform",
-              "bg-primary/10 border-primary/30 text-primary hover:bg-primary/20"
+              "h-auto py-3 font-semibold hover:scale-105 transition-transform",
+              "bg-green-600 hover:bg-green-700 text-white"
             )}
             onClick={(e) => {
               e.stopPropagation();
@@ -104,10 +103,9 @@ export const MarketCard = ({ market }: MarketCardProps) => {
             {outcome1?.label || 'YES'}
           </Button>
           <Button
-            variant="outline"
             className={cn(
-              "h-auto py-3 font-semibold border-2 hover:scale-105 transition-transform",
-              "bg-secondary/10 border-secondary/30 text-secondary hover:bg-secondary/20"
+              "h-auto py-3 font-semibold hover:scale-105 transition-transform",
+              "bg-red-600 hover:bg-red-700 text-white"
             )}
             onClick={(e) => {
               e.stopPropagation();
