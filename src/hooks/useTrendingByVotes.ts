@@ -79,11 +79,36 @@ export const useTrendingByVotes = () => {
         const voteCount = voteData.total_votes;
 
         try {
+          // Try primary endpoint first
           const response = await fetch(`${DEXSCREENER_API}/tokens/${address}`);
           if (!response.ok) {
-            console.warn(`Dexscreener fetch failed for ${address}: HTTP ${response.status}`);
-            return null;
+            // Try search endpoint as fallback
+            const searchResponse = await fetch(`${DEXSCREENER_API}/search?q=${address}`);
+            if (!searchResponse.ok) {
+              return null;
+            }
+            const searchData = await searchResponse.json();
+            const pulsechainPairs = (searchData.pairs || []).filter(
+              (pair: DexPair) => 
+                pair.chainId === 'pulsechain' &&
+                pair.dexId === 'pulsex' &&
+                pair.baseToken.address.toLowerCase() === address
+            );
+            
+            if (pulsechainPairs.length === 0) {
+              return null;
+            }
+            
+            const bestPair = pulsechainPairs.sort((a: DexPair, b: DexPair) => 
+              (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0)
+            )[0];
+            
+            return {
+              ...bestPair,
+              voteCount: voteCount
+            };
           }
+          
           const data = await response.json();
           
           // Dapatkan pasangan terbaik (likuiditas tertinggi di PulseChain)
@@ -96,7 +121,6 @@ export const useTrendingByVotes = () => {
           );
           
           if (pulsechainPairs.length === 0) {
-            console.warn(`No valid PulseChain pairs found for ${address}`);
             return null;
           }
           
@@ -104,15 +128,12 @@ export const useTrendingByVotes = () => {
             (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0)
           )[0];
           
-          console.log(`Found token: ${bestPair.baseToken.symbol} for address ${address} with ${voteCount} votes`);
-          
-          // Lampirkan vote count yang sudah dijamin benar
           return {
             ...bestPair,
             voteCount: voteCount
           };
         } catch (error) {
-          console.error(`Error fetching token ${address}:`, error);
+          // Silently handle errors to avoid console clutter
           return null;
         }
       });
