@@ -29,10 +29,11 @@ import Footer from '@/components/Footer';
 
 export default function Earn() {
   const navigate = useNavigate();
-  const { user } = useBetaTest();
-  const { wallet, addPoints, claimFaucet } = useWalletBetaStore();
+  const { user, loading: authLoading } = useBetaTest();
+  const { wallet, addPoints, claimFaucet, init: initWallet } = useWalletBetaStore();
   const { 
     earnings, 
+    initialized: earningsInit,
     getTotalUnclaimed, 
     getTotalEarned,
     claimEarnings,
@@ -42,26 +43,38 @@ export default function Earn() {
   const { 
     referralCode, 
     stats,
+    initialized: referralsInit,
     init: initReferrals,
     generateReferralCode,
     getReferralStats
   } = useReferralsStore();
-  const { positions, init: initPositions } = usePositionsStore();
+  const { positions, initialized: positionsInit, init: initPositions } = usePositionsStore();
 
   const [copied, setCopied] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
   const [isClaimingEarnings, setIsClaimingEarnings] = useState(false);
 
+  // Check authentication
   useEffect(() => {
-    if (!user) {
+    if (!authLoading && !user) {
       navigate('/auth');
-      return;
     }
+  }, [user, authLoading, navigate]);
 
+  // Initialize stores when user is available
+  useEffect(() => {
     if (user?.id) {
-      initEarnings(user.id);
-      initReferrals(user.id);
-      initPositions(user.id);
+      initWallet(user.id);
+      
+      if (!earningsInit) {
+        initEarnings(user.id);
+      }
+      if (!referralsInit) {
+        initReferrals(user.id);
+      }
+      if (!positionsInit) {
+        initPositions(user.id);
+      }
       
       const unsubEarnings = subscribeToEarnings(user.id);
       
@@ -69,7 +82,7 @@ export default function Earn() {
         unsubEarnings();
       };
     }
-  }, [user, navigate]);
+  }, [user, earningsInit, referralsInit, positionsInit]);
 
   const handleClaimFaucet = async () => {
     if (!user) return;
@@ -135,6 +148,21 @@ export default function Earn() {
   const totalUnclaimed = getTotalUnclaimed();
   const totalEarned = getTotalEarned();
   const activePositions = positions.filter(p => !p.claimed && p.shares > 0);
+
+  // Show loading state
+  if (authLoading || !user) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="container mx-auto px-4 py-8 pt-24">
+          <div className="text-center py-20">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
+            <p className="mt-4 text-muted-foreground">Loading...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
