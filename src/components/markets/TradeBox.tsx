@@ -27,7 +27,7 @@ export const TradeBox = ({ market, defaultSide }: TradeBoxProps) => {
   const { user } = useBetaTest();
   const { wallet, subtractPoints } = useWalletBetaStore();
   const { updateMarket } = useMarketsStore();
-  const { addTrade } = useTradesStore();
+  const { addTrade, getTrades } = useTradesStore();
 
   const [side, setSide] = useState<OutcomeKey>(
     defaultSide || market.outcomes[0].key
@@ -107,9 +107,14 @@ export const TradeBox = ({ market, defaultSide }: TradeBoxProps) => {
   const sideLabel = market.outcomes.find((o) => o.key === side)?.label || side;
   const isBullish = side === 'YES' || side === 'A';
 
-  // Calculate probabilities based on real trade data
-  const yesStake = market.yesStake || 0;
-  const noStake = market.noStake || 0;
+  // Calculate probabilities from actual trades (ignore seeded stakes)
+  const marketTrades = getTrades(market.id);
+  const yesStake = market.type === 'YES_NO'
+    ? marketTrades.filter((t) => t.side === 'YES').reduce((s, t) => s + (t.amountPts || 0), 0)
+    : marketTrades.filter((t) => t.side === 'A').reduce((s, t) => s + (t.amountPts || 0), 0);
+  const noStake = market.type === 'YES_NO'
+    ? marketTrades.filter((t) => t.side === 'NO').reduce((s, t) => s + (t.amountPts || 0), 0)
+    : marketTrades.filter((t) => t.side === 'B').reduce((s, t) => s + (t.amountPts || 0), 0);
   const totalStake = yesStake + noStake;
   const yesPercent = totalStake > 0 ? (yesStake / totalStake) * 100 : 0;
   const noPercent = totalStake > 0 ? (noStake / totalStake) * 100 : 0;

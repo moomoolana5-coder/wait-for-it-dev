@@ -73,9 +73,14 @@ const MarketDetail = () => {
     }
   };
 
-  // Calculate outcome probabilities based on real trade data
-  const yesStake = market.yesStake || 0;
-  const noStake = market.noStake || 0;
+  // Calculate outcome probabilities based on actual trades
+  const marketTrades = tradesStore.getTrades(market.id);
+  const yesStake = market.type === 'YES_NO'
+    ? marketTrades.filter((t) => t.side === 'YES').reduce((sum, t) => sum + (t.amountPts || 0), 0)
+    : marketTrades.filter((t) => t.side === 'A').reduce((sum, t) => sum + (t.amountPts || 0), 0);
+  const noStake = market.type === 'YES_NO'
+    ? marketTrades.filter((t) => t.side === 'NO').reduce((sum, t) => sum + (t.amountPts || 0), 0)
+    : marketTrades.filter((t) => t.side === 'B').reduce((sum, t) => sum + (t.amountPts || 0), 0);
   const totalStake = yesStake + noStake;
   const yesPercent = totalStake > 0 ? (yesStake / totalStake) * 100 : 0;
   const noPercent = totalStake > 0 ? (noStake / totalStake) * 100 : 0;
