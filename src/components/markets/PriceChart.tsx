@@ -162,7 +162,7 @@ export const PriceChart = ({ market }: PriceChartProps) => {
                 strokeWidth="2.5"
               />
               
-              {/* NO Line (Secondary - Pink) */}
+              {/* NO Line (Red) */}
               <path
                 d={chartData.map((d, i) => {
                   const x = (i / (chartData.length - 1)) * 800;
@@ -170,7 +170,7 @@ export const PriceChart = ({ market }: PriceChartProps) => {
                   return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
                 }).join(' ')}
                 fill="none"
-                stroke="hsl(var(--secondary))"
+                stroke="rgb(220, 38, 38)"
                 strokeWidth="2.5"
               />
             </svg>

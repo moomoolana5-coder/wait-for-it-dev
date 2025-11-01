@@ -170,7 +170,7 @@ export const TradeBox = ({ market, defaultSide }: TradeBoxProps) => {
                 className={cn(
                   'h-14 font-bold text-base transition-all border-2',
                   isSelected && isYes && 'bg-primary text-primary-foreground border-primary shadow-[0_0_20px_hsl(var(--primary)/0.3)]',
-                  isSelected && !isYes && 'bg-secondary text-secondary-foreground border-secondary shadow-[0_0_20px_hsl(var(--secondary)/0.3)]',
+                  isSelected && !isYes && 'bg-red-600 text-white border-red-600 shadow-[0_0_20px_rgba(220,38,38,0.3)]',
                   !isSelected && 'border-border/50 hover:border-border bg-card/50 hover:bg-card'
                 )}
               >
