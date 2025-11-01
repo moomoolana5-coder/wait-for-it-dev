@@ -43,6 +43,7 @@ export type Trade = {
   id: string;
   marketId: string;
   wallet: string;
+  userId?: string | null;
   side: OutcomeKey;
   amountPts: number;
   price: number;

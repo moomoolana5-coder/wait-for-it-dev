@@ -14,6 +14,7 @@ type MarketsStore = {
   updateMarket: (id: string, updates: Partial<Market>) => Promise<void>;
   deleteMarket: (id: string) => Promise<void>;
   incrementTrending: (id: string) => void;
+  subscribeToMarkets: () => () => void;
 };
 
 export const useMarketsStore = create<MarketsStore>((set, get) => ({
@@ -219,4 +220,86 @@ export const useMarketsStore = create<MarketsStore>((set, get) => ({
         if (error) console.error('Error updating trending score:', error);
       });
   },
+
+  subscribeToMarkets: () => {
+    const channel = supabase
+      .channel('markets-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'markets'
+        },
+        (payload) => {
+          const updatedMarket: Market = {
+            id: payload.new.id,
+            title: payload.new.title,
+            cover: payload.new.cover,
+            category: payload.new.category,
+            type: payload.new.type,
+            outcomes: payload.new.outcomes,
+            resolutionType: payload.new.resolution_type,
+            source: payload.new.source,
+            createdAt: payload.new.created_at,
+            createdBy: payload.new.created_by,
+            closesAt: payload.new.closes_at,
+            resolvesAt: payload.new.resolves_at,
+            status: payload.new.status,
+            poolUSD: parseFloat(payload.new.pool_usd || 0),
+            yesStake: parseFloat(payload.new.yes_stake || 0),
+            noStake: parseFloat(payload.new.no_stake || 0),
+            aStake: parseFloat(payload.new.a_stake || 0),
+            bStake: parseFloat(payload.new.b_stake || 0),
+            trendingScore: payload.new.trending_score,
+            resolution: payload.new.result,
+          };
+          
+          const markets = get().markets.map(m => 
+            m.id === updatedMarket.id ? updatedMarket : m
+          );
+          set({ markets });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'markets'
+        },
+        (payload) => {
+          const newMarket: Market = {
+            id: payload.new.id,
+            title: payload.new.title,
+            cover: payload.new.cover,
+            category: payload.new.category,
+            type: payload.new.type,
+            outcomes: payload.new.outcomes,
+            resolutionType: payload.new.resolution_type,
+            source: payload.new.source,
+            createdAt: payload.new.created_at,
+            createdBy: payload.new.created_by,
+            closesAt: payload.new.closes_at,
+            resolvesAt: payload.new.resolves_at,
+            status: payload.new.status,
+            poolUSD: parseFloat(payload.new.pool_usd || 0),
+            yesStake: parseFloat(payload.new.yes_stake || 0),
+            noStake: parseFloat(payload.new.no_stake || 0),
+            aStake: parseFloat(payload.new.a_stake || 0),
+            bStake: parseFloat(payload.new.b_stake || 0),
+            trendingScore: payload.new.trending_score,
+            resolution: payload.new.result,
+          };
+          
+          const markets = [...get().markets, newMarket];
+          set({ markets });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }
 }));

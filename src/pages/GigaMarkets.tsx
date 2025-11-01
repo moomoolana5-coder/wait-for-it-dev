@@ -17,7 +17,7 @@ import Navbar from '@/components/Navbar';
 const GigaMarkets = () => {
   const navigate = useNavigate();
   const { user, loading: betaLoading } = useBetaTest();
-  const { markets, initialized, init } = useMarketsStore();
+  const { markets, initialized, init, subscribeToMarkets } = useMarketsStore();
   const walletStore = useWalletBetaStore();
   const tradesStore = useTradesStore();
 
@@ -33,11 +33,21 @@ const GigaMarkets = () => {
       return;
     }
 
+    // Initialize stores
     init();
     if (user.id) {
       walletStore.init(user.id);
     }
     tradesStore.init();
+
+    // Subscribe to realtime updates
+    const unsubscribeTrades = tradesStore.subscribeToTrades();
+    const unsubscribeMarkets = subscribeToMarkets();
+
+    return () => {
+      unsubscribeTrades();
+      unsubscribeMarkets();
+    };
   }, [user, betaLoading, navigate]);
 
   const filteredMarkets = markets
@@ -65,6 +75,18 @@ const GigaMarkets = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6">
         <div className="max-w-7xl mx-auto space-y-6">
+          {/* Beta Banner */}
+          <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 rounded-lg p-4">
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0">
+                <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
+              </div>
+              <p className="text-sm font-medium">
+                <span className="text-primary font-bold">LIVE:</span> Real-time trading with actual points • Odds update instantly • All data synced to database
+              </p>
+            </div>
+          </div>
+
           {/* Hero Carousel */}
           <HeroCarousel markets={markets.slice(0, 5)} />
 

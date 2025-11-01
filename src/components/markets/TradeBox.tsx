@@ -10,10 +10,11 @@ import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { calculateTrade } from '@/lib/amm';
 import { formatPoints, formatPercent, formatUSD, formatDate } from '@/lib/format';
-import { useWalletStore } from '@/stores/wallet';
+import { useWalletBetaStore } from '@/stores/walletBeta';
 import { useMarketsStore } from '@/stores/markets';
 import { useTradesStore } from '@/stores/trades';
-import { toast } from '@/hooks/use-toast';
+import { useBetaTest } from '@/hooks/useBetaTest';
+import { toast } from 'sonner';
 import { TrendingUp, TrendingDown, CheckCircle2, Circle, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -23,7 +24,8 @@ type TradeBoxProps = {
 };
 
 export const TradeBox = ({ market, defaultSide }: TradeBoxProps) => {
-  const { wallet, subtractPoints } = useWalletStore();
+  const { user } = useBetaTest();
+  const { wallet, subtractPoints } = useWalletBetaStore();
   const { updateMarket } = useMarketsStore();
   const { addTrade } = useTradesStore();
 
@@ -32,6 +34,7 @@ export const TradeBox = ({ market, defaultSide }: TradeBoxProps) => {
   );
   const [amount, setAmount] = useState('');
   const [isTimelineOpen, setIsTimelineOpen] = useState(true);
+  const [isTrading, setIsTrading] = useState(false);
 
   useEffect(() => {
     if (defaultSide) setSide(defaultSide);
@@ -39,55 +42,66 @@ export const TradeBox = ({ market, defaultSide }: TradeBoxProps) => {
 
   const amountNum = parseFloat(amount) || 0;
   const isMarketClosed = new Date() > new Date(market.closesAt);
-  const canTrade = amountNum > 0 && amountNum <= wallet.points && market.status === 'OPEN' && !isMarketClosed;
+  const canTrade = amountNum > 0 && amountNum <= wallet.points && market.status === 'OPEN' && !isMarketClosed && !isTrading;
 
   const calc = calculateTrade(market, side, amountNum);
 
-  const handleTrade = () => {
-    if (!canTrade) return;
+  const handleTrade = async () => {
+    if (!canTrade || !user) return;
 
-    // Update wallet
-    subtractPoints(amountNum);
+    setIsTrading(true);
+    
+    try {
+      // 1. Deduct points from wallet
+      await subtractPoints(user.id, amountNum);
 
-    // Update market stakes
-    const updates: Partial<Market> = {
-      poolUSD: market.poolUSD + amountNum,
-    };
+      // 2. Update market stakes
+      const updates: Partial<Market> = {
+        poolUSD: market.poolUSD + amountNum,
+      };
 
-    if (market.type === 'YES_NO') {
-      if (side === 'YES') {
-        updates.yesStake = (market.yesStake || 0) + amountNum;
+      if (market.type === 'YES_NO') {
+        if (side === 'YES') {
+          updates.yesStake = (market.yesStake || 0) + amountNum;
+        } else {
+          updates.noStake = (market.noStake || 0) + amountNum;
+        }
       } else {
-        updates.noStake = (market.noStake || 0) + amountNum;
+        if (side === 'A') {
+          updates.aStake = (market.aStake || 0) + amountNum;
+        } else {
+          updates.bStake = (market.bStake || 0) + amountNum;
+        }
       }
-    } else {
-      if (side === 'A') {
-        updates.aStake = (market.aStake || 0) + amountNum;
-      } else {
-        updates.bStake = (market.bStake || 0) + amountNum;
-      }
+
+      await updateMarket(market.id, updates);
+
+      // 3. Add trade to database
+      await addTrade({
+        id: `${market.id}-${Date.now()}-${Math.random().toString(36).substring(7)}`,
+        marketId: market.id,
+        wallet: user.id,
+        userId: null,
+        side,
+        amountPts: amountNum,
+        price: calc.price,
+        shares: calc.shares,
+        ts: new Date().toISOString(),
+      });
+
+      toast.success(`Trade executed! Bought ${calc.shares.toFixed(2)} shares of ${side}`, {
+        description: `Spent ${formatPoints(amountNum)} points`
+      });
+
+      setAmount('');
+    } catch (error: any) {
+      console.error('Trade error:', error);
+      toast.error('Trade failed', {
+        description: error.message || 'Please try again'
+      });
+    } finally {
+      setIsTrading(false);
     }
-
-    updateMarket(market.id, updates);
-
-    // Add trade
-    addTrade({
-      id: `${market.id}-${Date.now()}-${Math.random()}`,
-      marketId: market.id,
-      wallet: wallet.address,
-      side,
-      amountPts: amountNum,
-      price: calc.price,
-      shares: calc.shares,
-      ts: new Date().toISOString(),
-    });
-
-    toast({
-      title: 'Trade executed',
-      description: `Bought ${calc.shares.toFixed(2)} shares of ${side}`,
-    });
-
-    setAmount('');
   };
 
   const sideLabel = market.outcomes.find((o) => o.key === side)?.label || side;
@@ -234,12 +248,18 @@ export const TradeBox = ({ market, defaultSide }: TradeBoxProps) => {
             : 'bg-secondary hover:bg-secondary/90 glow-no'
         )}
       >
-        {isBullish ? (
-          <TrendingUp className="h-5 w-5" />
+        {isTrading ? (
+          <>Loading...</>
         ) : (
-          <TrendingDown className="h-5 w-5" />
+          <>
+            {isBullish ? (
+              <TrendingUp className="h-5 w-5" />
+            ) : (
+              <TrendingDown className="h-5 w-5" />
+            )}
+            Buy {sideLabel}
+          </>
         )}
-        Buy {sideLabel}
       </Button>
 
       {wallet.points === 0 && (
