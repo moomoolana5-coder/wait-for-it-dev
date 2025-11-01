@@ -9,6 +9,8 @@ import { HoldersPanel } from '@/components/markets/HoldersPanel';
 import { TimelinePanel } from '@/components/markets/TimelinePanel';
 import { PriceChart } from '@/components/markets/PriceChart';
 import { useMarketsStore } from '@/stores/markets';
+import { useWalletStore } from '@/stores/wallet';
+import { useTradesStore } from '@/stores/trades';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -20,11 +22,15 @@ const MarketDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { getMarket, incrementTrending, init, initialized } = useMarketsStore();
+  const walletStore = useWalletStore();
+  const tradesStore = useTradesStore();
   const [activeTab, setActiveTab] = useState('activity');
 
   useEffect(() => {
     if (!initialized) init();
-  }, [initialized, init]);
+    if (!walletStore.wallet.address) walletStore.init();
+    if (!tradesStore.initialized) tradesStore.init();
+  }, [initialized, init, walletStore, tradesStore]);
 
   useEffect(() => {
     if (id) incrementTrending(id);

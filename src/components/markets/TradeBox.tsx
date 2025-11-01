@@ -208,6 +208,12 @@ export const TradeBox = ({ market, defaultSide }: TradeBoxProps) => {
         Buy {sideLabel}
       </Button>
 
+      {wallet.points === 0 && (
+        <p className="text-center text-sm text-muted-foreground">
+          You need points to trade. <a href="/earn" className="text-primary hover:underline">Claim 10k points</a> from the faucet!
+        </p>
+      )}
+
       {market.status !== 'OPEN' && (
         <p className="text-center text-sm text-muted-foreground">
           Market is {market.status.toLowerCase()}
