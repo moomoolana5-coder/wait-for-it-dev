@@ -35,7 +35,8 @@ export const TradeBox = ({ market, defaultSide }: TradeBoxProps) => {
   }, [defaultSide]);
 
   const amountNum = parseFloat(amount) || 0;
-  const canTrade = amountNum > 0 && amountNum <= wallet.points && market.status === 'OPEN';
+  const isMarketClosed = new Date() > new Date(market.closesAt);
+  const canTrade = amountNum > 0 && amountNum <= wallet.points && market.status === 'OPEN' && !isMarketClosed;
 
   const calc = calculateTrade(market, side, amountNum);
 
@@ -211,6 +212,12 @@ export const TradeBox = ({ market, defaultSide }: TradeBoxProps) => {
       {wallet.points === 0 && (
         <p className="text-center text-sm text-muted-foreground">
           You need points to trade. <a href="/earn" className="text-primary hover:underline">Claim 10k points</a> from the faucet!
+        </p>
+      )}
+
+      {isMarketClosed && market.status === 'OPEN' && (
+        <p className="text-center text-sm text-muted-foreground">
+          Market has closed for trading
         </p>
       )}
 

@@ -33,14 +33,22 @@ const AdminSettings = () => {
   const [uploadingCover, setUploadingCover] = useState(false);
   
   // Form state
+  const getDefaultDateTime = () => {
+    const now = new Date();
+    now.setMinutes(0);
+    now.setSeconds(0);
+    now.setMilliseconds(0);
+    return now.toISOString();
+  };
+
   const [formData, setFormData] = useState({
     title: '',
     cover: '',
     category: 'Crypto' as Category,
     threshold: 0,
     poolUSD: 10000,
-    closesAt: '',
-    resolvesAt: '',
+    closesAt: getDefaultDateTime(),
+    resolvesAt: getDefaultDateTime(),
     provider: 'DEXSCREENER' as 'DEXSCREENER' | 'COINGECKO',
     pairAddress: '',
     baseId: '',
@@ -87,8 +95,8 @@ const AdminSettings = () => {
       category: 'Crypto',
       threshold: 0,
       poolUSD: 10000,
-      closesAt: '',
-      resolvesAt: '',
+      closesAt: getDefaultDateTime(),
+      resolvesAt: getDefaultDateTime(),
       provider: 'DEXSCREENER',
       pairAddress: '',
       baseId: '',
