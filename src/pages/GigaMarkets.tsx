@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import { HeroCarousel } from '@/components/markets/HeroCarousel';
 import { MarketCard } from '@/components/markets/MarketCard';
-import { WalletHeader } from '@/components/markets/WalletHeader';
 import { useMarketsStore } from '@/stores/markets';
 import { useWalletStore } from '@/stores/wallet';
 import { useTradesStore } from '@/stores/trades';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, TrendingUp } from 'lucide-react';
-import { Category, MarketStatus } from '@/types/market';
+import { Search, TrendingUp, Volume2, Clock, Filter, Menu } from 'lucide-react';
+import { formatPoints } from '@/lib/format';
+import { cn } from '@/lib/utils';
 
 const GigaMarkets = () => {
   const { markets, initialized, init } = useMarketsStore();
@@ -18,9 +17,8 @@ const GigaMarkets = () => {
   const tradesStore = useTradesStore();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState<Category | 'All'>('All');
-  const [statusFilter, setStatusFilter] = useState<MarketStatus | 'All'>('All');
-  const [sortBy, setSortBy] = useState<'trending' | 'pool' | 'newest'>('trending');
+  const [activeFilter, setActiveFilter] = useState<'newest' | 'trending' | 'volume' | 'ending' | 'open'>('newest');
+  const [tokenFilter, setTokenFilter] = useState('all');
 
   useEffect(() => {
     if (!initialized) init();
@@ -31,95 +29,143 @@ const GigaMarkets = () => {
   const filteredMarkets = markets
     .filter((m) => {
       const matchesSearch = m.title.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = categoryFilter === 'All' || m.category === categoryFilter;
-      const matchesStatus = statusFilter === 'All' || m.status === statusFilter;
-      return matchesSearch && matchesCategory && matchesStatus;
+      return matchesSearch;
     })
     .sort((a, b) => {
-      if (sortBy === 'trending') return b.trendingScore - a.trendingScore;
-      if (sortBy === 'pool') return b.poolUSD - a.poolUSD;
+      if (activeFilter === 'trending') return b.trendingScore - a.trendingScore;
+      if (activeFilter === 'volume') return b.poolUSD - a.poolUSD;
+      if (activeFilter === 'ending') {
+        return new Date(a.closesAt).getTime() - new Date(b.closesAt).getTime();
+      }
+      if (activeFilter === 'open') {
+        return a.status === 'OPEN' ? -1 : 1;
+      }
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 
-  const categories: (Category | 'All')[] = [
-    'All',
-    'Crypto',
-    'Sports',
-    'Politics',
-    'Economy',
-    'Gaming',
-    'Culture',
-    'Sentiment',
-  ];
-
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
-      
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto space-y-8">
-          {/* Hero Section */}
-          <div className="text-center space-y-4 py-8">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              Giga Markets
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Trade on predictions. Win when you're right. Powered by automated market makers.
-            </p>
-          </div>
-
-          {/* Wallet Info */}
-          <WalletHeader />
-
-          {/* Filters */}
-          <div className="glass-card border-border/50 p-6 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="relative md:col-span-2">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search markets..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-
-              <Select value={categoryFilter} onValueChange={(v) => setCategoryFilter(v as any)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      {cat}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="All">All Status</SelectItem>
-                  <SelectItem value="OPEN">Open</SelectItem>
-                  <SelectItem value="CLOSED">Closed</SelectItem>
-                  <SelectItem value="RESOLVED">Resolved</SelectItem>
-                </SelectContent>
-              </Select>
+      {/* Header */}
+      <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center justify-between gap-4">
+            {/* Search */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search Myriad"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-background/50 border-border/50"
+              />
             </div>
 
-            <Tabs value={sortBy} onValueChange={(v) => setSortBy(v as any)} className="w-full">
-              <TabsList className="grid w-full max-w-md grid-cols-3">
-                <TabsTrigger value="trending" className="gap-1">
-                  <TrendingUp className="h-4 w-4" />
-                  Trending
-                </TabsTrigger>
-                <TabsTrigger value="pool">Highest Pool</TabsTrigger>
-                <TabsTrigger value="newest">Newest</TabsTrigger>
-              </TabsList>
-            </Tabs>
+            {/* Wallet Info */}
+            <div className="flex items-center gap-4">
+              <div className="text-right">
+                <p className="text-xs text-muted-foreground">Limbo 🎲</p>
+                <p className="text-sm font-bold">12,5k pts</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-muted-foreground">Points</p>
+                <p className="text-sm font-bold">{formatPoints(walletStore.wallet.points)}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-muted-foreground">USDC</p>
+                <p className="text-sm font-bold">$0</p>
+              </div>
+              <Button size="sm" className="bg-primary hover:bg-primary/90">
+                + Deposit
+              </Button>
+              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-secondary" />
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-6">
+        <div className="max-w-7xl mx-auto space-y-6">
+          {/* Hero Carousel */}
+          <HeroCarousel markets={markets.slice(0, 5)} />
+
+          {/* Filters */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="relative flex-1 max-w-xs">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search markets"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-card/50 border-border/50"
+              />
+            </div>
+
+            <Button
+              variant={activeFilter === 'newest' ? 'default' : 'outline'}
+              onClick={() => setActiveFilter('newest')}
+              className={cn(
+                activeFilter === 'newest' && 'bg-primary text-primary-foreground'
+              )}
+            >
+              <Filter className="h-4 w-4 mr-2" />
+              Newest
+            </Button>
+
+            <Button
+              variant={activeFilter === 'trending' ? 'default' : 'outline'}
+              onClick={() => setActiveFilter('trending')}
+              className={cn(
+                activeFilter === 'trending' && 'bg-primary text-primary-foreground'
+              )}
+            >
+              <TrendingUp className="h-4 w-4 mr-2" />
+              Trending
+            </Button>
+
+            <Button
+              variant={activeFilter === 'volume' ? 'default' : 'outline'}
+              onClick={() => setActiveFilter('volume')}
+              className={cn(
+                activeFilter === 'volume' && 'bg-primary text-primary-foreground'
+              )}
+            >
+              <Volume2 className="h-4 w-4 mr-2" />
+              Volume
+            </Button>
+
+            <Button
+              variant={activeFilter === 'ending' ? 'default' : 'outline'}
+              onClick={() => setActiveFilter('ending')}
+              className={cn(
+                activeFilter === 'ending' && 'bg-primary text-primary-foreground'
+              )}
+            >
+              <Clock className="h-4 w-4 mr-2" />
+              Ending
+            </Button>
+
+            <Select value={activeFilter} onValueChange={(v) => setActiveFilter(v as any)}>
+              <SelectTrigger className="w-32">
+                <SelectValue placeholder="Open" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="open">Open</SelectItem>
+                <SelectItem value="closed">Closed</SelectItem>
+                <SelectItem value="all">All</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={tokenFilter} onValueChange={setTokenFilter}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="All Tokens" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Tokens</SelectItem>
+                <SelectItem value="crypto">Crypto</SelectItem>
+                <SelectItem value="stocks">Stocks</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Markets Grid */}
@@ -136,8 +182,6 @@ const GigaMarkets = () => {
           )}
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 };
