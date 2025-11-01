@@ -61,8 +61,8 @@ export const TradingActivity = ({ market }: TradingActivityProps) => {
                     <TrendingUp className="h-4 w-4 text-primary" />
                   </div>
                 ) : (
-                  <div className="h-8 w-8 rounded-full bg-secondary/10 flex items-center justify-center">
-                    <TrendingDown className="h-4 w-4 text-secondary" />
+                  <div className="h-8 w-8 rounded-full bg-destructive/10 flex items-center justify-center">
+                    <TrendingDown className="h-4 w-4 text-destructive" />
                   </div>
                 )}
                 
@@ -72,7 +72,7 @@ export const TradingActivity = ({ market }: TradingActivityProps) => {
                       {trade.wallet.slice(0, 6)}...{trade.wallet.slice(-4)}
                     </span>
                     <Badge 
-                      variant={isBullish ? 'default' : 'secondary'}
+                      variant={isBullish ? 'default' : 'destructive'}
                       className="text-xs"
                     >
                       {sideLabel}
