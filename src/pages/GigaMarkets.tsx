@@ -110,6 +110,7 @@ const GigaMarkets = () => {
               variant={activeFilter === 'newest' ? 'default' : 'outline'}
               onClick={() => setActiveFilter('newest')}
               className={cn(
+                'text-foreground',
                 activeFilter === 'newest' && 'bg-primary text-primary-foreground'
               )}
             >
@@ -121,6 +122,7 @@ const GigaMarkets = () => {
               variant={activeFilter === 'trending' ? 'default' : 'outline'}
               onClick={() => setActiveFilter('trending')}
               className={cn(
+                'text-foreground',
                 activeFilter === 'trending' && 'bg-primary text-primary-foreground'
               )}
             >
@@ -132,6 +134,7 @@ const GigaMarkets = () => {
               variant={activeFilter === 'volume' ? 'default' : 'outline'}
               onClick={() => setActiveFilter('volume')}
               className={cn(
+                'text-foreground',
                 activeFilter === 'volume' && 'bg-primary text-primary-foreground'
               )}
             >
@@ -143,6 +146,7 @@ const GigaMarkets = () => {
               variant={activeFilter === 'ending' ? 'default' : 'outline'}
               onClick={() => setActiveFilter('ending')}
               className={cn(
+                'text-foreground',
                 activeFilter === 'ending' && 'bg-primary text-primary-foreground'
               )}
             >
