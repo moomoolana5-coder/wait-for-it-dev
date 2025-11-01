@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { dexFetch } from '@/lib/dex';
 
 interface TokenInfo {
   imageUrl?: string;
@@ -60,7 +61,7 @@ export const useTopByPriceGain = () => {
       const pairs: DexPair[] = [];
       for (let i = 0; i < addressesLower.length; i += BATCH_SIZE) {
         const batch = addressesLower.slice(i, i + BATCH_SIZE);
-        const response = await fetch(`${DEXSCREENER_API}/tokens/${batch.join(',')}`);
+        const response = await dexFetch(`${DEXSCREENER_API}/tokens/${batch.join(',')}`);
         if (!response.ok) {
           console.warn(`useTopByPriceGain: batch ${i / BATCH_SIZE + 1} failed with status ${response.status}`);
           continue;
@@ -97,7 +98,7 @@ export const useTopByPriceGain = () => {
         await Promise.all(
           missing.map(async (addr) => {
             try {
-              const rs = await fetch(`${DEXSCREENER_API}/search?q=${addr}`);
+              const rs = await dexFetch(`${DEXSCREENER_API}/search?q=${addr}`);
               if (!rs.ok) return null;
               const ds = await rs.json();
               const found: DexPair[] = (ds.pairs || []).filter(

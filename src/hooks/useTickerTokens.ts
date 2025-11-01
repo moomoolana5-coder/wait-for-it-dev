@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { dexFetch } from '@/lib/dex';
 import { FEATURED_TOKENS } from '@/hooks/useDexScreener';
 
 interface TokenInfo {
@@ -67,7 +68,7 @@ export const useTickerTokens = (config: TickerConfig = {}) => {
         const slice = addresses.slice(i, i + BATCH);
         await Promise.all(slice.map(async (addr) => {
           try {
-            const r = await fetch(`${DEXSCREENER_API}/search?q=${addr}`);
+            const r = await dexFetch(`${DEXSCREENER_API}/search?q=${addr}`);
             if (!r.ok) return;
             const d = await r.json();
             const pairs: DexPair[] = (d.pairs || []).filter((p: DexPair) => p.chainId === 'pulsechain');
@@ -89,7 +90,7 @@ export const useTickerTokens = (config: TickerConfig = {}) => {
 
       // Get latest pairs from PulseChain to fill up to maxItems
       try {
-        const latestRes = await fetch(`${DEXSCREENER_API}/pairs/pulsechain`);
+        const latestRes = await dexFetch(`${DEXSCREENER_API}/pairs/pulsechain`);
         if (latestRes.ok) {
           const latestData = await latestRes.json();
           const latestPairs: DexPair[] = latestData.pairs || [];

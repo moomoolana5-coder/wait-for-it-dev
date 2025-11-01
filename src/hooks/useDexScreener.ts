@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { dexFetch } from '@/lib/dex';
 
 interface TokenInfo {
   imageUrl?: string;
@@ -115,8 +116,8 @@ export const usePulseChainTokens = () => {
     queryFn: async () => {
       const addressesLower = FEATURED_TOKENS.map((a) => a.toLowerCase());
       const wanted = new Set(addressesLower);
-      const BATCH_SIZE = 20; // Process 20 tokens at a time
-      const DELAY_MS = 500; // 500ms delay between batches
+      const BATCH_SIZE = 10; // Process 10 tokens at a time
+      const DELAY_MS = 800; // 800ms delay between batches
 
       const bestByAddress = new Map<string, DexPair>();
 
@@ -138,7 +139,7 @@ export const usePulseChainTokens = () => {
             await new Promise(resolve => setTimeout(resolve, DELAY_MS));
           }
 
-          const r = await fetch(`${DEXSCREENER_API}/tokens/${batch.join(',')}`);
+          const r = await dexFetch(`${DEXSCREENER_API}/tokens/${batch.join(',')}`);
           if (!r.ok) {
             console.warn(`Batch ${batchIndex + 1} failed: HTTP ${r.status}`);
             continue;
@@ -182,7 +183,7 @@ export const usePulseChainTokens = () => {
               await new Promise(resolve => setTimeout(resolve, 300));
             }
 
-            const rs = await fetch(`${DEXSCREENER_API}/search?q=${addr}`);
+            const rs = await dexFetch(`${DEXSCREENER_API}/search?q=${addr}`);
             if (!rs.ok) continue;
             const ds = await rs.json();
             const found: DexPair[] = (ds.pairs || []).filter((p: DexPair) => 
@@ -220,7 +221,7 @@ export const useSearchToken = (query: string) => {
     queryKey: ['search-token', query],
     queryFn: async () => {
       if (!query || query.length < 2) return [];
-      const response = await fetch(`${DEXSCREENER_API}/search?q=${query}`);
+      const response = await dexFetch(`${DEXSCREENER_API}/search?q=${query}`);
       if (!response.ok) throw new Error('Failed to search tokens');
       const data = await response.json();
       return data.pairs?.filter((pair: DexPair) => pair.chainId === 'pulsechain') || [];
@@ -233,7 +234,7 @@ export const useTokenByAddress = (address: string) => {
   return useQuery({
     queryKey: ['token-address', address],
     queryFn: async () => {
-      const response = await fetch(`${DEXSCREENER_API}/tokens/${address}`);
+      const response = await dexFetch(`${DEXSCREENER_API}/tokens/${address}`);
       if (!response.ok) throw new Error('Failed to fetch token');
       const data = await response.json();
       return data.pairs?.filter((pair: DexPair) => pair.chainId === 'pulsechain') || [];
@@ -246,7 +247,7 @@ export const useLatestPulsechainPairs = () => {
   return useQuery({
     queryKey: ['latest-pulsechain-pairs'],
     queryFn: async () => {
-      const response = await fetch(`${DEXSCREENER_API}/search?q=pulsechain`);
+      const response = await dexFetch(`${DEXSCREENER_API}/search?q=pulsechain`);
       if (!response.ok) throw new Error('Failed to fetch latest pairs');
       const data = await response.json();
       const pairs: DexPair[] = (data.pairs || []).filter((pair: DexPair) => pair.chainId === 'pulsechain');

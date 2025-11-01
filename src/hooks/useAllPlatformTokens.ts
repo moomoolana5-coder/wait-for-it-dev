@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { dexFetch } from '@/lib/dex';
 import { FEATURED_TOKENS } from './useDexScreener';
 
 interface TokenInfo {
@@ -101,7 +102,7 @@ export const useAllPlatformTokens = () => {
             await new Promise(resolve => setTimeout(resolve, DELAY_MS));
           }
 
-          const response = await fetch(`${DEXSCREENER_API}/tokens/${batch.join(',')}`);
+          const response = await dexFetch(`${DEXSCREENER_API}/tokens/${batch.join(',')}`);
           if (!response.ok) {
             console.warn(`Batch ${batchIndex + 1} failed: HTTP ${response.status}`);
             continue;
@@ -140,7 +141,7 @@ export const useAllPlatformTokens = () => {
               await new Promise(resolve => setTimeout(resolve, 300));
             }
 
-            const rs = await fetch(`${DEXSCREENER_API}/search?q=${addr}`);
+            const rs = await dexFetch(`${DEXSCREENER_API}/search?q=${addr}`);
             if (!rs.ok) continue;
             const ds = await rs.json();
             const found: DexPair[] = (ds.pairs || []).filter((p: DexPair) => 

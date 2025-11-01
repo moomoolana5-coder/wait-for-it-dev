@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { DexPair } from './useTickerTokens';
+import { dexFetch } from '@/lib/dex';
 
 const DEXSCREENER_API = 'https://api.dexscreener.com/latest/dex';
 
@@ -15,35 +16,30 @@ export const useStablecoinTicker = () => {
   return useQuery({
     queryKey: ['stablecoin-ticker'],
     queryFn: async () => {
-      const pairsByAddress = new Map<string, DexPair>();
+      const lower = STABLECOIN_ADDRESSES.map((a) => a.toLowerCase());
+      const r = await dexFetch(`${DEXSCREENER_API}/tokens/${lower.join(',')}`);
+      if (!r.ok) return [] as DexPair[];
+      const d = await r.json();
+      const pairs: DexPair[] = (d.pairs || []).filter((p: DexPair) => p.chainId === 'pulsechain');
 
-      // Fetch all stablecoin tokens
-      await Promise.all(STABLECOIN_ADDRESSES.map(async (addr) => {
-        try {
-          const r = await fetch(`${DEXSCREENER_API}/search?q=${addr.toLowerCase()}`);
-          if (!r.ok) return;
-          const d = await r.json();
-          const pairs: DexPair[] = (d.pairs || []).filter((p: DexPair) => p.chainId === 'pulsechain');
-
-          // Find best pair for this address
-          let best: DexPair | null = null;
-          for (const p of pairs) {
-            const base = p.baseToken.address.toLowerCase();
-            if (base !== addr.toLowerCase()) continue;
-            if (!best || (p.liquidity?.usd || 0) > (best.liquidity?.usd || 0)) best = p;
-          }
-          if (best) pairsByAddress.set(best.pairAddress, best);
-        } catch (err) {
-          console.warn(`Failed to fetch stablecoin ${addr}:`, err);
+      // Pick best pair per base token by liquidity
+      const bestByBase = new Map<string, DexPair>();
+      for (const p of pairs) {
+        const base = p.baseToken.address.toLowerCase();
+        if (!lower.includes(base)) continue;
+        const current = bestByBase.get(base);
+        if (!current || (p.liquidity?.usd || 0) > (current.liquidity?.usd || 0)) {
+          bestByBase.set(base, p);
         }
-      }));
+      }
 
-      const uniquePairs = Array.from(pairsByAddress.values());
+      const uniquePairs = Array.from(bestByBase.values());
       console.log(`Stablecoin ticker loaded: ${uniquePairs.length} tokens`);
       return uniquePairs;
     },
-    refetchInterval: 45000,
-    staleTime: 22500,
+    refetchInterval: 120000,
+    staleTime: 60000,
     refetchOnWindowFocus: false,
+    retry: false,
   });
 };

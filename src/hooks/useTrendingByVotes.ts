@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { dexFetch } from '@/lib/dex';
 
 interface TokenInfo {
   imageUrl?: string;
@@ -80,10 +81,10 @@ export const useTrendingByVotes = () => {
 
         try {
           // Try primary endpoint first
-          const response = await fetch(`${DEXSCREENER_API}/tokens/${address}`);
+          const response = await dexFetch(`${DEXSCREENER_API}/tokens/${address}`);
           if (!response.ok) {
             // Try search endpoint as fallback
-            const searchResponse = await fetch(`${DEXSCREENER_API}/search?q=${address}`);
+            const searchResponse = await dexFetch(`${DEXSCREENER_API}/search?q=${address}`);
             if (!searchResponse.ok) {
               return null;
             }

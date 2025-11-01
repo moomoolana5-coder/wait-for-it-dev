@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { dexFetch } from '@/lib/dex';
 
 interface NetworkStat {
   value: number;
@@ -44,7 +45,7 @@ const ANCHOR_TOKENS: string[] = [
 
 const fetchPairsForAddress = async (address: string) => {
   try {
-    const res = await fetch(`${DEXSCREENER_API}/search?q=${address}`);
+    const res = await dexFetch(`${DEXSCREENER_API}/search?q=${address}`);
     if (!res.ok) return [] as any[];
     const data = await res.json();
     return (
