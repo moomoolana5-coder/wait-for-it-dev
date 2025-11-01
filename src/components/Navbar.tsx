@@ -1,4 +1,4 @@
-import { Wallet, Menu } from "lucide-react";
+import { Wallet, Menu, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { Link } from "react-router-dom";
@@ -6,12 +6,14 @@ import gigacockLogo from "@/assets/gigacock-logo.png";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import TokenSearch from "./TokenSearch";
+import { useWalletAdmin } from "@/hooks/useWalletAdmin";
 
 const Navbar = () => {
   const { address, isConnected } = useAccount();
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
   const [isOpen, setIsOpen] = useState(false);
+  const { isAdmin } = useWalletAdmin();
 
   const handleConnect = () => {
     const connector = connectors[0];
@@ -47,6 +49,12 @@ const Navbar = () => {
             <Link to="/token-sale-1" className="text-foreground hover:text-primary transition-colors">
               Token Sale 1
             </Link>
+            {isAdmin && (
+              <Link to="/admin/settings" className="text-primary hover:text-primary/80 transition-colors font-medium flex items-center gap-1">
+                <Shield className="h-4 w-4" />
+                Admin
+              </Link>
+            )}
             <a href="https://forms.google.com" target="_blank" rel="noopener noreferrer" className="text-foreground hover:text-accent transition-colors">
               Listing Form
             </a>
@@ -124,6 +132,16 @@ const Navbar = () => {
                   >
                     Token Sale 1
                   </Link>
+                  {isAdmin && (
+                    <Link 
+                      to="/admin/settings" 
+                      className="text-lg text-primary hover:text-primary/80 transition-colors font-medium flex items-center gap-2"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <Shield className="h-5 w-5" />
+                      Admin Settings
+                    </Link>
+                  )}
                   <a 
                     href="https://forms.google.com"
                     target="_blank"

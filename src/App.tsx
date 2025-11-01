@@ -19,6 +19,7 @@ import MarketDetail from "./pages/MarketDetail";
 import Leaderboard from "./pages/Leaderboard";
 import Earn from "./pages/Earn";
 import Integrations from "./pages/Integrations";
+import AdminSettings from "./pages/AdminSettings";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/earn" element={<Earn />} />
             <Route path="/integrations" element={<Integrations />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

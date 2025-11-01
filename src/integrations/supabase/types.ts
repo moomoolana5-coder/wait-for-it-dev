@@ -14,6 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
+      markets: {
+        Row: {
+          a_stake: number | null
+          b_stake: number | null
+          category: string
+          closes_at: string
+          cover: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          no_stake: number | null
+          opens_at: string | null
+          outcomes: Json
+          pool_usd: number | null
+          resolution_type: string
+          resolves_at: string
+          result: Json | null
+          source: Json
+          status: string
+          title: string
+          trending_score: number | null
+          type: string
+          updated_at: string | null
+          yes_stake: number | null
+        }
+        Insert: {
+          a_stake?: number | null
+          b_stake?: number | null
+          category: string
+          closes_at: string
+          cover?: string | null
+          created_at?: string
+          created_by?: string | null
+          id: string
+          no_stake?: number | null
+          opens_at?: string | null
+          outcomes: Json
+          pool_usd?: number | null
+          resolution_type: string
+          resolves_at: string
+          result?: Json | null
+          source: Json
+          status?: string
+          title: string
+          trending_score?: number | null
+          type: string
+          updated_at?: string | null
+          yes_stake?: number | null
+        }
+        Update: {
+          a_stake?: number | null
+          b_stake?: number | null
+          category?: string
+          closes_at?: string
+          cover?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          no_stake?: number | null
+          opens_at?: string | null
+          outcomes?: Json
+          pool_usd?: number | null
+          resolution_type?: string
+          resolves_at?: string
+          result?: Json | null
+          source?: Json
+          status?: string
+          title?: string
+          trending_score?: number | null
+          type?: string
+          updated_at?: string | null
+          yes_stake?: number | null
+        }
+        Relationships: []
+      }
       new_listing_tokens: {
         Row: {
           created_at: string
@@ -107,6 +182,47 @@ export type Database = {
         }
         Relationships: []
       }
+      trades: {
+        Row: {
+          amount_pts: number
+          id: string
+          market_id: string
+          price: number
+          shares: number
+          side: string
+          ts: string
+          wallet: string
+        }
+        Insert: {
+          amount_pts: number
+          id: string
+          market_id: string
+          price: number
+          shares: number
+          side: string
+          ts?: string
+          wallet: string
+        }
+        Update: {
+          amount_pts?: number
+          id?: string
+          market_id?: string
+          price?: number
+          shares?: number
+          side?: string
+          ts?: string
+          wallet?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trades_market_id_fkey"
+            columns: ["market_id"]
+            isOneToOne: false
+            referencedRelation: "markets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -173,6 +289,27 @@ export type Database = {
         }
         Relationships: []
       }
+      wallet_addresses: {
+        Row: {
+          created_at: string | null
+          id: string
+          user_id: string | null
+          wallet_address: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          user_id?: string | null
+          wallet_address: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          user_id?: string | null
+          wallet_address?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       token_vote_counts: {
@@ -190,6 +327,13 @@ export type Database = {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
+        }
+        Returns: boolean
+      }
+      wallet_has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _wallet_address: string
         }
         Returns: boolean
       }
