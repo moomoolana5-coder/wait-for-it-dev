@@ -87,7 +87,7 @@ const MarketDetail = () => {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search Myriad"
+                placeholder="Search"
                 className="pl-10 bg-background/50 border-border/50"
               />
             </div>
