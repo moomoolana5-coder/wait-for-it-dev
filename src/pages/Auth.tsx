@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useBetaTest } from "@/hooks/useBetaTest";
 import { z } from "zod";
-import projectLogo from "@/assets/project-logo.png";
+import gigaLogo from "@/assets/giga-logo.png";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -56,9 +56,9 @@ const Auth = () => {
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               <img 
-                src={projectLogo} 
+                src={gigaLogo} 
                 alt="GIGACOCK Logo"
-                className="h-16 w-16 rounded-xl shadow-lg shadow-primary/20"
+                className="h-16 w-16"
               />
             </div>
             <CardTitle className="text-3xl bg-gradient-primary bg-clip-text text-transparent">
