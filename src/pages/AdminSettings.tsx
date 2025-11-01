@@ -13,9 +13,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Shield, Plus, Edit, Trash2, Save, X } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Shield, Plus, Edit, Trash2, Save, X, CalendarIcon } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Market, Category } from '@/types/market';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 import dayjs from 'dayjs';
 
 const AdminSettings = () => {
@@ -34,6 +38,7 @@ const AdminSettings = () => {
     cover: '',
     category: 'Crypto' as Category,
     threshold: 0,
+    poolUSD: 10000,
     closesAt: '',
     resolvesAt: '',
     provider: 'DEXSCREENER' as 'DEXSCREENER' | 'COINGECKO',
@@ -63,6 +68,7 @@ const AdminSettings = () => {
       cover: market.cover || '',
       category: market.category,
       threshold: market.source.threshold || 0,
+      poolUSD: market.poolUSD || 10000,
       closesAt: market.closesAt,
       resolvesAt: market.resolvesAt,
       provider: market.source.provider,
@@ -80,6 +86,7 @@ const AdminSettings = () => {
       cover: '',
       category: 'Crypto',
       threshold: 0,
+      poolUSD: 10000,
       closesAt: '',
       resolvesAt: '',
       provider: 'DEXSCREENER',
@@ -133,6 +140,7 @@ const AdminSettings = () => {
           category: formData.category,
           closesAt: formData.closesAt,
           resolvesAt: formData.resolvesAt,
+          poolUSD: formData.poolUSD,
           source: {
             ...editingMarket.source,
             threshold: formData.threshold,
@@ -169,9 +177,9 @@ const AdminSettings = () => {
           closesAt: formData.closesAt,
           resolvesAt: formData.resolvesAt,
           status: 'OPEN',
-          poolUSD: 10000,
-          yesStake: 5000,
-          noStake: 5000,
+          poolUSD: formData.poolUSD,
+          yesStake: formData.poolUSD / 2,
+          noStake: formData.poolUSD / 2,
           trendingScore: 50,
         };
 
@@ -330,19 +338,63 @@ const AdminSettings = () => {
                           </div>
                           <div className="space-y-2">
                             <Label>Closes At</Label>
-                            <Input
-                              type="datetime-local"
-                              value={dayjs(formData.closesAt).format('YYYY-MM-DDTHH:mm')}
-                              onChange={(e) => setFormData({ ...formData, closesAt: new Date(e.target.value).toISOString() })}
-                            />
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  className={cn(
+                                    "w-full justify-start text-left font-normal",
+                                    !formData.closesAt && "text-muted-foreground"
+                                  )}
+                                >
+                                  <CalendarIcon className="mr-2 h-4 w-4" />
+                                  {formData.closesAt ? format(new Date(formData.closesAt), "PPP HH:mm") : "Pick a date"}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                  mode="single"
+                                  selected={formData.closesAt ? new Date(formData.closesAt) : undefined}
+                                  onSelect={(date) => {
+                                    if (date) {
+                                      setFormData({ ...formData, closesAt: date.toISOString() });
+                                    }
+                                  }}
+                                  initialFocus
+                                  className={cn("p-3 pointer-events-auto")}
+                                />
+                              </PopoverContent>
+                            </Popover>
                           </div>
                           <div className="space-y-2">
                             <Label>Resolves At</Label>
-                            <Input
-                              type="datetime-local"
-                              value={dayjs(formData.resolvesAt).format('YYYY-MM-DDTHH:mm')}
-                              onChange={(e) => setFormData({ ...formData, resolvesAt: new Date(e.target.value).toISOString() })}
-                            />
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  className={cn(
+                                    "w-full justify-start text-left font-normal",
+                                    !formData.resolvesAt && "text-muted-foreground"
+                                  )}
+                                >
+                                  <CalendarIcon className="mr-2 h-4 w-4" />
+                                  {formData.resolvesAt ? format(new Date(formData.resolvesAt), "PPP HH:mm") : "Pick a date"}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                  mode="single"
+                                  selected={formData.resolvesAt ? new Date(formData.resolvesAt) : undefined}
+                                  onSelect={(date) => {
+                                    if (date) {
+                                      setFormData({ ...formData, resolvesAt: date.toISOString() });
+                                    }
+                                  }}
+                                  initialFocus
+                                  className={cn("p-3 pointer-events-auto")}
+                                />
+                              </PopoverContent>
+                            </Popover>
                           </div>
                         </div>
                         <div className="flex gap-2">
@@ -490,24 +542,74 @@ const AdminSettings = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Initial Pool (USD)</Label>
-                      <Input disabled value="10,000" />
+                      <Label>Initial Pool (USD) *</Label>
+                      <Input
+                        type="number"
+                        step="1000"
+                        placeholder="10000"
+                        value={formData.poolUSD}
+                        onChange={(e) => setFormData({ ...formData, poolUSD: parseFloat(e.target.value) || 10000 })}
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label>Trading Closes At *</Label>
-                      <Input
-                        type="datetime-local"
-                        value={formData.closesAt ? dayjs(formData.closesAt).format('YYYY-MM-DDTHH:mm') : ''}
-                        onChange={(e) => setFormData({ ...formData, closesAt: new Date(e.target.value).toISOString() })}
-                      />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !formData.closesAt && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {formData.closesAt ? format(new Date(formData.closesAt), "PPP HH:mm") : "Pick a date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={formData.closesAt ? new Date(formData.closesAt) : undefined}
+                            onSelect={(date) => {
+                              if (date) {
+                                setFormData({ ...formData, closesAt: date.toISOString() });
+                              }
+                            }}
+                            initialFocus
+                            className={cn("p-3 pointer-events-auto")}
+                          />
+                        </PopoverContent>
+                      </Popover>
                     </div>
                     <div className="space-y-2">
                       <Label>Market Resolves At *</Label>
-                      <Input
-                        type="datetime-local"
-                        value={formData.resolvesAt ? dayjs(formData.resolvesAt).format('YYYY-MM-DDTHH:mm') : ''}
-                        onChange={(e) => setFormData({ ...formData, resolvesAt: new Date(e.target.value).toISOString() })}
-                      />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !formData.resolvesAt && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {formData.resolvesAt ? format(new Date(formData.resolvesAt), "PPP HH:mm") : "Pick a date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={formData.resolvesAt ? new Date(formData.resolvesAt) : undefined}
+                            onSelect={(date) => {
+                              if (date) {
+                                setFormData({ ...formData, resolvesAt: date.toISOString() });
+                              }
+                            }}
+                            initialFocus
+                            className={cn("p-3 pointer-events-auto")}
+                          />
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </div>
                   <Button onClick={handleSave} className="w-full" disabled={uploadingCover}>
