@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { Market } from '@/types/market';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ChevronLeft, ChevronRight, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTokenLogo } from '@/hooks/useTokenLogo';
 
 type HeroCarouselProps = {
   markets: Market[];
@@ -51,6 +52,12 @@ export const HeroCarousel = ({ markets }: HeroCarouselProps) => {
   const yesPercent = totalStake > 0 ? (yesStake / totalStake) * 100 : 50;
   const noPercent = totalStake > 0 ? (noStake / totalStake) * 100 : 50;
 
+  const { data: tokenLogo } = useTokenLogo(currentMarket.source.provider, {
+    tokenAddress: currentMarket.source.tokenAddress,
+    pairAddress: currentMarket.source.pairAddress,
+    baseId: currentMarket.source.baseId,
+  });
+
   return (
     <div 
       className="relative w-full h-[500px] rounded-2xl overflow-hidden group"
@@ -86,9 +93,17 @@ export const HeroCarousel = ({ markets }: HeroCarouselProps) => {
       <div className="absolute bottom-0 left-0 right-0 p-8 z-10">
         <div className="flex items-end justify-between gap-8">
           <div className="flex items-end gap-4 flex-1">
-            {/* Market Icon */}
-            <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center flex-shrink-0 border-2 border-border/50">
-              <span className="text-3xl">📊</span>
+            {/* Token Logo */}
+            <div className="h-16 w-16 rounded-xl overflow-hidden bg-background/80 backdrop-blur-sm flex items-center justify-center flex-shrink-0 border-2 border-border/50 shadow-xl">
+              {tokenLogo?.logoUrl ? (
+                <img 
+                  src={tokenLogo.logoUrl} 
+                  alt={tokenLogo.tokenSymbol || 'Token'} 
+                  className="h-full w-full object-contain p-2"
+                />
+              ) : (
+                <span className="text-3xl">📊</span>
+              )}
             </div>
 
             {/* Market Info */}
