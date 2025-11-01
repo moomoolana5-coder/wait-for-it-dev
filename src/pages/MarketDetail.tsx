@@ -16,6 +16,8 @@ import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, Search, Share2, Clock } from 'lucide-react';
 import { formatUSD, formatTimeRemaining, formatPoints } from '@/lib/format';
 import { cn } from '@/lib/utils';
+import { useWplsPrice } from '@/hooks/useWplsPrice';
+import { Badge } from '@/components/ui/badge';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -31,6 +33,7 @@ const MarketDetail = () => {
   const tradesStore = useTradesStore();
   const [activeTab, setActiveTab] = useState('activity');
   const [timeRemaining, setTimeRemaining] = useState('');
+  const { priceData, loading: priceLoading } = useWplsPrice();
 
   useEffect(() => {
     if (!initialized) init();
@@ -209,6 +212,39 @@ const MarketDetail = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Current WPLS Price */}
+                {market.source.provider === 'DEXSCREENER' && (
+                  <div className="glass-card border-border/50 rounded-lg p-4 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Current WPLS Price</span>
+                      {market.source.threshold && (
+                        <span className="text-xs text-muted-foreground">
+                          Target: ${market.source.threshold.toFixed(6)}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                      {priceLoading ? (
+                        <div className="h-8 w-32 bg-muted animate-pulse rounded" />
+                      ) : priceData ? (
+                        <>
+                          <span className="text-3xl font-bold">
+                            ${priceData.price.toFixed(6)}
+                          </span>
+                          <Badge 
+                            variant={priceData.priceChange24h >= 0 ? 'default' : 'destructive'}
+                            className="text-xs"
+                          >
+                            {priceData.priceChange24h >= 0 ? '↑' : '↓'} {Math.abs(priceData.priceChange24h).toFixed(2)}%
+                          </Badge>
+                        </>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">Price unavailable</span>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* Price Display */}
                 <div className="flex items-baseline gap-2">
