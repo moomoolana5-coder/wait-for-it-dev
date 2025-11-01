@@ -106,23 +106,30 @@ export const TradeBox = ({ market, defaultSide }: TradeBoxProps) => {
         <ToggleGroup
           type="single"
           value={side}
-          onValueChange={(val) => val && setSide(val as OutcomeKey)}
-          className="grid grid-cols-2 gap-2"
+          onValueChange={(val) => {
+            if (val) setSide(val as OutcomeKey);
+          }}
+          className="grid grid-cols-2 gap-3"
         >
-          {market.outcomes.map((outcome, idx) => (
-            <ToggleGroupItem
-              key={outcome.key}
-              value={outcome.key}
-              className={cn(
-                'h-12 font-semibold data-[state=on]:bg-opacity-20 border-2',
-                idx === 0
-                  ? 'data-[state=on]:bg-primary data-[state=on]:text-primary data-[state=on]:border-primary'
-                  : 'data-[state=on]:bg-secondary data-[state=on]:text-secondary data-[state=on]:border-secondary'
-              )}
-            >
-              {outcome.label}
-            </ToggleGroupItem>
-          ))}
+          {market.outcomes.map((outcome) => {
+            const isYes = outcome.key === 'YES' || outcome.key === 'A';
+            const isSelected = side === outcome.key;
+            
+            return (
+              <ToggleGroupItem
+                key={outcome.key}
+                value={outcome.key}
+                className={cn(
+                  'h-14 font-bold text-base transition-all border-2',
+                  isSelected && isYes && 'bg-primary/20 text-primary border-primary shadow-[0_0_20px_hsl(var(--primary)/0.3)]',
+                  isSelected && !isYes && 'bg-secondary/20 text-secondary border-secondary shadow-[0_0_20px_hsl(var(--secondary)/0.3)]',
+                  !isSelected && 'border-border/50 hover:border-border bg-card/50 hover:bg-card'
+                )}
+              >
+                {outcome.label}
+              </ToggleGroupItem>
+            );
+          })}
         </ToggleGroup>
       </div>
 
