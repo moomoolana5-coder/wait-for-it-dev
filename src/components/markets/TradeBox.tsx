@@ -13,6 +13,7 @@ import { formatPoints, formatPercent, formatUSD, formatDate } from '@/lib/format
 import { useWalletBetaStore } from '@/stores/walletBeta';
 import { useMarketsStore } from '@/stores/markets';
 import { useTradesStore } from '@/stores/trades';
+import { usePositionsStore } from '@/stores/positions';
 import { useBetaTest } from '@/hooks/useBetaTest';
 import { toast } from 'sonner';
 import { TrendingUp, TrendingDown, CheckCircle2, Circle, ChevronDown } from 'lucide-react';
@@ -28,6 +29,7 @@ export const TradeBox = ({ market, defaultSide }: TradeBoxProps) => {
   const { wallet, subtractPoints } = useWalletBetaStore();
   const { updateMarket } = useMarketsStore();
   const { addTrade, getTrades } = useTradesStore();
+  const { upsertPosition, getPosition } = usePositionsStore();
 
   const [side, setSide] = useState<OutcomeKey>(
     defaultSide || market.outcomes[0].key
@@ -87,6 +89,18 @@ export const TradeBox = ({ market, defaultSide }: TradeBoxProps) => {
         price: calc.price,
         shares: calc.shares,
         ts: new Date().toISOString(),
+      });
+
+      // 4. Update or create position
+      const existingPosition = getPosition(market.id, side);
+      await upsertPosition({
+        walletAddress: user.id,
+        marketId: market.id,
+        side,
+        shares: (existingPosition?.shares || 0) + calc.shares,
+        costBasis: (existingPosition?.costBasis || 0) + amountNum,
+        userId: null,
+        claimed: false
       });
 
       toast.success(`Trade executed! Bought ${calc.shares.toFixed(2)} shares of ${side}`, {

@@ -50,6 +50,9 @@ const Navbar = () => {
             <Link to="/giga-markets" className="text-foreground hover:text-primary transition-colors">
               Giga Markets
             </Link>
+            <Link to="/earn" className="text-foreground hover:text-primary transition-colors">
+              Earn
+            </Link>
             {isAdmin && (
               <Link to="/admin/settings" className="text-primary hover:text-primary/80 transition-colors font-medium flex items-center gap-1">
                 <Shield className="h-4 w-4" />
@@ -151,6 +154,13 @@ const Navbar = () => {
                     onClick={() => setIsOpen(false)}
                   >
                     Giga Markets
+                  </Link>
+                  <Link 
+                    to="/earn" 
+                    className="text-lg hover:text-primary transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Earn
                   </Link>
                   {isAdmin && (
                     <Link 
