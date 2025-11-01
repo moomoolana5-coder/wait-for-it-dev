@@ -4,6 +4,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useWalletAdmin } from '@/hooks/useWalletAdmin';
 import { useMarketsStore } from '@/stores/markets';
+import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,6 +25,8 @@ const AdminSettings = () => {
   
   const [editingMarket, setEditingMarket] = useState<Market | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [uploadingCover, setUploadingCover] = useState(false);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -71,6 +74,7 @@ const AdminSettings = () => {
   const handleCancel = () => {
     setEditingMarket(null);
     setIsCreating(false);
+    setCoverFile(null);
     setFormData({
       title: '',
       cover: '',
@@ -84,6 +88,24 @@ const AdminSettings = () => {
     });
   };
 
+  const uploadCoverImage = async (file: File): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('market-covers')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase.storage
+      .from('market-covers')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  };
+
   const handleSave = async () => {
     try {
       if (!formData.title || !formData.closesAt || !formData.resolvesAt) {
@@ -95,11 +117,19 @@ const AdminSettings = () => {
         return;
       }
 
+      setUploadingCover(true);
+      let coverUrl = formData.cover;
+
+      // Upload cover image if file is selected
+      if (coverFile) {
+        coverUrl = await uploadCoverImage(coverFile);
+      }
+
       if (editingMarket) {
         // Update existing market
         await updateMarket(editingMarket.id, {
           title: formData.title,
-          cover: formData.cover,
+          cover: coverUrl,
           category: formData.category,
           closesAt: formData.closesAt,
           resolvesAt: formData.resolvesAt,
@@ -121,7 +151,7 @@ const AdminSettings = () => {
         const newMarket: Market = {
           id: `market-${Date.now()}`,
           title: formData.title,
-          cover: formData.cover,
+          cover: coverUrl,
           category: formData.category,
           type: 'YES_NO',
           outcomes: [
@@ -161,6 +191,8 @@ const AdminSettings = () => {
         description: 'Failed to save market',
         variant: 'destructive',
       });
+    } finally {
+      setUploadingCover(false);
     }
   };
 
@@ -247,11 +279,29 @@ const AdminSettings = () => {
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label>Cover Image URL</Label>
+                            <Label>Cover Image</Label>
                             <Input
-                              value={formData.cover}
-                              onChange={(e) => setFormData({ ...formData, cover: e.target.value })}
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  setCoverFile(file);
+                                  const reader = new FileReader();
+                                  reader.onload = (e) => {
+                                    setFormData({ ...formData, cover: e.target?.result as string });
+                                  };
+                                  reader.readAsDataURL(file);
+                                }
+                              }}
                             />
+                            {formData.cover && (
+                              <img 
+                                src={formData.cover} 
+                                alt="Cover preview" 
+                                className="w-full h-32 object-cover rounded"
+                              />
+                            )}
                           </div>
                           <div className="space-y-2">
                             <Label>Category</Label>
@@ -296,9 +346,9 @@ const AdminSettings = () => {
                           </div>
                         </div>
                         <div className="flex gap-2">
-                          <Button onClick={handleSave}>
+                          <Button onClick={handleSave} disabled={uploadingCover}>
                             <Save className="h-4 w-4 mr-2" />
-                            Save Changes
+                            {uploadingCover ? 'Uploading...' : 'Save Changes'}
                           </Button>
                           <Button variant="outline" onClick={handleCancel}>
                             <X className="h-4 w-4 mr-2" />
@@ -352,12 +402,29 @@ const AdminSettings = () => {
                       />
                     </div>
                     <div className="space-y-2 col-span-2">
-                      <Label>Cover Image URL</Label>
+                      <Label>Cover Image</Label>
                       <Input
-                        placeholder="https://..."
-                        value={formData.cover}
-                        onChange={(e) => setFormData({ ...formData, cover: e.target.value })}
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setCoverFile(file);
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                              setFormData({ ...formData, cover: e.target?.result as string });
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
                       />
+                      {formData.cover && (
+                        <img 
+                          src={formData.cover} 
+                          alt="Cover preview" 
+                          className="w-full h-32 object-cover rounded"
+                        />
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label>Category *</Label>
@@ -443,9 +510,9 @@ const AdminSettings = () => {
                       />
                     </div>
                   </div>
-                  <Button onClick={handleSave} className="w-full">
+                  <Button onClick={handleSave} className="w-full" disabled={uploadingCover}>
                     <Plus className="h-4 w-4 mr-2" />
-                    Create Market
+                    {uploadingCover ? 'Uploading...' : 'Create Market'}
                   </Button>
                 </div>
               </Card>
