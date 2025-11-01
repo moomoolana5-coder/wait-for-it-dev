@@ -1,11 +1,12 @@
 import { Market } from '@/types/market';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatUSD } from '@/lib/format';
 import { Clock, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useTokenLogo } from '@/hooks/useTokenLogo';
 
 type MarketCardProps = {
   market: Market;
@@ -13,6 +14,11 @@ type MarketCardProps = {
 
 export const MarketCard = ({ market }: MarketCardProps) => {
   const navigate = useNavigate();
+  
+  const { data: tokenLogo } = useTokenLogo(market.source.provider, {
+    pairAddress: market.source.pairAddress,
+    baseId: market.source.baseId,
+  });
   
   const yesStake = market.yesStake || 0;
   const noStake = market.noStake || 0;
@@ -36,6 +42,18 @@ export const MarketCard = ({ market }: MarketCardProps) => {
           className="w-full h-full object-cover transition-transform group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/50 to-transparent" />
+        
+        {/* Token Logo Overlay */}
+        {tokenLogo?.logoUrl && (
+          <div className="absolute top-3 left-3">
+            <Avatar className="h-12 w-12 border-2 border-background shadow-lg">
+              <AvatarImage src={tokenLogo.logoUrl} alt={tokenLogo.tokenSymbol || 'Token'} />
+              <AvatarFallback className="bg-muted text-xs">
+                {tokenLogo.tokenSymbol?.slice(0, 2) || '??'}
+              </AvatarFallback>
+            </Avatar>
+          </div>
+        )}
       </div>
 
       {/* Content */}
