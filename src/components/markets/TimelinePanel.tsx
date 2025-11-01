@@ -1,14 +1,17 @@
 import { Market } from '@/types/market';
 import { Card } from '@/components/ui/card';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { formatDate } from '@/lib/format';
-import { CheckCircle2, Circle, Clock } from 'lucide-react';
+import { CheckCircle2, Circle, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useState } from 'react';
 
 type TimelinePanelProps = {
   market: Market;
 };
 
 export const TimelinePanel = ({ market }: TimelinePanelProps) => {
+  const [isOpen, setIsOpen] = useState(true);
   const now = new Date();
   const createdDate = new Date(market.createdAt);
   const closesDate = new Date(market.closesAt);
@@ -18,78 +21,95 @@ export const TimelinePanel = ({ market }: TimelinePanelProps) => {
   const isClosed = now >= closesDate;
   const isResolved = market.status === 'RESOLVED';
 
+  const timelineEvents = [
+    {
+      title: 'Market published',
+      date: formatDate(market.createdAt),
+      time: new Date(market.createdAt).toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: true 
+      }),
+      status: isPublished,
+      icon: CheckCircle2,
+      color: 'text-primary'
+    },
+    {
+      title: 'Market closes',
+      date: formatDate(market.closesAt),
+      time: new Date(market.closesAt).toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: true 
+      }),
+      status: isClosed,
+      icon: isClosed ? CheckCircle2 : Circle,
+      color: isClosed ? 'text-yellow-500' : 'text-muted-foreground',
+      note: isClosed ? 'Only when an outcome is reached.' : null
+    },
+    {
+      title: 'Resolution',
+      date: formatDate(market.resolvesAt),
+      time: new Date(market.resolvesAt).toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: true 
+      }),
+      status: isResolved,
+      icon: isResolved ? CheckCircle2 : Circle,
+      color: isResolved ? 'text-primary' : 'text-muted-foreground',
+      note: 'The outcome will be validated by the team within 24 hours of its occurrence.'
+    }
+  ];
+
   return (
-    <Card className="glass-card border-border/50 p-6 space-y-4">
-      <h3 className="text-lg font-semibold">Timeline</h3>
-
-      <div className="space-y-6">
-        {/* Published */}
-        <div className="flex gap-4">
-          <div className="flex flex-col items-center">
-            <div className={cn(
-              "rounded-full p-1",
-              isPublished ? "bg-primary/20" : "bg-muted"
-            )}>
-              {isPublished ? (
-                <CheckCircle2 className="h-5 w-5 text-primary" />
-              ) : (
-                <Circle className="h-5 w-5 text-muted-foreground" />
-              )}
-            </div>
-            {!isResolved && <div className="w-px h-12 bg-border mt-2" />}
-          </div>
-          <div className="flex-1 pb-2">
-            <p className="font-medium">Market published</p>
-            <p className="text-sm text-muted-foreground">{formatDate(market.createdAt)}</p>
-          </div>
-        </div>
-
-        {/* Closes */}
-        <div className="flex gap-4">
-          <div className="flex flex-col items-center">
-            <div className={cn(
-              "rounded-full p-1",
-              isClosed ? "bg-yellow-500/20" : "bg-muted"
-            )}>
-              {isClosed ? (
-                <CheckCircle2 className="h-5 w-5 text-yellow-500" />
-              ) : (
-                <Clock className="h-5 w-5 text-muted-foreground" />
-              )}
-            </div>
-            {!isResolved && <div className="w-px h-12 bg-border mt-2" />}
-          </div>
-          <div className="flex-1 pb-2">
-            <p className="font-medium">Market closes</p>
-            <p className="text-sm text-muted-foreground">{formatDate(market.closesAt)}</p>
-          </div>
-        </div>
-
-        {/* Resolution */}
-        <div className="flex gap-4">
-          <div className="flex flex-col items-center">
-            <div className={cn(
-              "rounded-full p-1",
-              isResolved ? "bg-blue-500/20" : "bg-muted"
-            )}>
-              {isResolved ? (
-                <CheckCircle2 className="h-5 w-5 text-blue-500" />
-              ) : (
-                <Circle className="h-5 w-5 text-muted-foreground" />
-              )}
-            </div>
-          </div>
-          <div className="flex-1">
-            <p className="font-medium">Resolution</p>
-            <p className="text-sm text-muted-foreground">{formatDate(market.resolvesAt)}</p>
-            {isResolved && market.resolution && (
-              <p className="text-sm text-primary font-medium mt-1">
-                Winner: {market.resolution.winner}
-              </p>
+    <Card className="glass-card border-border/50 overflow-hidden">
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CollapsibleTrigger className="w-full p-4 flex items-center justify-between hover:bg-accent/50 transition-colors">
+          <h3 className="text-lg font-semibold">Timeline</h3>
+          <ChevronDown 
+            className={cn(
+              "h-5 w-5 transition-transform",
+              isOpen && "transform rotate-180"
             )}
+          />
+        </CollapsibleTrigger>
+
+        <CollapsibleContent>
+          <div className="border-t border-border/50">
+            <table className="w-full">
+              <tbody>
+                {timelineEvents.map((event, index) => (
+                  <tr 
+                    key={index}
+                    className={cn(
+                      "border-b border-border/30 last:border-0",
+                      event.status && "bg-accent/20"
+                    )}
+                  >
+                    <td className="p-4">
+                      <div className="flex items-start gap-3">
+                        <event.icon className={cn("h-5 w-5 mt-0.5 flex-shrink-0", event.color)} />
+                        <div className="flex-1 space-y-1">
+                          <p className="font-medium text-sm">{event.title}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {event.date}, {event.time} GMT+7
+                          </p>
+                          {event.note && (
+                            <p className="text-xs text-muted-foreground italic mt-1">
+                              {event.note}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </div>
-      </div>
+        </CollapsibleContent>
+      </Collapsible>
     </Card>
   );
 };
