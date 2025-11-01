@@ -63,16 +63,8 @@ const GigaMarkets = () => {
             {/* Wallet Info */}
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <p className="text-xs text-muted-foreground">Limbo 🎲</p>
-                <p className="text-sm font-bold">12,5k pts</p>
-              </div>
-              <div className="text-right">
                 <p className="text-xs text-muted-foreground">Points</p>
                 <p className="text-sm font-bold">{formatPoints(walletStore.wallet.points)}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-xs text-muted-foreground">USDC</p>
-                <p className="text-sm font-bold">$0</p>
               </div>
               <Button 
                 size="sm" 
