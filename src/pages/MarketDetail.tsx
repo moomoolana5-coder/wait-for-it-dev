@@ -16,6 +16,7 @@ import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, Search, Share2, Clock } from 'lucide-react';
 import { formatUSD, formatTimeRemaining, formatPoints } from '@/lib/format';
 import { cn } from '@/lib/utils';
+import { useTokenLogo } from '@/hooks/useTokenLogo';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -52,6 +53,15 @@ const MarketDetail = () => {
   }, [id, incrementTrending]);
 
   const market = id ? getMarket(id) : undefined;
+
+  const { data: tokenLogo } = useTokenLogo(
+    market?.source.provider || 'DEXSCREENER',
+    {
+      tokenAddress: market?.source.tokenAddress,
+      pairAddress: market?.source.pairAddress,
+      baseId: market?.source.baseId,
+    }
+  );
 
   // Update countdown every second
   useEffect(() => {
@@ -185,8 +195,16 @@ const MarketDetail = () => {
               {/* Market Header */}
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
-                  <div className="h-16 w-16 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl">📈</span>
+                  <div className="h-16 w-16 rounded-lg overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center flex-shrink-0 border border-border/50">
+                    {tokenLogo?.logoUrl ? (
+                      <img 
+                        src={tokenLogo.logoUrl} 
+                        alt={tokenLogo.tokenSymbol || 'Token'} 
+                        className="h-full w-full object-contain p-2"
+                      />
+                    ) : (
+                      <span className="text-2xl">📈</span>
+                    )}
                   </div>
                   <div className="flex-1">
                     <h1 className="text-2xl md:text-3xl font-bold mb-2">{market.title}</h1>
@@ -197,7 +215,7 @@ const MarketDetail = () => {
                       <Separator orientation="vertical" className="h-4" />
                       <span className={cn(
                         "flex items-center gap-1 font-medium",
-                        market.status === 'CLOSED' ? "text-yellow-500" : 
+                        market.status === 'CLOSED' ? "text-yellow-500" :
                         timeRemaining.includes('Closed') ? "text-red-500" :
                         timeRemaining.includes('s') && !timeRemaining.includes('m') && !timeRemaining.includes('h') ? "text-red-500 animate-pulse" :
                         timeRemaining.includes('m') && parseInt(timeRemaining.split('m')[0].split(' ').pop() || '0') < 5 ? "text-orange-500" :
